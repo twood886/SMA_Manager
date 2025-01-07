@@ -1,4 +1,3 @@
-# Object Definition ------------------------------------------------------------
 #' @title Portfolio (S4 Object)
 #' @description S4 Class representing a portfolio object
 #' @slot id Account Id
@@ -6,6 +5,7 @@
 #' @slot short_name Portfolio Short Name
 #' @slot enfusion_url Enfusion Web URL to Consolidated Position Listing Report
 #' @slot positions List of Positions
+#' @include position.R
 setClass(
   "portfolio",
   representation(
@@ -15,19 +15,7 @@ setClass(
     nav = "numeric",
     enfusion_url = "character",
     positions_current = "list",
-    positions_target = "list"
+    positions_target = "list",
+    linked_smas = "character"
   )
 )
-
-# Object Creator ---------------------------------------------------------------
-create_portfio <- function(
-  id, long_name, short_name, nav, enfusion_url
-) {
-  new("portfolio",
-    id = id,
-    long_name = long_name,
-    short_name = short_name,
-    nav = nav,
-    enfusion_url = enfusion_url
-  )
-}

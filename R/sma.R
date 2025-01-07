@@ -4,11 +4,12 @@
 #' @slot long_name SMA Long Name
 #' @slot short_name SMA Short Name
 #' @slot positions List of Positions
+#' @include portfolio.R
 setClass(
-  "portfolio",
+  "sma",
   contains = "portfolio",
   representation(
     portfolio_target = "character",
-    sma_rules = ""
+    sma_rules = "list"
   )
 )
