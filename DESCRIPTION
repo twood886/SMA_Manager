@@ -1,4 +1,4 @@
-Package: SMA_MANAGER
+Package: SMAManager
 Type: Package
 Title: SMA Manager
 Version: 0.1.0
@@ -10,12 +10,24 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2.9000
 Collate: 
+    'SMAManager-package.R'
     'security.R'
     'position.R'
     'portfolio.R'
-    'create_portfolio.R'
+    'get_tickers.R'
+    'add_security_data.R'
+    'scale_position.R'
+    'sma.R'
+    'get_nav.R'
+    'create_idea_sma.R'
     'create_position.R'
+    'create_portfolio.R'
     'get_yahoo_history.R'
     'create_security.R'
-    'sma.R'
+    'create_sma_rule.R'
+    'get_position.R'
+    'get_position_shares.R'
+    'get_position_weight.R'
+    'get_security.R'
+    'registry.R'
     'sma_rule.R'

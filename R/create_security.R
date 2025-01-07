@@ -9,7 +9,7 @@
 #' @importFrom dplyr slice
 #' @importFrom dplyr row_number
 #' @importFrom dplyr pull
-create_security <- function(ticker, adv_days = 30) {
+create_security_old <- function(ticker, adv_days = 30) {
   yahoo_data <- get_yahoo_history(ticker) #nolint
 
   if (yahoo_data$match) {
@@ -37,4 +37,23 @@ create_security <- function(ticker, adv_days = 30) {
     volume = yahoo_data$data$volume,
     adj_close = yahoo_data$data$adj_close
   )
+}
+
+#' @title Create Security (R6 Object)
+#' @description
+#' Function to create an R6 Security Object
+#' @param ticker Security Ticker
+#' @include security.R
+#' @export
+create_security <- function(ticker = NULL) {
+  if (is.null(ticker)) {
+    stop("Ticker must be supplied")
+  }
+  # Check if the ticker already exists in the registry
+  if (exists(ticker, envir = .security_registry, inherits = FALSE)) {
+    stop("Security already exists")
+  }
+  # Create new security
+  sec <- SecurityR6$new(ticker = ticker)
+  assign(ticker, sec, envir = .security_registry)
 }

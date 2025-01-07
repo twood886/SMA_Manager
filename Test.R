@@ -1,6 +1,23 @@
-# Load Libraries
-#source(file.path("R", "obj", "security.R"))
-#source(file.path("R", "obj", "position.R"))
-#source(file.path("R", "obj", "portfolio.R"))
-#source(file.path("R", "obj", "sma.R"))
-#source(file.path("R", "obj", "sma_rule.R"))
+library(enfusion)
+library(SMAManager)
+
+ccmf_url <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=shared%2FDaily+Reports+Callodine%2FConsolidated+Position+Listing.ppr" #nolint
+
+ccmf <- create_portfolio_from_consolodated_position_report(
+  "ccmf",
+  "Callodine Capital Master Fund",
+  "CCMF",
+  ccmf_url
+)
+
+
+test <- get_yahoo_history("AAPL")
+AAPL <- SecurityR6$new(ticker = "AAPL")
+
+AAPL <- create_security("AAPL")
+MSFT <- create_security("MSFT")
+
+
+.security_registry <- new.env(parent = emptyenv())
+
+1+1

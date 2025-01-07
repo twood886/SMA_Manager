@@ -16,6 +16,6 @@ Parent Class for SMA Rules
 
 \item{\code{rule_scope}}{Rule Scope (Agg/SMA)}
 
-\item{\code{rule_type}}{Rule Type}
+\item{\code{rule_desc}}{Rule Type}
 }}
 
