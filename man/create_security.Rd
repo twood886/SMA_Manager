@@ -2,12 +2,15 @@
 % Please edit documentation in R/create_security.R
 \name{create_security}
 \alias{create_security}
-\title{Create Security (R6 Object)}
+\title{Create Security}
 \usage{
 create_security(ticker = NULL)
 }
 \arguments{
 \item{ticker}{Security Ticker}
+}
+\value{
+A \code{Security} object.
 }
 \description{
 Function to create an R6 Security Object

@@ -1,42 +1,18 @@
-#' @title Security (S4 Object)
-#' @description An S4 Class to represent a security
-#' @slot ticker Security Ticker
-#' @slot yahoo_match Boolean if found on yahoo finance
-#' @slot long_name Security Long Name
-#' @slot short_name Security Short Name
-#' @slot adv Average Daily Volume
-#' @slot dates Dates corresponding to data
-#' @slot open Open Prices
-#' @slot close Close Prices
-#' @slot low Low Prices
-#' @slot high High Prices
-#' @slot volume Trading Volume
-#' @slot adj_close Adjusted Close Price
-setClass(
-  "security",
-  representation(
-    ticker = "character",
-    yahoo_match = "logical",
-    long_name = "character",
-    short_name = "character",
-    adv = "numeric",
-    dates = "Date",
-    open = "numeric",
-    close = "numeric",
-    low = "numeric",
-    high = "numeric",
-    volume = "numeric",
-    adj_close = "numeric"
-  )
-)
-
-
+# nolint start
 #' @title Security (R6 Object)
-#' @docType class
 #' @description
 #' A security where data comes from yahoo finance
-#' @import R6
-SecurityR6 <- R6::R6Class("SecurityR6",
+#'
+#' @name Security
+#' @rdname Security
+#' @docType class
+#'
+#' @importFrom R6 R6Class
+#' @include get_yahoo_history.R
+#' @export
+Security <- R6::R6Class(
+  # nolint end
+  "Security",
   public = list(
     #' @field ticker Security Ticker
     ticker = NULL,
@@ -46,8 +22,6 @@ SecurityR6 <- R6::R6Class("SecurityR6",
     long_name = NULL,
     #' @field short_name Security Short Name
     short_name = NULL,
-    #' @field adv Average Daily Volume
-    adv = NULL,
     #' @field dates Dates corresponding to data
     dates = NULL,
     #' @field open Open Prices
@@ -63,10 +37,11 @@ SecurityR6 <- R6::R6Class("SecurityR6",
     #' @field adj_close Adjusted Close Price
     adj_close = NULL,
 
-    #' @description
-    #' Create New SecurityR6 object
+    # Initialize Security object -----------------------------------------------
+    #' @description Create New Security R6 object
+    #'
     #' @param ticker Security Ticker
-    #' @return A new `SecurityR6` object.
+    #' @return A new \code{Security} object.
     initialize = function(ticker) {
       yahoo_data <- get_yahoo_history(ticker)
       self$ticker <- ticker
@@ -80,6 +55,29 @@ SecurityR6 <- R6::R6Class("SecurityR6",
       self$high <- yahoo_data$data$high
       self$volume <- yahoo_data$data$volume
       self$adj_close <- yahoo_data$data$adj_close
+    },
+
+    # Compute Average Daily Volume ---------------------------------------------
+    #' @description Computes the average daily volume for the specified number
+    #'  of trailing days.
+    #'
+    #' @param adv_days Integer. The number of days to consider.
+    #' @return A numeric value representing the average daily volume.
+    #'
+    #' @details
+    #' This method is added onto the \code{Security} R6 class dynamically.
+    #'
+    #' @examples
+    #' \dontrun{
+    #'   sec <- Security$new("AAPL")
+    #'   sec$get_adv(30)
+    #' }
+    get_adv = function(adv_days = 30) {
+      dates_all <- self$dates
+      valid_dates <- dates_all[dates_all < Sys.Date()]
+      volume_subset <- self$volume[match(valid_dates, sort(valid_dates))]
+      len_volume <- length(volume_subset)
+      mean(volume_subset[(len_volume - adv_days + 1):len_volume])
     }
   )
 )

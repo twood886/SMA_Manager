@@ -2,9 +2,12 @@
 % Please edit documentation in R/get_or_create_security.R
 \name{get_or_create_security}
 \alias{get_or_create_security}
-\title{Get or Create Security (R6 Object)}
+\title{Get or Create Security}
 \usage{
 get_or_create_security(ticker = NULL)
+}
+\value{
+A \code{Security} object.
 }
 \description{
 Function to get or create R6 Security Object.

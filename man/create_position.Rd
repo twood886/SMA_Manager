@@ -17,9 +17,9 @@ create_position(
 )
 }
 \arguments{
-\item{ticker}{Ticker}
+\item{ticker}{Security Ticker}
 
-\item{desc}{Description}
+\item{desc}{Security Description}
 
 \item{stock_qty}{Stock Quantity}
 
@@ -35,6 +35,9 @@ create_position(
 
 \item{delta_pct_nav}{Delta Percent of NAV}
 }
+\value{
+A \code{Position} object.
+}
 \description{
-Create Position
+Create an R6 Position object
 }

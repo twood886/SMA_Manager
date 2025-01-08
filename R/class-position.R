@@ -1,30 +1,10 @@
-#' @title Position (S4 Object)
-#' @description An S4 Class to represent a portoflio position
-#' @include security.R
-setClass(
-  "position",
-  representation(
-    ticker = "character",
-    desc = "character",
-    stock_qty = "numeric",
-    delta_qty = "numeric",
-    total_qty = "numeric",
-    mkt_val = "numeric",
-    delta_val = "numeric",
-    stock_pct_nav = "numeric",
-    delta_pct_nav = "numeric",
-    adv_days = "numeric",
-    security = "security"
-  )
-)
-
 #' @title Position (R6 Object)
-#' @docType class
 #' @description
 #' A position
 #' @import R6
 #' @include get_or_create_security.R
-PositionR6 <- R6::R6Class("PoisitionR6",
+Position <- R6::R6Class(  #nolint
+  "PoisitionR6",
   public = list(
     #' @field ticker Security Ticker
     ticker = NULL,
@@ -59,7 +39,10 @@ PositionR6 <- R6::R6Class("PoisitionR6",
     #' @param stock_pct_nav Stock Percent of NAV
     #' @param delta_pct_nav Delta PErcent of NAV
     initialize = function(
-      ticker, desc, stock_qty, delta_qty, stock_pct_nav, delta_pct_nav
+      ticker, desc,
+      stock_qty, delta_qty, total_qty,
+      mkt_val, delta_val,
+      stock_pct_nav, delta_pct_nav
     ) {
       self$ticker <- ticker
       self$desc <- desc

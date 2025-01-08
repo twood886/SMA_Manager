@@ -1,7 +1,14 @@
-library(enfusion)
 library(SMAManager)
 
+
+1+1
+
+
 ccmf_url <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=shared%2FDaily+Reports+Callodine%2FConsolidated+Position+Listing.ppr" #nolint
+
+ccmf <- SMAManager::create_portfolio("Callodine Capital Master Fund", "ccmf", ccmf_url)
+?SMAManager::Security
+
 
 ccmf <- create_portfolio_from_consolodated_position_report(
   "ccmf",
@@ -11,13 +18,10 @@ ccmf <- create_portfolio_from_consolodated_position_report(
 )
 
 
-
-AAPL <- create_security("AAPL")
-test <- get_security("AAPL")
-
-MSFT <- create_security("MSFT")
+AAPL <- SMAManager::create_security("AAPL")
 
 
-.security_registry <- new.env(parent = emptyenv())
-
-1+1
+dates_all <- AAPL$dates
+dates <- dates_all[which(dates_all < Sys.Date())]
+volume <- AAPL$volume
+volume[match(dates, sort(dates))]

@@ -2,7 +2,7 @@
 #' @description
 #' Function to get R6 Security Object from envir
 #' @param ticker Security Ticker
-#' @include security.R
+#' @include class-security.R
 #' @export
 get_security <- function(ticker = NULL) {
   if (is.null(ticker)) {

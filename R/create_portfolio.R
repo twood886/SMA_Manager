@@ -1,68 +1,26 @@
 #' @title Create Portfolio
-#' @param id Id
-#' @param long_name Long Name
-#' @param short_name Short Name
-#' @param NAV NAV
-#' @param enfusion_url enfusion url
-#' @include portfolio.R
-create_portfio <- function(
-  id, long_name, short_name, nav, enfusion_url
-) {
-  new("portfolio",
-    id = id,
-    long_name = long_name,
-    short_name = short_name,
-    nav = nav,
-    enfusion_url = enfusion_url
-  )
-}
-
-#' @title Create Portfolio from Consoldated Position Report
-#' @description Function to create a Portfolio S4 object from an enfusion
-#'  Consolodated Positions Report.
-#'  Specific to the Consolodated Positions Report.
+#' @description
+#' Function to create an R6 Portfolio Object
 #' @param long_name Portfolio Long Name
 #' @param short_name Portfolio Short Name
-#' @param enfusion_url Enfusion WebServiceURL to Consolodated Positions Report
-#' @returns portfolio S4 object
-#' @import enfusion
-#' @importFrom dplyr filter
-#' @include create_position.R
-#' @include portfolio.R
+#' @param enfusion_url Enfusion Web URL to
+#'  Consolidated Position Listing Report
+#' @include class-portfolio.R
+#' @return A \code{Portfolio} object.
 #' @export
-create_portfolio_from_consolodated_position_report <- function( #nolint
-  id, long_name, short_name, enfusion_url
-) {
-  enfusion_rep <- dplyr::filter(
-    enfusion::get_enfusion_report(enfusion_url),
-    !is.na(`Description`)
-  )
-  nav <- as.numeric(enfusion_rep$`$ GL NAV`[[1]])
-  positions <- apply(
-    enfusion_rep,
-    1,
-    \(x) {
-      create_position(
-        as.character(x["Ticker"]),
-        as.character(x["Description"]),
-        as.numeric(x["Stock Quantity"]),
-        as.numeric(x["Delta Quantity"]),
-        as.numeric(x["Total Quantity"]),
-        as.numeric(x["Market value"]),
-        as.numeric(x["Delta Value"]),
-        as.numeric(x["Stock % NAV"]),
-        as.numeric(x["Delta % NAV"])
-      )
-    }
-  )
-  names(positions) <- as.character(enfusion_rep$Ticker)
-  new("portfolio",
-    id = id,
+create_portfolio <- function(long_name, short_name = NULL, enfusion_url) {
+  if (is.null(short_name)) {
+    stop("Portfolio Short Name must be supplied")
+  }
+  # Check if the portfolio already exists in the registry
+  if (exists(short_name, envir = .portfolio_registry, inherits = FALSE)) {
+    stop("Portfolio already exists")
+  }
+  # Create new portfolio
+  port <- Portfolio$new(
     long_name = long_name,
     short_name = short_name,
-    nav = nav,
-    enfusion_url = enfusion_url,
-    positions_current = positions,
-    positions_target = positions
+    enfusion_url = enfusion_url
   )
+  assign(short_name, port, envir = .portfolio_registry)
 }
