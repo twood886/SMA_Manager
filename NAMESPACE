@@ -2,6 +2,8 @@
 
 export(create_portfolio_from_consolodated_position_report)
 export(create_security)
+export(get_or_create_security)
+export(get_security)
 import(R6)
 import(enfusion)
 import(magrittr)

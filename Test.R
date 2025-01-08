@@ -11,10 +11,10 @@ ccmf <- create_portfolio_from_consolodated_position_report(
 )
 
 
-test <- get_yahoo_history("AAPL")
-AAPL <- SecurityR6$new(ticker = "AAPL")
 
 AAPL <- create_security("AAPL")
+test <- get_security("AAPL")
+
 MSFT <- create_security("MSFT")
 
 

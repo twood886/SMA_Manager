@@ -1,3 +1,9 @@
+#' @title Get Security (R6 Object)
+#' @description
+#' Function to get R6 Security Object from envir
+#' @param ticker Security Ticker
+#' @include security.R
+#' @export
 get_security <- function(ticker = NULL) {
   if (is.null(ticker)) {
     stop("Ticker must be supplied")
