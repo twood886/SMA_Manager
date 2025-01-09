@@ -19,6 +19,7 @@ Collate:
     'class-position.R'
     'create_position.R'
     'class-portfolio.R'
+    'class-sma.R'
     'create_portfolio.R'
     'get_portfolio.R'
     'registry.R'

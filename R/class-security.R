@@ -22,20 +22,18 @@ Security <- R6::R6Class(
     long_name = NULL,
     #' @field short_name Security Short Name
     short_name = NULL,
-    #' @field dates Dates corresponding to data
-    dates = NULL,
-    #' @field open Open Prices
-    open = NULL,
-    #' @field close Close Prices
-    close = NULL,
-    #' @field low Low Prices
-    low = NULL,
-    #' @field high High Prices
-    high = NULL,
-    #' @field volume Trading Volume
-    volume = NULL,
-    #' @field adj_close Adjusted Close Price
-    adj_close = NULL,
+    #' @field ts_data Time Series Data List
+    ts_data = list(
+      dates = NULL,
+      open = NULL,
+      close = NULL,
+      low = NULL,
+      high = NULL,
+      volume = NULL,
+      adj_close = NULL
+    ),
+    #' @field data Non-Time Series Data List
+    data = list(NULL),
 
     # Initialize Security object -----------------------------------------------
     #' @description Create New Security R6 object
@@ -48,13 +46,30 @@ Security <- R6::R6Class(
       self$yahoo_match <- yahoo_data$yahoo_match
       self$long_name <- yahoo_data$long_name
       self$short_name <- yahoo_data$short_name
-      self$dates <- yahoo_data$data$date
-      self$open <- yahoo_data$data$open
-      self$close <- yahoo_data$data$close
-      self$low <- yahoo_data$data$low
-      self$high <- yahoo_data$data$high
-      self$volume <- yahoo_data$data$volume
-      self$adj_close <- yahoo_data$data$adj_close
+      self$ts_data$dates <- yahoo_data$data$date
+      self$ts_data$open <- yahoo_data$data$open
+      self$ts_data$close <- yahoo_data$data$close
+      self$ts_data$low <- yahoo_data$data$low
+      self$ts_data$high <- yahoo_data$data$high
+      self$ts_data$volume <- yahoo_data$data$volume
+      self$ts_data$adj_close <- yahoo_data$data$adj_close
+    },
+
+    # Get TS Data Item ---------------------------------------------------------
+    #' @description Gets an item from the ts_data list field.
+    #'
+    #' @param item String. Item in ts_data list.
+    #' @return An array of ts_data with dates as name.
+    get_ts_data_item = function(item = NULL) {
+      if (is.null(item)) {
+        stop("Item must be specified")
+      }
+      if (!item %in% names(self$ts_data)) {
+        stop("Item not in ts_data")
+      }
+      ts <- self$ts_data[[item]]
+      names(ts) <- self$ts_data$dates
+      return(ts)
     },
 
     # Compute Average Daily Volume ---------------------------------------------
@@ -73,9 +88,11 @@ Security <- R6::R6Class(
     #'   sec$get_adv(30)
     #' }
     get_adv = function(adv_days = 30) {
-      dates_all <- self$dates
+      dates_all <- self$ts_data$dates
       valid_dates <- dates_all[dates_all < Sys.Date()]
-      volume_subset <- self$volume[match(valid_dates, sort(valid_dates))]
+      volume_subset <- self$ts_data$volume[
+        match(valid_dates, sort(valid_dates))
+      ]
       len_volume <- length(volume_subset)
       mean(volume_subset[(len_volume - adv_days + 1):len_volume])
     }

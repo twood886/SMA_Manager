@@ -29,19 +29,9 @@ A security where data comes from yahoo finance
 
 \item{\code{short_name}}{Security Short Name}
 
-\item{\code{dates}}{Dates corresponding to data}
+\item{\code{ts_data}}{Time Series Data List}
 
-\item{\code{open}}{Open Prices}
-
-\item{\code{close}}{Close Prices}
-
-\item{\code{low}}{Low Prices}
-
-\item{\code{high}}{High Prices}
-
-\item{\code{volume}}{Trading Volume}
-
-\item{\code{adj_close}}{Adjusted Close Price}
+\item{\code{data}}{Non-Time Series Data List}
 }
 \if{html}{\out{</div>}}
 }
@@ -49,6 +39,7 @@ A security where data comes from yahoo finance
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Security-new}{\code{Security$new()}}
+\item \href{#method-Security-get_ts_data_item}{\code{Security$get_ts_data_item()}}
 \item \href{#method-Security-get_adv}{\code{Security$get_adv()}}
 \item \href{#method-Security-clone}{\code{Security$clone()}}
 }
@@ -71,6 +62,26 @@ Create New Security R6 object
 }
 \subsection{Returns}{
 A new \code{Security} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_ts_data_item"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_ts_data_item}{}}}
+\subsection{Method \code{get_ts_data_item()}}{
+Gets an item from the ts_data list field.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_ts_data_item(item = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{item}}{String. Item in ts_data list.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An array of ts_data with dates as name.
 }
 }
 \if{html}{\out{<hr>}}

@@ -31,10 +31,10 @@ SMA <- R6::R6Class(
     sma_rules = NULL,
 
 
-    initialize = function(
-      long_name, short_name, enfusion_url, target_portfolio
-    ) {
-      
-    }
+    #initialize = function(
+    #  long_name, short_name, enfusion_url, target_portfolio
+    #) {
+    #  
+    #}
   )
 )
