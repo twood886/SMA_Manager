@@ -4,20 +4,21 @@
 \alias{Position}
 \title{Position (R6 Object)}
 \description{
-A position
+R6 Class representing a position object.
+A position object contains information about the size of the
+ position (in relation to a portfolio or SMA object) as well as
+ underlying security R6 object.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{ticker}}{Security Ticker}
+\item{\code{portfolio_short_name}}{Portfolio Short Name}
 
-\item{\code{desc}}{Security Description}
+\item{\code{id}}{Security Ticker}
 
-\item{\code{stock_qty}}{Stock Quantity}
+\item{\code{qty}}{Stock Quantity}
 
 \item{\code{delta_qty}}{Delta Quantity}
-
-\item{\code{total_qty}}{Total Quantity}
 
 \item{\code{mkt_val}}{Market Value}
 
@@ -34,41 +35,45 @@ A position
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-PoisitionR6-new}{\code{Position$new()}}
-\item \href{#method-PoisitionR6-clone}{\code{Position$clone()}}
+\item \href{#method-Position-new}{\code{Position$new()}}
+\item \href{#method-Position-get_id}{\code{Position$get_id()}}
+\item \href{#method-Position-get_security}{\code{Position$get_security()}}
+\item \href{#method-Position-get_qty}{\code{Position$get_qty()}}
+\item \href{#method-Position-set_qty}{\code{Position$set_qty()}}
+\item \href{#method-Position-calc_stock_pct_nav}{\code{Position$calc_stock_pct_nav()}}
+\item \href{#method-Position-calc_delta_pct_nav}{\code{Position$calc_delta_pct_nav()}}
+\item \href{#method-Position-clone}{\code{Position$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PoisitionR6-new"></a>}}
-\if{latex}{\out{\hypertarget{method-PoisitionR6-new}{}}}
+\if{html}{\out{<a id="method-Position-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-new}{}}}
 \subsection{Method \code{new()}}{
 Create New PositionR6 object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Position$new(
-  ticker,
-  desc,
-  stock_qty,
+  portfolio_short_name,
+  id,
+  qty,
   delta_qty,
-  total_qty,
   mkt_val,
   delta_val,
   stock_pct_nav,
-  delta_pct_nav
+  delta_pct_nav,
+  sec
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ticker}}{Security Ticker}
+\item{\code{portfolio_short_name}}{Portfolio_Short_name}
 
-\item{\code{desc}}{Security Description}
+\item{\code{id}}{Security Ticker}
 
-\item{\code{stock_qty}}{Stock Quantity}
+\item{\code{qty}}{Stock Quantity}
 
 \item{\code{delta_qty}}{Delta Quantity}
-
-\item{\code{total_qty}}{Total Quantity}
 
 \item{\code{mkt_val}}{Market Value}
 
@@ -77,13 +82,96 @@ Create New PositionR6 object
 \item{\code{stock_pct_nav}}{Stock Percent of NAV}
 
 \item{\code{delta_pct_nav}}{Delta PErcent of NAV}
+
+\item{\code{sec}}{Security}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PoisitionR6-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-PoisitionR6-clone}{}}}
+\if{html}{\out{<a id="method-Position-get_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_id}{}}}
+\subsection{Method \code{get_id()}}{
+Get position ticker
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_id()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-get_security"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_security}{}}}
+\subsection{Method \code{get_security()}}{
+Get position security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_security()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-get_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_qty}{}}}
+\subsection{Method \code{get_qty()}}{
+Get position Quantity
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_qty()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-set_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-set_qty}{}}}
+\subsection{Method \code{set_qty()}}{
+Set Qty
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$set_qty(new_qty)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_qty}}{todo}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-calc_stock_pct_nav"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-calc_stock_pct_nav}{}}}
+\subsection{Method \code{calc_stock_pct_nav()}}{
+Calc stock_pct_nav
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$calc_stock_pct_nav(nav = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nav}}{Portfolio NAV}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-calc_delta_pct_nav"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-calc_delta_pct_nav}{}}}
+\subsection{Method \code{calc_delta_pct_nav()}}{
+Calc delta_pct_nav
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$calc_delta_pct_nav(nav = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nav}}{Portfolio NAV}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

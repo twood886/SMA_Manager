@@ -3,44 +3,17 @@
 \docType{class}
 \name{Security}
 \alias{Security}
-\title{Security (R6 Object)}
+\title{Security (R6 Class)}
 \description{
-A security where data comes from yahoo finance
-}
-\examples{
-
-## ------------------------------------------------
-## Method `Security$get_adv`
-## ------------------------------------------------
-
-\dontrun{
-  sec <- Security$new("AAPL")
-  sec$get_adv(30)
-}
-}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{ticker}}{Security Ticker}
-
-\item{\code{yahoo_match}}{Boolean if ticker was found on yahoo finance}
-
-\item{\code{long_name}}{Security Long Name}
-
-\item{\code{short_name}}{Security Short Name}
-
-\item{\code{ts_data}}{Time Series Data List}
-
-\item{\code{data}}{Non-Time Series Data List}
-}
-\if{html}{\out{</div>}}
+R6 class for a security with time-series and non-time-series data.
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Security-new}{\code{Security$new()}}
+\item \href{#method-Security-set_data_item}{\code{Security$set_data_item()}}
+\item \href{#method-Security-get_data_item}{\code{Security$get_data_item()}}
 \item \href{#method-Security-get_ts_data_item}{\code{Security$get_ts_data_item()}}
-\item \href{#method-Security-get_adv}{\code{Security$get_adv()}}
 \item \href{#method-Security-clone}{\code{Security$clone()}}
 }
 }
@@ -48,27 +21,62 @@ A security where data comes from yahoo finance
 \if{html}{\out{<a id="method-Security-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-new}{}}}
 \subsection{Method \code{new()}}{
-Create New Security R6 object
+Create new Security R6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$new(ticker)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Security$new(id = NULL, ts_data = NULL, data = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ticker}}{Security Ticker}
+\item{\code{id}}{Character string. Security identifier (e.g., "AAPL").}
+
+\item{\code{ts_data}}{Named list of time-series data (like volume, prices).}
+
+\item{\code{data}}{Named list of non-time-series data.}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-A new \code{Security} object.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-set_data_item"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-set_data_item}{}}}
+\subsection{Method \code{set_data_item()}}{
+Add or overwrite an item in \code{data}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$set_data_item(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Named values to store in \code{data} list.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_data_item"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_data_item}{}}}
+\subsection{Method \code{get_data_item()}}{
+Get an items from \code{data} as a named value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_data_item(item = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{item}}{String name of the list item in \code{data}}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-get_ts_data_item"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-get_ts_data_item}{}}}
 \subsection{Method \code{get_ts_data_item()}}{
-Gets an item from the ts_data list field.
+Get an item from \code{ts_data} as a named vector.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Security$get_ts_data_item(item = NULL)}\if{html}{\out{</div>}}
 }
@@ -76,49 +84,10 @@ Gets an item from the ts_data list field.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{item}}{String. Item in ts_data list.}
+\item{\code{item}}{String name of the time-series vector in \code{ts_data}.}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-An array of ts_data with dates as name.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Security-get_adv"></a>}}
-\if{latex}{\out{\hypertarget{method-Security-get_adv}{}}}
-\subsection{Method \code{get_adv()}}{
-Computes the average daily volume for the specified number
- of trailing days.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$get_adv(adv_days = 30)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{adv_days}}{Integer. The number of days to consider.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is added onto the \code{Security} R6 class dynamically.
-}
-
-\subsection{Returns}{
-A numeric value representing the average daily volume.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-  sec <- Security$new("AAPL")
-  sec$get_adv(30)
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-clone"></a>}}

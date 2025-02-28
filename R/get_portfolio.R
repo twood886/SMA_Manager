@@ -9,8 +9,8 @@ get_portfolio <- function(short_name = NULL) {
     stop("Portfolio short name must be supplied")
   }
   # Check if the portfolio already exists in the registry
-  if (exists(short_name, envir = .portfolio_registry, inherits = FALSE)) {
-    get(short_name, envir = .portfolio_registry, inherits = FALSE)
+  if (!exists(short_name, envir = .portfolio_registry, inherits = FALSE)) {
+    stop("Specified portfolio has not been created")
   }
-  return(NULL)
+  get(short_name, envir = .portfolio_registry, inherits = FALSE)
 }

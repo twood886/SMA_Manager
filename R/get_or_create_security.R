@@ -1,4 +1,4 @@
-#' @title Get or Create Security
+#' @title get or Create Security
 #' @description
 #' Function to get or create R6 Security Object.
 #' If security already exists, return object.
@@ -8,14 +8,16 @@
 #' @include create_security.R
 #' @return A \code{Security} object.
 #' @export
-get_or_create_security <- function(ticker = NULL) {
-  if (is.null(ticker)) {
-    stop("Ticker must be supplied")
+get_or_create_security <- function(id = NULL, ...) {
+  if (is.null(id)) {
+    stop("id must be supplied")
   }
-  if (exists(ticker, envir = .security_registry, inherits = FALSE)) {
-    get(ticker, envir = .security_registry, inherits = FALSE)
+  id <- tolower(id)
+  if (exists(id, envir = .security_registry, inherits = FALSE)) {
+    sec <- get_security(id)
   } else {
-    sec <- Security$new(ticker = ticker)
-    assign(ticker, sec, envir = .security_registry)
+    sec <- create_security(id = id, ...)
+    assign(id, sec, envir = .security_registry)
   }
+  return(sec)
 }

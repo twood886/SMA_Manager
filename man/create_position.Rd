@@ -5,11 +5,10 @@
 \title{Create Position}
 \usage{
 create_position(
-  ticker,
-  desc,
-  stock_qty,
+  portfolio_short_name,
+  id,
+  qty,
   delta_qty,
-  total_qty,
   mkt_val,
   delta_val,
   stock_pct_nav,
@@ -17,15 +16,13 @@ create_position(
 )
 }
 \arguments{
-\item{ticker}{Security Ticker}
+\item{portfolio_short_name}{Portfolio Short Name the security belongs to}
 
-\item{desc}{Security Description}
+\item{id}{Security Ticker}
 
-\item{stock_qty}{Stock Quantity}
+\item{qty}{Quantity}
 
 \item{delta_qty}{Delta Quantity}
-
-\item{total_qty}{Total Quantity}
 
 \item{mkt_val}{Market Value}
 
@@ -34,6 +31,8 @@ create_position(
 \item{stock_pct_nav}{Stock Percent of NAV}
 
 \item{delta_pct_nav}{Delta Percent of NAV}
+
+\item{desc}{Security Description}
 }
 \value{
 A \code{Position} object.

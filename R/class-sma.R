@@ -1,4 +1,3 @@
-# nolint start
 #' @title SMA (R6 Object)
 #'
 #' @description R6 Class representing a seperately managed account.
@@ -8,33 +7,84 @@
 #' @import R6
 #' @import enfusion
 #' @include create_position.R
-SMA <- R6::R6Class(
-  #nolint end
+#' @include class-portfolio.R
+#' @include get_portfolio.R
+#'
+SMA <- R6::R6Class(   #nolint
   "SMA",
+  inherit = Portfolio,
   public = list(
-    #' @field id SMA Id
-    id = NULL,
-    #' @field long_name SMA Long Name
-    long_name = NULL,
-    #' @field short_name SMA Short Name
-    short_name = NULL,
-    #' @field nav SMA NAV
-    nav = NULL,
-    #' @field enfusion_url Enfusion Web URL to
-    #'  Consolidated Position Listing Report
-    enfusion_url = NULL,
-    #' @field positions List of Positions
-    positions = NULL,
-    #' @field target_portfolio Target Portfolio
-    target_portfolio = NULL,
-    #' @field sma_rules SMA Rules
-    sma_rules = NULL,
+
+    #' @description
+    #' Create a new SMA R6 object.
+    #' @param long_name Character. SMA Long Name.
+    #' @param short_name Character. SMA Short Name.
+    #' @param nav Numeric. SMA Net Asset Value.
+    #' @param target_portfolio An object representing the target portfolio.
+    #' @param positions Optional. SMA Positions. Default is NULL.
+    #' @return A new instance of the SMA class.
+    initialize = function(
+      long_name, short_name, nav, target_portfolio = NULL, positions = NULL
+    ) {
+      private$id_ <- length(ls(envir = .sma_registry)) + 1
+      private$long_name_ <- long_name
+      private$short_name_ <- short_name
+      private$nav_ <- nav
+      private$target_portfolio_ <- target_portfolio
+      private$positions_ <- positions
+      private$target_positions_ <- NULL
+      private$sma_rules_ <- list()
+    },
+
+    #' Add SMA Rule
+    #' @description Create SMA Rule and Add to SMA
+    #' @param rule_name Character representing identifing name of rule
+    #' @param rule_scope Character representing the scope of the rule
+    #' @param rule_formula formula representing the rule
+    add_rule = function(rule_name, rule_scope, rule_formula) {
+      if (is.null(rule_name)) {
+        stop("rule_name must be supplied")
+      }
+      if (is.null(rule_scope)) {
+        stop("rule_scope must be supplied")
+      }
+      if (is.null(rule_formula) || class(rule_formula) != "function") {
+        stop("rule_formula must be supplied")
+      }
+      rule <- new(
+        "sma_rule",
+        sma_id = self$id,
+        rule_name = rule_name,
+        rule_scope = rule_scope,
+        rule_formula = rule_formula
+      )
+      private$sma_rules_[[rule_name]] <- rule
+      invisible(self)
+    },
+
+    #' Add Replacement
+    #' @description Add replacement securitit
+    #' @param original_security The original Security id
+    #' @param replacement_security The replacement Security id
+    add_replacement = function(
+      original_security = NULL, replacement_security = NULL
+    ) {
+      if (is.null(original_security) | is.null(replacment_security)) {
+        stop("Securities must be provided")
+      }
+      invisible(self)
+    },
+
+    
 
 
-    #initialize = function(
-    #  long_name, short_name, enfusion_url, target_portfolio
-    #) {
-    #  
-    #}
+
+
+
+  ),
+  private = list(
+    target_portfolio_ = NULL,
+    sma_rules_ = list(),
+    replacements_ = list()
   )
 )

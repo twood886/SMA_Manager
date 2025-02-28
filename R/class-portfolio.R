@@ -8,56 +8,86 @@
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
   public = list(
-    #' @field id Portfolio Id
-    id = NULL,
-    #' @field long_name Portfolio Long Name
-    long_name = NULL,
-    #' @field short_name Portfolio Short Name
-    short_name = NULL,
-    #' @field nav Portfolio NAV
-    nav = NULL,
-    #' @field enfusion_url Enfusion Web URL to
-    #'  Consolidated Position Listing Report
-    enfusion_url = NULL,
-    #' @field positions List of Positions
-    positions = NULL,
-
     #' @description
-    #' Create New PortfolioR6 object
+    #' Create New Portfolio R6 object
+    #' @param id Portfolio id
     #' @param long_name Portfolio Long Name
     #' @param short_name Portfolio Short Name
-    #' @param enfusion_url Enfusion URL
+    #' @param nav NAV of portfolio
+    #' @param positions list of position items
     initialize = function(
-      long_name, short_name, enfusion_url
+      long_name, short_name, nav, positions
     ) {
-      self$id <- length(ls(envir = .portfolio_registry)) + 1
-      self$long_name <- long_name
-      self$short_name <- short_name
-      # Download Enfusion Report
-      enfusion_rep <- dplyr::filter(
-        enfusion::get_enfusion_report(enfusion_url),
-        !is.na(`Description`)
-      )
-      self$nav <- as.numeric(enfusion_rep$`$ GL NAV`[[1]])
-      # Create Positions
-      positions <- apply(
-        enfusion_rep,
-        1,
-        \(x) {
-          create_position(
-            ticker = as.character(x["Ticker"]),
-            desc = as.character(x["Description"]),
-            stock_qty = as.numeric(x["Stock Quantity"]),
-            delta_qty = as.numeric(x["Delta Quantity"]),
-            total_qty = as.numeric(x["Total Quantity"]),
-            mkt_val = as.numeric(x["Market value"]),
-            delta_val = as.numeric(x["Delta Value"]),
-            stock_pct_nav = as.numeric(x["Stock % NAV"]),
-            delta_pct_nav = as.numeric(x["Delta % NAV"])
-          )
-        }
-      )
-      self$positions <- positions
+      private$id_ <- length(ls(envir = .portfolio_registry)) + 1
+      private$long_name_ <- long_name
+      private$short_name_ <- short_name
+      private$nav_ <- nav
+      private$positions_ <- positions
+      private$target_positions_ <- positions
+    },
+
+    #' @description Print
+    print = function() {
+      long_col_width <- max(15, nchar(private$long_name_) + 2)
+      short_col_width <- max(12, nchar(private$short_name_) + 2)
+      nav_col_width <- 16
+      nav_formatted <- formatC(private$nav_, format = "f", big.mark = ",", digits = 0) #nolint
+
+      # Print the headers with dynamic spacing
+      cat(sprintf(
+        "%-*s %-*s %-*s\n",
+        long_col_width, "Long Name",
+        short_col_width, "Short Name",
+        nav_col_width, "NAV ($)"
+      ))
+      cat(strrep("-", long_col_width + short_col_width + nav_col_width + 2), "\n") #nolint
+
+      # Print the values with aligned formatting
+      cat(sprintf(
+        "%-*s %-*s %-*s\n",
+        long_col_width, private$long_name_,
+        short_col_width, private$short_name_,
+        nav_col_width, nav_formatted
+      ))
+    },
+
+    # Getter Functions ---------------------------------------------------------
+    #' @description Get Fund NAV
+    get_nav = function() private$nav_,
+
+    #' @description
+    #' Get list of positions in portfolio
+    #' @param id Ticker
+    get_position = function(id = NULL) {
+      positions <- private$positions_
+      if (is.null(id)) {
+        return(positions)
+      }
+      position_ids <- sapply(positions, \(x) x$get_id())
+      if (!id %in% position_ids) {
+        stop("No position in portfolio with id")
+      }
+      return(positions[[which(position_ids == id)]])
+    }
+  ),
+
+  private = list(
+    id_ = NULL,
+    long_name_ = NULL,
+    short_name_ = NULL,
+    nav_ = NULL,
+    positions_ = NULL,
+    target_positions_ = NULL,
+
+
+    get_position_df_ = function(id = NULL) {
+      positions <- private$positions_
+      if (is.null(id)) {
+        data.frame()
+
+
+
+      }
     }
   )
 )

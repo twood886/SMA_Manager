@@ -11,7 +11,6 @@ LazyData: true
 RoxygenNote: 7.3.2.9000
 Collate: 
     'SMAManager-package.R'
-    'get_yahoo_history.R'
     'class-security.R'
     'create_security.R'
     'get_security.R'
@@ -19,7 +18,12 @@ Collate:
     'class-position.R'
     'create_position.R'
     'class-portfolio.R'
-    'class-sma.R'
-    'create_portfolio.R'
     'get_portfolio.R'
-    'registry.R'
+    'class-sma.R'
+    'class-smarule.R'
+    'class-smaruleposition.R'
+    'combine_portfolios.R'
+    'create_portfolio.R'
+    'create_scaled_position.R'
+    'create_sma.R'
+    'zzz.R'

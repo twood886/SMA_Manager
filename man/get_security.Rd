@@ -4,10 +4,10 @@
 \alias{get_security}
 \title{Get Security (R6 Object)}
 \usage{
-get_security(ticker = NULL)
+get_security(id = NULL)
 }
 \arguments{
-\item{ticker}{Security Ticker}
+\item{id}{Security Ticker}
 }
 \description{
 Function to get R6 Security Object from envir

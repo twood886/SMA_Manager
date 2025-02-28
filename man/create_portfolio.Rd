@@ -4,19 +4,17 @@
 \alias{create_portfolio}
 \title{Create Portfolio}
 \usage{
-create_portfolio(long_name, short_name = NULL, enfusion_url)
+create_portfolio(long_name, short_name = NULL, nav = NULL, positions = NULL)
 }
 \arguments{
-\item{long_name}{Portfolio Long Name}
+\item{long_name}{portofolio long name}
 
-\item{short_name}{Portfolio Short Name}
+\item{short_name}{portfolio short name}
 
-\item{enfusion_url}{Enfusion Web URL to
-Consolidated Position Listing Report}
-}
-\value{
-A \code{Portfolio} object.
+\item{nav}{Portfolio NAV}
+
+\item{positions}{List of positions}
 }
 \description{
-Function to create an R6 Portfolio Object
+Create an R6 Portfolio object
 }

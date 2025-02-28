@@ -4,10 +4,24 @@
 \alias{create_security}
 \title{Create Security}
 \usage{
-create_security(ticker = NULL)
+create_security(
+  id = NULL,
+  description = NULL,
+  instrument_type = NULL,
+  occ_code = NULL,
+  ...
+)
 }
 \arguments{
-\item{ticker}{Security Ticker}
+\item{id}{Security Ticker}
+
+\item{description}{Security Description}
+
+\item{instrument_type}{security instrument type}
+
+\item{occ_code}{security occ_code}
+
+\item{...}{Additional data}
 }
 \value{
 A \code{Security} object.

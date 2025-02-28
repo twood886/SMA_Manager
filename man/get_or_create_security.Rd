@@ -2,9 +2,9 @@
 % Please edit documentation in R/get_or_create_security.R
 \name{get_or_create_security}
 \alias{get_or_create_security}
-\title{Get or Create Security}
+\title{get or Create Security}
 \usage{
-get_or_create_security(ticker = NULL)
+get_or_create_security(id = NULL, ...)
 }
 \value{
 A \code{Security} object.
