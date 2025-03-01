@@ -77,17 +77,6 @@ Portfolio <- R6::R6Class( #nolint
     short_name_ = NULL,
     nav_ = NULL,
     positions_ = NULL,
-    target_positions_ = NULL,
-
-
-    get_position_df_ = function(id = NULL) {
-      positions <- private$positions_
-      if (is.null(id)) {
-        data.frame()
-
-
-
-      }
-    }
+    target_positions_ = NULL
   )
 )

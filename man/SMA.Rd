@@ -17,6 +17,9 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-add_rule}{\code{SMA$add_rule()}}
 \item \href{#method-SMA-add_replacement}{\code{SMA$add_replacement()}}
+\item \href{#method-SMA-get_target_portfolio}{\code{SMA$get_target_portfolio()}}
+\item \href{#method-SMA-get_target_portfolio_position}{\code{SMA$get_target_portfolio_position()}}
+\item \href{#method-SMA-compare_weight_current}{\code{SMA$compare_weight_current()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -84,7 +87,7 @@ Add Replacement}
 \if{html}{\out{<a id="method-SMA-add_replacement"></a>}}
 \if{latex}{\out{\hypertarget{method-SMA-add_replacement}{}}}
 \subsection{Method \code{add_replacement()}}{
-Add replacement securitit
+Add replacement securitity
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMA$add_replacement(original_security = NULL, replacement_security = NULL)}\if{html}{\out{</div>}}
 }
@@ -94,7 +97,55 @@ Add replacement securitit
 \describe{
 \item{\code{original_security}}{The original Security id}
 
-\item{\code{replacement_security}}{The replacement Security id}
+\item{\code{replacement_security}}{The replacement Security id
+Get Target Portfolio}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_target_portfolio"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_target_portfolio}{}}}
+\subsection{Method \code{get_target_portfolio()}}{
+Get the tagret portfolio
+Get Target Portfolio Position
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_target_portfolio_position"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_target_portfolio_position}{}}}
+\subsection{Method \code{get_target_portfolio_position()}}{
+Get a position in the target portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio_position()}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID
+Compare Weights to Target Portfolio}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-compare_weight_current"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-compare_weight_current}{}}}
+\subsection{Method \code{compare_weight_current()}}{
+Compare the current weight in the sma
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$compare_weight_current(security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID
+to the current weight in the target portfolio}
 }
 \if{html}{\out{</div>}}
 }
