@@ -9,29 +9,6 @@ A position object contains information about the size of the
  position (in relation to a portfolio or SMA object) as well as
  underlying security R6 object.
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{portfolio_short_name}}{Portfolio Short Name}
-
-\item{\code{id}}{Security Ticker}
-
-\item{\code{qty}}{Stock Quantity}
-
-\item{\code{delta_qty}}{Delta Quantity}
-
-\item{\code{mkt_val}}{Market Value}
-
-\item{\code{delta_val}}{Delta Value}
-
-\item{\code{stock_pct_nav}}{Stock Percent of NAV}
-
-\item{\code{delta_pct_nav}}{Delta PErcent of NAV}
-
-\item{\code{security}}{SecurityR6 Objct}
-}
-\if{html}{\out{</div>}}
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -39,7 +16,18 @@ A position object contains information about the size of the
 \item \href{#method-Position-get_id}{\code{Position$get_id()}}
 \item \href{#method-Position-get_security}{\code{Position$get_security()}}
 \item \href{#method-Position-get_qty}{\code{Position$get_qty()}}
+\item \href{#method-Position-get_delta_qty}{\code{Position$get_delta_qty()}}
+\item \href{#method-Position-get_mkt_val}{\code{Position$get_mkt_val()}}
+\item \href{#method-Position-get_delta_val}{\code{Position$get_delta_val()}}
 \item \href{#method-Position-set_qty}{\code{Position$set_qty()}}
+\item \href{#method-Position-set_delta_qty}{\code{Position$set_delta_qty()}}
+\item \href{#method-Position-set_mkt_val}{\code{Position$set_mkt_val()}}
+\item \href{#method-Position-set_delta_val}{\code{Position$set_delta_val()}}
+\item \href{#method-Position-set_stock_pct_nav}{\code{Position$set_stock_pct_nav()}}
+\item \href{#method-Position-set_delta_pct_nav}{\code{Position$set_delta_pct_nav()}}
+\item \href{#method-Position-calc_delta_qty}{\code{Position$calc_delta_qty()}}
+\item \href{#method-Position-calc_mkt_val}{\code{Position$calc_mkt_val()}}
+\item \href{#method-Position-calc_delta_val}{\code{Position$calc_delta_val()}}
 \item \href{#method-Position-calc_stock_pct_nav}{\code{Position$calc_stock_pct_nav()}}
 \item \href{#method-Position-calc_delta_pct_nav}{\code{Position$calc_delta_pct_nav()}}
 \item \href{#method-Position-clone}{\code{Position$clone()}}
@@ -51,17 +39,7 @@ A position object contains information about the size of the
 \subsection{Method \code{new()}}{
 Create New PositionR6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Position$new(
-  portfolio_short_name,
-  id,
-  qty,
-  delta_qty,
-  mkt_val,
-  delta_val,
-  stock_pct_nav,
-  delta_pct_nav,
-  sec
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Position$new(portfolio_short_name, id, qty, sec)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -72,16 +50,6 @@ Create New PositionR6 object
 \item{\code{id}}{Security Ticker}
 
 \item{\code{qty}}{Stock Quantity}
-
-\item{\code{delta_qty}}{Delta Quantity}
-
-\item{\code{mkt_val}}{Market Value}
-
-\item{\code{delta_val}}{Delta Value}
-
-\item{\code{stock_pct_nav}}{Stock Percent of NAV}
-
-\item{\code{delta_pct_nav}}{Delta PErcent of NAV}
 
 \item{\code{sec}}{Security}
 }
@@ -119,6 +87,36 @@ Get position Quantity
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-get_delta_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_delta_qty}{}}}
+\subsection{Method \code{get_delta_qty()}}{
+Get position Delta Quantity
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_delta_qty()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-get_mkt_val"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_mkt_val}{}}}
+\subsection{Method \code{get_mkt_val()}}{
+Get position Market Value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_mkt_val()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-get_delta_val"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_delta_val}{}}}
+\subsection{Method \code{get_delta_val()}}{
+Get position Delta Value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_delta_val()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Position-set_qty"></a>}}
 \if{latex}{\out{\hypertarget{method-Position-set_qty}{}}}
 \subsection{Method \code{set_qty()}}{
@@ -130,10 +128,125 @@ Set Qty
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{new_qty}}{todo}
+\item{\code{new_qty}}{New Quantity}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-set_delta_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-set_delta_qty}{}}}
+\subsection{Method \code{set_delta_qty()}}{
+Set Delta Qty
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$set_delta_qty(new_delta_qty)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_delta_qty}}{New Delta Quantity}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-set_mkt_val"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-set_mkt_val}{}}}
+\subsection{Method \code{set_mkt_val()}}{
+Set Market Value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$set_mkt_val(new_mkt_val)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_mkt_val}}{New Market Value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-set_delta_val"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-set_delta_val}{}}}
+\subsection{Method \code{set_delta_val()}}{
+Set Delta Value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$set_delta_val(new_delta_val)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_delta_val}}{New Delta Value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-set_stock_pct_nav"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-set_stock_pct_nav}{}}}
+\subsection{Method \code{set_stock_pct_nav()}}{
+Set Stock Percent of NAV
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$set_stock_pct_nav(new_stock_pct_nav)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_stock_pct_nav}}{New Stock Percent of NAV}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-set_delta_pct_nav"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-set_delta_pct_nav}{}}}
+\subsection{Method \code{set_delta_pct_nav()}}{
+Set Delta Percent of NAV
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$set_delta_pct_nav(new_delta_pct_nav)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_delta_pct_nav}}{New Delta Percent of NAV}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-calc_delta_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-calc_delta_qty}{}}}
+\subsection{Method \code{calc_delta_qty()}}{
+Calc delta_qty
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$calc_delta_qty()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-calc_mkt_val"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-calc_mkt_val}{}}}
+\subsection{Method \code{calc_mkt_val()}}{
+Calc mkt_val
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$calc_mkt_val()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-calc_delta_val"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-calc_delta_val}{}}}
+\subsection{Method \code{calc_delta_val()}}{
+Calc delta_val
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$calc_delta_val()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Position-calc_stock_pct_nav"></a>}}

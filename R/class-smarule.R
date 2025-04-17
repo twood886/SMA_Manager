@@ -78,7 +78,6 @@ SMARule <- R6::R6Class( #nolint
     get_threshold = function() {
       return(private$threshold_)
     }
-
   ),
   private = list(
     sma_name_ = NULL,

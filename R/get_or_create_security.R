@@ -8,7 +8,7 @@
 #' @include create_security.R
 #' @return A \code{Security} object.
 #' @export
-get_or_create_security <- function(id = NULL, ...) {
+get_or_create_security <- function(id = NULL) {
   if (is.null(id)) {
     stop("id must be supplied")
   }
@@ -16,7 +16,7 @@ get_or_create_security <- function(id = NULL, ...) {
   if (exists(id, envir = .security_registry, inherits = FALSE)) {
     sec <- get_security(id)
   } else {
-    sec <- create_security(id = id, ...)
+    sec <- create_security(id)
     assign(id, sec, envir = .security_registry)
   }
   return(sec)

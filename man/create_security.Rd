@@ -4,28 +4,14 @@
 \alias{create_security}
 \title{Create Security}
 \usage{
-create_security(
-  id = NULL,
-  description = NULL,
-  instrument_type = NULL,
-  occ_code = NULL,
-  ...
-)
+create_security(bbid = NULL)
 }
 \arguments{
-\item{id}{Security Ticker}
-
-\item{description}{Security Description}
-
-\item{instrument_type}{security instrument type}
-
-\item{occ_code}{security occ_code}
-
-\item{...}{Additional data}
+\item{bbid}{Bloomberg Id}
 }
 \value{
 A \code{Security} object.
 }
 \description{
-Function to create an R6 Security Object
+Function to create an R6 Security Object from Bloomberg id
 }

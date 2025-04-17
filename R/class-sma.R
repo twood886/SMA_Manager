@@ -32,7 +32,7 @@ SMA <- R6::R6Class(   #nolint
       private$nav_ <- nav
       private$target_portfolio_ <- target_portfolio
       private$positions_ <- positions
-      private$target_positions_ <- NULL
+      private$target_positions_ <- positions
       private$sma_rules_ <- list()
     },
 
@@ -77,7 +77,7 @@ SMA <- R6::R6Class(   #nolint
 
     #' Get Target Portfolio
     #' @description Get the tagret portfolio
-    get_target_portfolio = function(){
+    get_target_portfolio = function() {
       get_portfolio(private$target_portfolio_)
     },
 

@@ -4,7 +4,7 @@
 \alias{get_or_create_security}
 \title{get or Create Security}
 \usage{
-get_or_create_security(id = NULL, ...)
+get_or_create_security(id = NULL)
 }
 \value{
 A \code{Security} object.

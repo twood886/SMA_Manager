@@ -4,16 +4,7 @@
 \alias{create_position}
 \title{Create Position}
 \usage{
-create_position(
-  portfolio_short_name,
-  id,
-  qty,
-  delta_qty,
-  mkt_val,
-  delta_val,
-  stock_pct_nav,
-  delta_pct_nav
-)
+create_position(portfolio_short_name, id, qty)
 }
 \arguments{
 \item{portfolio_short_name}{Portfolio Short Name the security belongs to}
@@ -21,16 +12,6 @@ create_position(
 \item{id}{Security Ticker}
 
 \item{qty}{Quantity}
-
-\item{delta_qty}{Delta Quantity}
-
-\item{mkt_val}{Market Value}
-
-\item{delta_val}{Delta Value}
-
-\item{stock_pct_nav}{Stock Percent of NAV}
-
-\item{delta_pct_nav}{Delta Percent of NAV}
 
 \item{desc}{Security Description}
 }

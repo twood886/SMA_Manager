@@ -26,4 +26,5 @@ Collate:
     'create_portfolio.R'
     'create_scaled_position.R'
     'create_sma.R'
+    'rebalance_sma.R'
     'zzz.R'
