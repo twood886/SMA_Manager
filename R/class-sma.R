@@ -75,17 +75,16 @@ SMA <- R6::R6Class(   #nolint
       invisible(self)
     },
 
+    # Getters ------------------------------------------------------------------
     #' Get Target Portfolio
     #' @description Get the tagret portfolio
-    get_target_portfolio = function() {
-      get_portfolio(private$target_portfolio_)
-    },
+    get_target_portfolio = function() private$target_portfolio_,
 
     #' Get Target Portfolio Position
     #' @description Get a position in the target portfolio
     #' @param security_id Security ID
-    get_target_portfolio_position = function() {
-      get_portfolio(private$target_portfolio_)$get_position(security_id)
+    get_target_portfolio_position = function(security_id = NULL) {
+      self$get_targert_portfolio()$get_position(security_id)
     },
 
     #' Compare Weights to Target Portfolio
@@ -94,6 +93,15 @@ SMA <- R6::R6Class(   #nolint
     #' to the current weight in the target portfolio
     compare_weight_current = function(security_id = NULL) {
       self$get_position(security_id)
+    },
+
+    #' @description Get the SMA Rules
+    #' @return A list of SMA rules
+    get_sma_rules = function() {
+      if (length(private$sma_rules_) == 0) {
+        stop("No SMA rules defined")
+      }
+      return(private$sma_rules_)
     }
 
   ),

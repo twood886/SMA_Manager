@@ -3,6 +3,7 @@
 #' @description R6 Class that encapsulates rule for SMAs
 #'
 #' @import R6
+#' @include class-smarule.R
 #'
 #' @export
 SMARulePosition <- R6::R6Class( #nolint

@@ -17,6 +17,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-add_rule}{\code{SMA$add_rule()}}
 \item \href{#method-SMA-add_replacement}{\code{SMA$add_replacement()}}
+\item \href{#method-SMA-get_target_portfolio_id}{\code{SMA$get_target_portfolio_id()}}
 \item \href{#method-SMA-get_target_portfolio}{\code{SMA$get_target_portfolio()}}
 \item \href{#method-SMA-get_target_portfolio_position}{\code{SMA$get_target_portfolio_position()}}
 \item \href{#method-SMA-compare_weight_current}{\code{SMA$compare_weight_current()}}
@@ -98,10 +99,21 @@ Add replacement securitity
 \item{\code{original_security}}{The original Security id}
 
 \item{\code{replacement_security}}{The replacement Security id
-Get Target Portfolio}
+Get Target Portfolio ID}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_target_portfolio_id"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_target_portfolio_id}{}}}
+\subsection{Method \code{get_target_portfolio_id()}}{
+Get the target portfolio ID
+Get Target Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio_id()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-get_target_portfolio"></a>}}

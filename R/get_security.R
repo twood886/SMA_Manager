@@ -10,7 +10,8 @@ get_security <- function(id = NULL) {
   }
   id <- tolower(id)
   # Check if the ticker already exists in the registry
-  if (exists(id, envir = .security_registry, inherits = FALSE)) {
-    get(id, envir = .security_registry, inherits = FALSE)
+  if (!exists(id, envir = .security_registry, inherits = FALSE)) {
+    stop("Security not found")
   }
+  get(id, envir = .security_registry, inherits = FALSE)
 }

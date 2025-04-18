@@ -24,4 +24,5 @@ create_security <- function(bbid = NULL) {
   sec <- Security$new(id = id)
   # Assign security object to the registry
   assign(id, sec, envir = .security_registry)
+  get(id, envir = .security_registry, inherits = FALSE)
 }

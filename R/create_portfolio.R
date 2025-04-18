@@ -43,7 +43,7 @@ create_portfolio_from_enfusion <- function(long_name, short_name = NULL, enfusio
   # Download the enfusion report
   enfusion_rep <- dplyr::filter(
     enfusion::get_enfusion_report(enfusion_url),
-    !is.na(`Description`)
+    !is.na(`Description`) #nolint
   )
   # get the portfolio NAV from the enfusion report
   nav <- as.numeric(enfusion_rep$`$ GL NAV`[[1]])

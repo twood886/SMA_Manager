@@ -4,6 +4,7 @@
 #'
 #' @import R6
 #'
+#' @export
 SMARule <- R6::R6Class( #nolint
   "SMARule",
   public = list(
@@ -51,33 +52,23 @@ SMARule <- R6::R6Class( #nolint
 
     #' Get Id
     #' @description Get Id of SMA Rule
-    get_id = function() {
-      return(private$id_)
-    },
+    get_id = function() private$id_,
 
     #' Get Name
     #' @description Get name of SMA Rule
-    get_name = function() {
-      return(private$name_)
-    },
+    get_name = function() private$name_,
 
     #' Get Scope
     #' @description Get the scope of the SMA Rule
-    get_scope = function() {
-      return(private$scope_)
-    },
+    get_scope = function() private$scope_,
 
     #' Get Definition
     #' @description Get the definition of the SMA Rule
-    get_definition = function() {
-      return(private$definition_)
-    },
+    get_definition = function() private$definition_,
 
     #' Get Threshold
     #' @description Get the threshold of the SMA Rule
-    get_threshold = function() {
-      return(private$threshold_)
-    }
+    get_threshold = function() private$threshold_
   ),
   private = list(
     sma_name_ = NULL,

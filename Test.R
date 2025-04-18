@@ -2,7 +2,6 @@ library(SMAManager)
 library(Rblpapi)
 
 con <- blpConnect()
-test <- Rblpapi::bdp("AB US Equity", "DS213")
 
 ccmf_url <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=shared%2FTaylor%2FSMA_Mgr_Reports%2FCCMF+Consolidated+Position+Listing+-+Options.ppr" #nolint
 
@@ -13,12 +12,18 @@ ccmf <- SMAManager::create_portfolio_from_enfusion(
 )
 
 
-
 cube_sma <- SMAManager::create_sma(
   long_name = "Cube Test SMA",
   short_name = "cube",
   nav = 75000000,
   target_portfolio = "ccmf"
+)
+
+cube_sma <- SMA$new(
+  long_name = "Cube Test SMA",
+  short_name = "cube",
+  nav = 75000000,
+  target_portfolio = ccmf
 )
 
 

@@ -5,16 +5,22 @@
 #' @param id Security Ticker
 #' @param desc Security Description
 #' @param qty Quantity
+#' @param sec_id Security ID (optional). If not provided, \code{id} is used.
 #' @return A \code{Position} object.
 #' @include class-position.R
 #' @export
-create_position <- function(portfolio_short_name, id, qty) {
+create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
   id <- tolower(id)
+  if (is.null(sec_id)) {
+    sec_id <- id
+  } else {
+    sec_id <- tolower(sec_id)
+  }
   pos <- Position$new(
     portfolio_short_name = portfolio_short_name,
     id = id,
     qty = qty,
-    sec = get_security(id)
+    sec = get_or_create_security(sec_id)
   )
   pos$calc_delta_qty()
   pos$calc_mkt_val()

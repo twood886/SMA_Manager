@@ -13,11 +13,9 @@ get_or_create_security <- function(id = NULL) {
     stop("id must be supplied")
   }
   id <- tolower(id)
-  if (exists(id, envir = .security_registry, inherits = FALSE)) {
-    sec <- get_security(id)
-  } else {
+  if (!exists(id, envir = .security_registry, inherits = FALSE)) {
     sec <- create_security(id)
     assign(id, sec, envir = .security_registry)
   }
-  return(sec)
+  get_security(id)
 }

@@ -1,4 +1,4 @@
-rebalance <- function(sma) {
+rebalance_sma <- function(sma) {
   # Check that SMA is supplied
   if (is.null(sma)) {
     stop("SMA must be supplied")
