@@ -1,7 +1,6 @@
 combine_portfolios <- function() {
   funds <- mget(ls(.portfolio_registry), envir = .portfolio_registry)
-  # get all the smas in the registry
-  smas <- mget(ls(.sma_registry), envir = .sma_registry)
+
 
   # Calc NAVs
   nav <- sum(sapply(c(funds, smas), \(x) x$get_nav()))

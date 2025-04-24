@@ -13,26 +13,29 @@ SMARulePosition <- R6::R6Class( #nolint
     #' Get SMA
     #' @description Get SMA the Rule applies to
     get_sma = function() {
-      sma <- get(private$sma_name_, envir = .sma_registry, inherits = FALSE)
-      sma
+      get(private$sma_name_, envir = .portfolio_registry, inherits = FALSE)
     },
     #' Check Rule Against Current Holdings
     #' @description Check the rule against the current holdings
     check_rule_current = function() {
-      positions <- private$get_positions_current_()
+      positions <- self$get_sma()$get_position()
       check <- sapply(
         lapply(positions, private$definition_),
         private$threshold_
       )
       breaks <- which(!check)
       sapply(positions[breaks], function(x) x$get_id())
-    }
-  ),
-  private = list(
-    get_positions_current_ = function() {
-      sma <- self$get_sma()
-      positions <- sma$get_position()
-      return(positions)
+    },
+    #' Check Rule Against Target Holdings
+    #' @description Check the rule against the target holdings
+    check_rule_target = function() {
+      positions <- self$get_sma()$get_target_position()
+      check <- sapply(
+        lapply(positions, private$definition_),
+        private$threshold_
+      )
+      breaks <- which(!check)
+      sapply(positions[breaks], function(x) x$get_id())
     }
   )
 )

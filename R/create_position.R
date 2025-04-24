@@ -3,11 +3,11 @@
 #' Create an R6 Position object
 #' @param portfolio_short_name Portfolio Short Name the security belongs to
 #' @param id Security Ticker
-#' @param desc Security Description
 #' @param qty Quantity
 #' @param sec_id Security ID (optional). If not provided, \code{id} is used.
 #' @return A \code{Position} object.
 #' @include class-position.R
+#' @include get_or_create_security.R
 #' @export
 create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
   id <- tolower(id)
@@ -27,21 +27,18 @@ create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
   pos$calc_delta_val()
   pos$calc_stock_pct_nav()
   pos$calc_delta_pct_nav()
+  return(pos)
 }
 
 #' @importFrom dplyr case_when
 create_position_from_enfusion <- function(x, portfolio_short_name = NULL) {
   # Values to create security
-  bb_pos <- x[["BB Yellow Key Position"]]
   instrument_type <- x[["Instrument Type"]]
-  description <- x[["Description"]]
-  figi <- x[["FIGI"]]
-
   id <- dplyr::case_when(
-    instrument_type == "Bond" ~ Rblpapi::bdp(figi, "DX194")$DX194,
-    instrument_type == "Listed Option" ~ bb_pos,
-    instrument_type == "Equity" ~ bb_pos,
-    .default = description
+    instrument_type == "Bond" ~ Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
+    instrument_type == "Listed Option" ~ x[["BB Yellow Key Position"]],
+    instrument_type == "Equity" ~ x[["BB Yellow Key Position"]],
+    .default = x[["Description"]]
   )
   id <- tolower(id)
 

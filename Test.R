@@ -11,7 +11,6 @@ ccmf <- SMAManager::create_portfolio_from_enfusion(
   enfusion_url = ccmf_url
 )
 
-
 cube_sma <- SMAManager::create_sma(
   long_name = "Cube Test SMA",
   short_name = "cube",
@@ -19,13 +18,11 @@ cube_sma <- SMAManager::create_sma(
   target_portfolio = "ccmf"
 )
 
-cube_sma <- SMA$new(
-  long_name = "Cube Test SMA",
-  short_name = "cube",
-  nav = 75000000,
-  target_portfolio = ccmf
-)
+cube_sma$add_replacement("et us equity", "xom us equity")
+cube_sma$add_replacement("gel us equity", "xom us equity")
 
+rebalance_sma_position(cube_sma, "et us equity")
+rebalance_sma(cube_sma)
 
 test <- SMARulePosition$new(
   "cube",

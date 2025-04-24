@@ -6,6 +6,7 @@
 #'  underlying security R6 object.
 #' @import R6
 #' @include get_or_create_security.R
+#' @include get_portfolio.R
 Position <- R6::R6Class(  #nolint
   "Position",
   public = list(
@@ -56,6 +57,11 @@ Position <- R6::R6Class(  #nolint
     #' @param new_qty New Quantity
     set_qty = function(new_qty) {
       private$qty_ <- new_qty
+      self$calc_delta_qty()
+      self$calc_mkt_val()
+      self$calc_delta_val()
+      self$calc_stock_pct_nav()
+      self$calc_delta_pct_nav()
     },
     #' @description Set Delta Qty
     #' @param new_delta_qty New Delta Quantity

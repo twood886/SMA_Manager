@@ -66,6 +66,6 @@ create_sma <- function(
       target_portfolio = tgt_ptfl
     )
   }
-  assign(short_name, sma, envir = .sma_registry)
+  assign(short_name, sma, envir = .portfolio_registry)
   return(sma)
 }

@@ -20,7 +20,7 @@ SMARule <- R6::R6Class( #nolint
       if (is.null(sma_name) | !is.character(sma_name)) {
         stop("sma_name must be provided as a string")
       }
-      if (!exists(sma_name, envir = .sma_registry, inherits = FALSE)) {
+      if (!exists(sma_name, envir = .portfolio_registry, inherits = FALSE)) {
         stop("SMA not defined")
       }
       # Check if name is valid
@@ -49,7 +49,6 @@ SMARule <- R6::R6Class( #nolint
       private$definition_ <- definition
       private$threshold_ <- threshold
     },
-
     #' Get Id
     #' @description Get Id of SMA Rule
     get_id = function() private$id_,

@@ -14,7 +14,6 @@ SMA <- R6::R6Class(   #nolint
   "SMA",
   inherit = Portfolio,
   public = list(
-
     #' @description
     #' Create a new SMA R6 object.
     #' @param long_name Character. SMA Long Name.
@@ -26,7 +25,7 @@ SMA <- R6::R6Class(   #nolint
     initialize = function(
       long_name, short_name, nav, target_portfolio = NULL, positions = NULL
     ) {
-      private$id_ <- length(ls(envir = .sma_registry)) + 1
+      private$id_ <- length(ls(envir = .portfolio_registry)) + 1
       private$long_name_ <- long_name
       private$short_name_ <- short_name
       private$nav_ <- nav
@@ -34,6 +33,7 @@ SMA <- R6::R6Class(   #nolint
       private$positions_ <- positions
       private$target_positions_ <- positions
       private$sma_rules_ <- list()
+      private$replacements_ <- list()
     },
 
     #' Add SMA Rule
@@ -69,9 +69,12 @@ SMA <- R6::R6Class(   #nolint
     add_replacement = function(
       original_security = NULL, replacement_security = NULL
     ) {
-      if (is.null(original_security) | is.null(replacment_security)) {
+      if (is.null(original_security) | is.null(replacement_security)) {
         stop("Securities must be provided")
       }
+      original_security <- tolower(original_security)
+      replacement_security <- tolower(replacement_security)
+      private$replacements_[[original_security]] <- replacement_security
       invisible(self)
     },
 
@@ -101,9 +104,37 @@ SMA <- R6::R6Class(   #nolint
       if (length(private$sma_rules_) == 0) {
         stop("No SMA rules defined")
       }
-      return(private$sma_rules_)
-    }
+      private$sma_rules_
+    },
 
+    #' @description Get replacement security for a given replaced security
+    #' @param replaced_security_id Security ID of the replaced security (in target ptfl) #nolint
+    get_replacement_security = function(replaced_security_id = NULL) {
+      if (is.null(replaced_security_id)) {
+        stop("Security ID must be supplied")
+      }
+      if (!replaced_security_id %in% names(private$replacements_)) {
+        return(NULL)
+      }
+      replacement <- private$replacements_[[replaced_security_id]]
+      replacement
+    },
+
+    #' @description Get replaced security for a given replacement security
+    #' @param replacement_security_id Security ID of the replacement security (in SMA) #nolint
+    get_replaced_security = function(replacement_security_id = NULL) {
+      if (is.null(replacement_security_id)) {
+        stop("Security ID must be supplied")
+      }
+      u <- unlist(private$replacements_, use.names = TRUE)
+      idx <- which(u == replacement_security_id)
+
+      if (length(idx) == 0) {
+        return(NULL)
+      }
+      replaced_security <- names(u)[idx]
+      replaced_security
+    }
   ),
   private = list(
     target_portfolio_ = NULL,

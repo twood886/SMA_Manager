@@ -4,7 +4,7 @@
 \alias{create_position}
 \title{Create Position}
 \usage{
-create_position(portfolio_short_name, id, qty)
+create_position(portfolio_short_name, id, qty, sec_id = NULL)
 }
 \arguments{
 \item{portfolio_short_name}{Portfolio Short Name the security belongs to}
@@ -13,7 +13,7 @@ create_position(portfolio_short_name, id, qty)
 
 \item{qty}{Quantity}
 
-\item{desc}{Security Description}
+\item{sec_id}{Security ID (optional). If not provided, \code{id} is used.}
 }
 \value{
 A \code{Position} object.

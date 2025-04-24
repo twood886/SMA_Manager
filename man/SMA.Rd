@@ -17,19 +17,25 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-add_rule}{\code{SMA$add_rule()}}
 \item \href{#method-SMA-add_replacement}{\code{SMA$add_replacement()}}
-\item \href{#method-SMA-get_target_portfolio_id}{\code{SMA$get_target_portfolio_id()}}
 \item \href{#method-SMA-get_target_portfolio}{\code{SMA$get_target_portfolio()}}
 \item \href{#method-SMA-get_target_portfolio_position}{\code{SMA$get_target_portfolio_position()}}
 \item \href{#method-SMA-compare_weight_current}{\code{SMA$compare_weight_current()}}
+\item \href{#method-SMA-get_sma_rules}{\code{SMA$get_sma_rules()}}
+\item \href{#method-SMA-get_replacement_security}{\code{SMA$get_replacement_security()}}
+\item \href{#method-SMA-get_replaced_security}{\code{SMA$get_replaced_security()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
 \if{html}{\out{
-<details open><summary>Inherited methods</summary>
+<details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_target_position'><code>SMAManager::Portfolio$add_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="print"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-print'><code>SMAManager::Portfolio$print()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -99,21 +105,10 @@ Add replacement securitity
 \item{\code{original_security}}{The original Security id}
 
 \item{\code{replacement_security}}{The replacement Security id
-Get Target Portfolio ID}
+Get Target Portfolio}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_target_portfolio_id"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_target_portfolio_id}{}}}
-\subsection{Method \code{get_target_portfolio_id()}}{
-Get the target portfolio ID
-Get Target Portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio_id()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-get_target_portfolio"></a>}}
@@ -132,7 +127,7 @@ Get Target Portfolio Position
 \subsection{Method \code{get_target_portfolio_position()}}{
 Get a position in the target portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio_position()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio_position(security_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -158,6 +153,53 @@ Compare the current weight in the sma
 \describe{
 \item{\code{security_id}}{Security ID
 to the current weight in the target portfolio}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_sma_rules"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_sma_rules}{}}}
+\subsection{Method \code{get_sma_rules()}}{
+Get the SMA Rules
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_sma_rules()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A list of SMA rules
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_replacement_security"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_replacement_security}{}}}
+\subsection{Method \code{get_replacement_security()}}{
+Get replacement security for a given replaced security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_replacement_security(replaced_security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{replaced_security_id}}{Security ID of the replaced security (in target ptfl) #nolint}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_replaced_security"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_replaced_security}{}}}
+\subsection{Method \code{get_replaced_security()}}{
+Get replaced security for a given replacement security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_replaced_security(replacement_security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{replacement_security_id}}{Security ID of the replacement security (in SMA) #nolint}
 }
 \if{html}{\out{</div>}}
 }

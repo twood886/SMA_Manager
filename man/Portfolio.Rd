@@ -11,8 +11,12 @@ R6 Class representing a portfolio object.
 \itemize{
 \item \href{#method-Portfolio-new}{\code{Portfolio$new()}}
 \item \href{#method-Portfolio-print}{\code{Portfolio$print()}}
+\item \href{#method-Portfolio-get_short_name}{\code{Portfolio$get_short_name()}}
 \item \href{#method-Portfolio-get_nav}{\code{Portfolio$get_nav()}}
 \item \href{#method-Portfolio-get_position}{\code{Portfolio$get_position()}}
+\item \href{#method-Portfolio-get_target_position}{\code{Portfolio$get_target_position()}}
+\item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
+\item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
 \item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
 }
@@ -52,6 +56,16 @@ Print
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_short_name"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_short_name}{}}}
+\subsection{Method \code{get_short_name()}}{
+Get Portfolio short name
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_short_name()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-get_nav"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-get_nav}{}}}
 \subsection{Method \code{get_nav()}}{
@@ -74,6 +88,57 @@ Get list of positions in portfolio
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{id}}{Ticker}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_target_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_target_position}{}}}
+\subsection{Method \code{get_target_position()}}{
+Get list of target positions in portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_target_position(id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{Ticker}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-add_target_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_target_position}{}}}
+\subsection{Method \code{add_target_position()}}{
+Add New Target Position to Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_target_position(position)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{position}}{Position S6 Object}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-remove_target_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-remove_target_position}{}}}
+\subsection{Method \code{remove_target_position()}}{
+Remove existing Target Positiion from Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$remove_target_position(position_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{position_id}}{Position ID}
 }
 \if{html}{\out{</div>}}
 }

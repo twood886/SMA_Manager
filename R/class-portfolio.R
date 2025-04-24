@@ -23,7 +23,7 @@ Portfolio <- R6::R6Class( #nolint
       private$short_name_ <- short_name
       private$nav_ <- nav
       private$positions_ <- positions
-      private$target_positions_ <- positions
+      private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
     },
 
     #' @description Print
@@ -31,7 +31,12 @@ Portfolio <- R6::R6Class( #nolint
       long_col_width <- max(15, nchar(private$long_name_) + 2)
       short_col_width <- max(12, nchar(private$short_name_) + 2)
       nav_col_width <- 16
-      nav_formatted <- formatC(private$nav_, format = "f", big.mark = ",", digits = 0) #nolint
+      nav_formatted <- formatC(
+        private$nav_,
+        format = "f",
+        big.mark = ",",
+        digits = 0
+      )
 
       # Print the headers with dynamic spacing
       cat(sprintf(
@@ -52,6 +57,8 @@ Portfolio <- R6::R6Class( #nolint
     },
 
     # Getter Functions ---------------------------------------------------------
+    #' @description Get Portfolio short name
+    get_short_name = function() private$short_name_,
     #' @description Get Fund NAV
     get_nav = function() private$nav_,
 
@@ -68,9 +75,44 @@ Portfolio <- R6::R6Class( #nolint
         stop("No position in portfolio with id")
       }
       return(positions[[which(position_ids == id)]])
-    }
-  ),
+    },
 
+    #' @description
+    #' Get list of target positions in portfolio
+    #' @param id Ticker
+    get_target_position = function(id = NULL) {
+      positions <- private$target_positions_
+      if (is.null(id)) {
+        return(positions)
+      }
+      position_ids <- sapply(positions, \(x) x$get_id())
+      if (!id %in% position_ids) {
+        stop("No position in portfolio with id")
+      }
+      return(positions[[which(position_ids == id)]])
+    },
+
+    #' @description
+    #' Add New Target Position to Portfolio
+    #' @param position Position S6 Object
+    add_target_position = function(position) {
+      if (!inherits(position, "Position")) {
+        stop("position must be a Position object")
+      }
+      private$target_positions_ <- c(private$positions_, position)
+    },
+
+    #' @description
+    #' Remove existing Target Positiion from Portfolio
+    #' @param position_id Position ID
+    remove_target_position = function(position_id) {
+      position_ids <- sapply(private$target_positions_, \(x) x$get_id())
+      if (position_id %in% position_ids) {
+        private$target_positions_ <- private$target_positions_[position_ids != position_id] #nolint
+      }
+    }
+
+  ),
   private = list(
     id_ = NULL,
     long_name_ = NULL,

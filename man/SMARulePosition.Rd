@@ -14,6 +14,7 @@ R6 Class that encapsulates rule for SMAs
 \itemize{
 \item \href{#method-SMARulePosition-get_sma}{\code{SMARulePosition$get_sma()}}
 \item \href{#method-SMARulePosition-check_rule_current}{\code{SMARulePosition$check_rule_current()}}
+\item \href{#method-SMARulePosition-check_rule_target}{\code{SMARulePosition$check_rule_target()}}
 \item \href{#method-SMARulePosition-clone}{\code{SMARulePosition$clone()}}
 }
 }
@@ -45,8 +46,19 @@ Check Rule Against Current Holdings
 \if{latex}{\out{\hypertarget{method-SMARulePosition-check_rule_current}{}}}
 \subsection{Method \code{check_rule_current()}}{
 Check the rule against the current holdings
+Check Rule Against Target Holdings
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_current()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePosition-check_rule_target"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-check_rule_target}{}}}
+\subsection{Method \code{check_rule_target()}}{
+Check the rule against the target holdings
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_target()}\if{html}{\out{</div>}}
 }
 
 }
