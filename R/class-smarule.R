@@ -3,6 +3,7 @@
 #' @description R6 Class that encapsultes rules for SMAs.
 #'
 #' @import R6
+#' @include class-sma.R
 #'
 #' @export
 SMARule <- R6::R6Class( #nolint
@@ -12,9 +13,14 @@ SMARule <- R6::R6Class( #nolint
     #' @param name Character
     #' @param scope Character
     #' @param definition Formula
-    #' @param threshold Formula
+    #' @param max_threshold numeric
+    #' @param min_threshold numeirc
     initialize = function(
-      sma_name = NULL, name = NULL, scope = NULL, definition = NULL, threshold = NULL #nolint
+      sma_name = NULL,
+      name = NULL,
+      scope = NULL,
+      definition = NULL,
+      max_threshold = NULL, min_threshold = NULL
     ) {
       # Check if sma_name is valid
       if (is.null(sma_name) | !is.character(sma_name)) {
@@ -39,8 +45,11 @@ SMARule <- R6::R6Class( #nolint
         stop("definition is not a function")
       }
       # Check if threshold is valid
-      if (!is.function(threshold)) {
-        stop("threshold is not valid")
+      if (is.null(max_threshold) | !is.numeric(max_threshold)) {
+        stop("max threshold is not valid")
+      }
+      if (is.null(min_threshold) | !is.numeric(min_threshold)) {
+        stop("max threshold is not valid")
       }
       private$id_ <- length(ls(envir = .smarule_registry)) + 1
       private$sma_name_ <- sma_name
@@ -65,9 +74,13 @@ SMARule <- R6::R6Class( #nolint
     #' @description Get the definition of the SMA Rule
     get_definition = function() private$definition_,
 
-    #' Get Threshold
+    #' Get Max Threshold
     #' @description Get the threshold of the SMA Rule
-    get_threshold = function() private$threshold_
+    get_max_threshold = function() private$max_threshold_,
+
+    #' Get Min Threshold
+    #' @description Get the threshold of the SMA Rule
+    get_min_threshold = function() private$min_threshold_
   ),
   private = list(
     sma_name_ = NULL,
@@ -75,6 +88,7 @@ SMARule <- R6::R6Class( #nolint
     name_ = NULL,
     scope_ = NULL,
     definition_ = NULL,
-    threshold_ = NULL
+    max_threshold_ = NULL,
+    min_threshold_ = NULL
   )
 )

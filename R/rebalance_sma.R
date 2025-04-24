@@ -37,7 +37,7 @@ rebalance_sma_position <- function(sma, tgt_position_id) {
   # Check SMA replacements
   sma_replacement_security <- sma$get_replacement_security(tgt_position_id)
   if (!is.null(sma_replacement_security)) {
-    sma_position_id <- sma_replacement_security
+    sma_position_id <- c(sma_position_id, sma_replacement_security)
     tgt_position_id <- sma$get_replaced_security(sma_position_id)
   } else {
     sma_position_id <- tgt_position_id

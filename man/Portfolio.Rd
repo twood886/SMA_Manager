@@ -15,7 +15,9 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_nav}{\code{Portfolio$get_nav()}}
 \item \href{#method-Portfolio-get_position}{\code{Portfolio$get_position()}}
 \item \href{#method-Portfolio-get_target_position}{\code{Portfolio$get_target_position()}}
+\item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
+\item \href{#method-Portfolio-remove_position}{\code{Portfolio$remove_position()}}
 \item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
 \item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
@@ -110,18 +112,56 @@ Get list of target positions in portfolio
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-add_target_position"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-add_target_position}{}}}
-\subsection{Method \code{add_target_position()}}{
-Add New Target Position to Portfolio
+\if{html}{\out{<a id="method-Portfolio-add_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_position}{}}}
+\subsection{Method \code{add_position()}}{
+Add Position to Portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_target_position(position)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_position(position, overwrite = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{position}}{Position S6 Object}
+
+\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-add_target_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_target_position}{}}}
+\subsection{Method \code{add_target_position()}}{
+Add New Target Position to Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_target_position(position, overwrite = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{position}}{Position S6 Object}
+
+\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-remove_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-remove_position}{}}}
+\subsection{Method \code{remove_position()}}{
+Remove existing Position from Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$remove_position(position_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{position_id}}{Position ID}
 }
 \if{html}{\out{</div>}}
 }

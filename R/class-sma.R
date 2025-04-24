@@ -38,27 +38,15 @@ SMA <- R6::R6Class(   #nolint
 
     #' Add SMA Rule
     #' @description Create SMA Rule and Add to SMA
-    #' @param rule_name Character representing identifing name of rule
-    #' @param rule_scope Character representing the scope of the rule
-    #' @param rule_formula formula representing the rule
-    add_rule = function(rule_name, rule_scope, rule_formula) {
-      if (is.null(rule_name)) {
-        stop("rule_name must be supplied")
+    #' @param rule An object of class SMARule
+    add_rule = function(rule) {
+      if (is.null(rule)) {
+        stop("rule must be supplied")
       }
-      if (is.null(rule_scope)) {
-        stop("rule_scope must be supplied")
+      if (!inherits(rule, "SMARule")) {
+        stop("rule must be of class SMARule")
       }
-      if (is.null(rule_formula) || class(rule_formula) != "function") {
-        stop("rule_formula must be supplied")
-      }
-      rule <- new(
-        "sma_rule",
-        sma_id = self$id,
-        rule_name = rule_name,
-        rule_scope = rule_scope,
-        rule_formula = rule_formula
-      )
-      private$sma_rules_[[rule_name]] <- rule
+      private$sma_rules_[[rule$get_name()]] <- rule
       invisible(self)
     },
 

@@ -93,13 +93,63 @@ Portfolio <- R6::R6Class( #nolint
     },
 
     #' @description
-    #' Add New Target Position to Portfolio
+    #' Add Position to Portfolio
     #' @param position Position S6 Object
-    add_target_position = function(position) {
+    #' @param overwrite Logical. Overwrite existing position if TRUE
+    add_position = function(position, overwrite = FALSE) {
       if (!inherits(position, "Position")) {
         stop("position must be a Position object")
       }
-      private$target_positions_ <- c(private$positions_, position)
+      existing_pos <- tryCatch(
+        self$get_position(position$get_id()),
+        error = function(e) {
+          NULL
+        }
+      )
+      if (!is.null(existing_pos)) {
+        if (overwrite) {
+          self$remove_position(position$get_id())
+          private$positions_ <- c(private$positions_, position)
+        }
+      } else {
+        private$positions_ <- c(private$positions_, position)
+      }
+      invisible(NULL)
+    },
+
+    #' @description
+    #' Add New Target Position to Portfolio
+    #' @param position Position S6 Object
+    #' @param overwrite Logical. Overwrite existing position if TRUE
+    add_target_position = function(position, overwrite = FALSE) {
+      if (!inherits(position, "Position")) {
+        stop("position must be a Position object")
+      }
+      existing_pos <- tryCatch(
+        self$get_target_position(position$get_id()),
+        error = function(e) {
+          NULL
+        }
+      )
+      if (!is.null(existing_pos)) {
+        if (overwrite) {
+          self$remove_target_position(position$get_id())
+          private$target_positions_ <- c(private$target_positions_, position)
+        }
+      } else {
+        private$target_positions_ <- c(private$target_positions_, position)
+      }
+      invisible(NULL)
+    },
+
+    #' @description
+    #' Remove existing Position from Portfolio
+    #' @param position_id Position ID
+    remove_position = function(position_id) {
+      position_ids <- sapply(private$positions_, \(x) x$get_id())
+      if (position_id %in% position_ids) {
+        private$positions_ <- private$positions_[position_ids != position_id] #nolint
+      }
     },
 
     #' @description

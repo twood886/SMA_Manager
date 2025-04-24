@@ -29,12 +29,14 @@ R6 Class representing a seperately managed account.
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_target_position'><code>SMAManager::Portfolio$add_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="print"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-print'><code>SMAManager::Portfolio$print()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_position'><code>SMAManager::Portfolio$remove_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
 </ul>
 </details>
@@ -74,17 +76,13 @@ Add SMA Rule
 \subsection{Method \code{add_rule()}}{
 Create SMA Rule and Add to SMA
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$add_rule(rule_name, rule_scope, rule_formula)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$add_rule(rule)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{rule_name}}{Character representing identifing name of rule}
-
-\item{\code{rule_scope}}{Character representing the scope of the rule}
-
-\item{\code{rule_formula}}{formula representing the rule
+\item{\code{rule}}{An object of class SMARule
 Add Replacement}
 }
 \if{html}{\out{</div>}}
