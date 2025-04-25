@@ -12,9 +12,12 @@ R6 Class that encapsulates rule for SMAs
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-SMARulePosition-get_sma}{\code{SMARulePosition$get_sma()}}
 \item \href{#method-SMARulePosition-check_rule_current}{\code{SMARulePosition$check_rule_current()}}
 \item \href{#method-SMARulePosition-check_rule_target}{\code{SMARulePosition$check_rule_target()}}
+\item \href{#method-SMARulePosition-check_swap_current}{\code{SMARulePosition$check_swap_current()}}
+\item \href{#method-SMARulePosition-check_swap_target}{\code{SMARulePosition$check_swap_target()}}
+\item \href{#method-SMARulePosition-get_security_max_value}{\code{SMARulePosition$get_security_max_value()}}
+\item \href{#method-SMARulePosition-get_security_min_value}{\code{SMARulePosition$get_security_min_value()}}
 \item \href{#method-SMARulePosition-clone}{\code{SMARulePosition$clone()}}
 }
 }
@@ -23,30 +26,20 @@ R6 Class that encapsulates rule for SMAs
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_min_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_min_threshold'><code>SMAManager::SMARule$get_min_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_name'><code>SMAManager::SMARule$get_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_scope"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_scope'><code>SMAManager::SMARule$get_scope()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_threshold'><code>SMAManager::SMARule$get_threshold()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
 </ul>
 </details>
 }}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-get_sma"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-get_sma}{}}}
-\subsection{Method \code{get_sma()}}{
-Get SMA the Rule applies to
-Check Rule Against Current Holdings
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$get_sma()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePosition-check_rule_current"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARulePosition-check_rule_current}{}}}
 \subsection{Method \code{check_rule_current()}}{
 Check the rule against the current holdings
-Check Rule Against Target Holdings
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_current()}\if{html}{\out{</div>}}
 }
@@ -61,6 +54,68 @@ Check the rule against the target holdings
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_target()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePosition-check_swap_current"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-check_swap_current}{}}}
+\subsection{Method \code{check_swap_current()}}{
+Check the swap rule against the current holdings
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_swap_current()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePosition-check_swap_target"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-check_swap_target}{}}}
+\subsection{Method \code{check_swap_target()}}{
+Check the swap rule against the target holdings
+Get Security Max Value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_swap_target()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePosition-get_security_max_value"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-get_security_max_value}{}}}
+\subsection{Method \code{get_security_max_value()}}{
+Get the maximum value of the security based on the rule
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$get_security_max_value(security_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Number of Shares
+Get Security Min Value
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePosition-get_security_min_value"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-get_security_min_value}{}}}
+\subsection{Method \code{get_security_min_value()}}{
+Get the minimum value of the security based on the rule
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$get_security_min_value(security_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Number of Shares
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePosition-clone"></a>}}

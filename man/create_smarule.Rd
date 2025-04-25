@@ -9,7 +9,9 @@ create_smarule(
   rule_name = NULL,
   scope = NULL,
   definition = NULL,
-  threshold = NULL
+  max_threshold = Inf,
+  min_threshold = -Inf,
+  swap_only = FALSE
 )
 }
 \arguments{
@@ -21,7 +23,11 @@ create_smarule(
 
 \item{definition}{Function to define the rule}
 
-\item{threshold}{Function to define the threshold}
+\item{max_threshold}{Max weight of the rule}
+
+\item{min_threshold}{Min weight of the rule}
+
+\item{swap_only}{If TRUE, position can only be on swap}
 }
 \description{
 Function to create a SMA Rule object

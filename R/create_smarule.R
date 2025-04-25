@@ -5,7 +5,9 @@
 #' @param rule_name Name of the SMA rule
 #' @param scope Scope of the rule (position)
 #' @param definition Function to define the rule
-#' @param threshold Function to define the threshold
+#' @param max_threshold Max weight of the rule
+#' @param min_threshold Min weight of the rule
+#' @param swap_only If TRUE, position can only be on swap
 #' @return NULL
 #' @export
 create_smarule <- function(
@@ -14,7 +16,8 @@ create_smarule <- function(
   scope = NULL,
   definition = NULL,
   max_threshold = Inf,
-  min_threshold = -Inf
+  min_threshold = -Inf,
+  swap_only = FALSE
 ) {
   if (scope == "position") {
     smarule <- SMARulePosition$new(
@@ -23,7 +26,8 @@ create_smarule <- function(
       scope = scope,
       definition = definition,
       max_threshold = max_threshold,
-      min_threshold = min_threshold
+      min_threshold = min_threshold,
+      swap_only = swap_only
     )
   }
 

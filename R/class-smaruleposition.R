@@ -10,22 +10,33 @@ SMARulePosition <- R6::R6Class( #nolint
   "SMARulePosition",
   inherit = SMARule,
   public = list(
-    #' Check Rule Against Current Holdings
     #' @description Check the rule against the current holdings
     check_rule_current = function() {
-      private$check_rule_multi_position_(self$get_sma()$get_position())
+      positions <- private$get_sma_()$get_position()
+      private$check_rule_multi_position_(positions)
     },
-    #' Check Rule Against Target Holdings
     #' @description Check the rule against the target holdings
     check_rule_target = function() {
-      private$check_rule_multi_position_(self$get_sma()$get_target_position())
+      positions <- private$get_sma_()$get_target_position()
+      private$check_rule_multi_position_(positions)
     },
+    #' @description Check the swap rule against the current holdings
+    check_swap_current = function() {
+      positions <- private$get_sma_()$get_position()
+      private$check_swap_multi_position_(positions)
+    },
+    #' @description Check the swap rule against the target holdings
+    check_swap_target = function() {
+      positions <- private$get_sma_()$get_position()
+      private$check_swap_multi_position_(positions)
+    },
+
     #' Get Security Max Value
     #' @description Get the maximum value of the security based on the rule
     #' @param security_id Security ID
     #' @return Number of Shares
     get_security_max_value = function(security_id) {
-      exp <- private$definition_(security_id)
+      exp <- private$definition_(security_id, private$get_sma_())
       if (is.logical(exp)) {
         if (exp) {
           return(private$max_threshold_)
@@ -40,7 +51,7 @@ SMARulePosition <- R6::R6Class( #nolint
     #' @param security_id Security ID
     #' @return Number of Shares
     get_security_min_value = function(security_id) {
-      exp <- private$definition_(security_id)
+      exp <- private$definition_(security_id, private$get_sma_())
       if (is.logical(exp)) {
         if (exp) {
           return(private$min_threshold_)
@@ -49,21 +60,36 @@ SMARulePosition <- R6::R6Class( #nolint
         }
       }
       exp * min_threshold_
-    },
+    }
   ),
   private = list(
-    get_sma = function() {
+    get_sma_ = function() {
       get(private$sma_name_, envir = .portfolio_registry, inherits = FALSE)
     },
-    check_rule_position_ = function(position) {
-      secruity_id <- position$get_security()$get_id()
+    check_rule_position_ = function(position, sma) {
+      security_id <- position$get_security()$get_id()
       qty <- position$get_qty()
-      exp <- qty * private$definition_(security_id)
+      exp <- qty * private$definition_(security_id, sma)
       exp <= private$max_threshold_ & exp >= private$min_threshold_
     },
     check_rule_multi_position_ = function(positions) {
-      comply <- sapply(positions, private$check_rule_position_)
+      sma <- private$get_sma_()
+      comply <- sapply(positions, private$check_rule_position_, sma = sma)
       sapply(positions[which(!comply)], function(x) x$get_id())
     },
+    check_swap_security_ = function(security_id) {
+      if (!private$swap_only_) {
+        return(FALSE)
+      }
+      private$definition_(security_id)
+    },
+    check_swap_position_ = function(position) {
+      security_id <- position$get_security()$get_id()
+      private$check_swap_security_(security_id)
+    },
+    check_swap_multi_position_ = function(positions) {
+      swap_only <- sapply(positions, private$check_swap_position_)
+      sapply(positions[which(swap_only)], function(x) x$get_id())
+    }
   )
 )

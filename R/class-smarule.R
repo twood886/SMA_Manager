@@ -15,12 +15,14 @@ SMARule <- R6::R6Class( #nolint
     #' @param definition Formula
     #' @param max_threshold numeric
     #' @param min_threshold numeirc
+    #' @param swap_only logical
     initialize = function(
       sma_name = NULL,
       name = NULL,
       scope = NULL,
       definition = NULL,
-      max_threshold = NULL, min_threshold = NULL
+      max_threshold = NULL, min_threshold = NULL,
+      swap_only = FALSE
     ) {
       # Check if sma_name is valid
       if (is.null(sma_name) | !is.character(sma_name)) {
@@ -56,7 +58,9 @@ SMARule <- R6::R6Class( #nolint
       private$name_ <- name
       private$scope_ <- scope
       private$definition_ <- definition
-      private$threshold_ <- threshold
+      private$max_threshold_ <- max_threshold
+      private$min_threshold_ <- min_threshold
+      private$swap_only_ <- swap_only
     },
     #' Get Id
     #' @description Get Id of SMA Rule
@@ -80,7 +84,11 @@ SMARule <- R6::R6Class( #nolint
 
     #' Get Min Threshold
     #' @description Get the threshold of the SMA Rule
-    get_min_threshold = function() private$min_threshold_
+    get_min_threshold = function() private$min_threshold_,
+
+    #' Get Swap Only Flag
+    #' @description Get the swap only flag of the SMA Rule
+    get_swap_only = function() private$swap_only_
   ),
   private = list(
     sma_name_ = NULL,
@@ -89,6 +97,7 @@ SMARule <- R6::R6Class( #nolint
     scope_ = NULL,
     definition_ = NULL,
     max_threshold_ = NULL,
-    min_threshold_ = NULL
+    min_threshold_ = NULL,
+    swap_only_ = NULL
   )
 )

@@ -122,7 +122,16 @@ SMA <- R6::R6Class(   #nolint
       }
       replaced_security <- names(u)[idx]
       replaced_security
+    },
+
+    #' @description Check SMA rules against the target positions
+    check_sma_rules_target = function() {
+      if (length(private$sma_rules_) == 0) {
+        stop("No SMA rules defined")
+      }
+      lapply(private$sma_rules_, function(x) x$check_rule_target())
     }
+
   ),
   private = list(
     target_portfolio_ = NULL,

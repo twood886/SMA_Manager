@@ -23,6 +23,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-get_sma_rules}{\code{SMA$get_sma_rules()}}
 \item \href{#method-SMA-get_replacement_security}{\code{SMA$get_replacement_security()}}
 \item \href{#method-SMA-get_replaced_security}{\code{SMA$get_replaced_security()}}
+\item \href{#method-SMA-check_sma_rules_target}{\code{SMA$check_sma_rules_target()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -201,6 +202,16 @@ Get replaced security for a given replacement security
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-check_sma_rules_target"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-check_sma_rules_target}{}}}
+\subsection{Method \code{check_sma_rules_target()}}{
+Check SMA rules against the target positions
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$check_sma_rules_target()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-clone"></a>}}

@@ -14,7 +14,9 @@ R6 Class that encapsultes rules for SMAs.
 \item \href{#method-SMARule-get_name}{\code{SMARule$get_name()}}
 \item \href{#method-SMARule-get_scope}{\code{SMARule$get_scope()}}
 \item \href{#method-SMARule-get_definition}{\code{SMARule$get_definition()}}
-\item \href{#method-SMARule-get_threshold}{\code{SMARule$get_threshold()}}
+\item \href{#method-SMARule-get_max_threshold}{\code{SMARule$get_max_threshold()}}
+\item \href{#method-SMARule-get_min_threshold}{\code{SMARule$get_min_threshold()}}
+\item \href{#method-SMARule-get_swap_only}{\code{SMARule$get_swap_only()}}
 \item \href{#method-SMARule-clone}{\code{SMARule$clone()}}
 }
 }
@@ -28,7 +30,9 @@ R6 Class that encapsultes rules for SMAs.
   name = NULL,
   scope = NULL,
   definition = NULL,
-  threshold = NULL
+  max_threshold = NULL,
+  min_threshold = NULL,
+  swap_only = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -43,7 +47,11 @@ R6 Class that encapsultes rules for SMAs.
 
 \item{\code{definition}}{Formula}
 
-\item{\code{threshold}}{Formula
+\item{\code{max_threshold}}{numeric}
+
+\item{\code{min_threshold}}{numeirc}
+
+\item{\code{swap_only}}{logical
 Get Id}
 }
 \if{html}{\out{</div>}}
@@ -87,19 +95,41 @@ Get Definition
 \if{latex}{\out{\hypertarget{method-SMARule-get_definition}{}}}
 \subsection{Method \code{get_definition()}}{
 Get the definition of the SMA Rule
-Get Threshold
+Get Max Threshold
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARule$get_definition()}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARule-get_threshold"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARule-get_threshold}{}}}
-\subsection{Method \code{get_threshold()}}{
+\if{html}{\out{<a id="method-SMARule-get_max_threshold"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_max_threshold}{}}}
+\subsection{Method \code{get_max_threshold()}}{
 Get the threshold of the SMA Rule
+Get Min Threshold
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_threshold()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_max_threshold()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_min_threshold"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_min_threshold}{}}}
+\subsection{Method \code{get_min_threshold()}}{
+Get the threshold of the SMA Rule
+Get Swap Only Flag
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_min_threshold()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_swap_only"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_swap_only}{}}}
+\subsection{Method \code{get_swap_only()}}{
+Get the swap only flag of the SMA Rule
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_swap_only()}\if{html}{\out{</div>}}
 }
 
 }

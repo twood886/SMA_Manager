@@ -14,8 +14,21 @@ rebalance_sma <- function(sma = NULL) {
     tgt_portfolio$get_position(),
     function(x) x$get_id()
   )
+  # Create a new target position for each position in the target portfolio
+  new_pos <- lapply(tgt_position_id, rebalance_sma_position, sma = sma)
 
-  lapply(tgt_position_id, rebalance_sma_position, sma = sma)
+  # Check new_positions against SMA rules
+  errors <- lapply(sma$get_sma_rules(), function(rule) rule$check_rule_target())
+
+  # Find positions that pass the rules
+  pass_pos <- new_pos[which(!sapply(new_pos, \(pos) pos$get_id()) %in% unlist(errors, use.names = FALSE))]
+
+  # Remove existing postion and add new target position
+  lapply(pass_pos)
+  sma$remove_target_position(sma_position_id)
+  sma$add_target_position(new_position)
+  # Check SMA target positions pass rules
+
   invisible(NULL)
 }
 
@@ -69,13 +82,9 @@ rebalance_sma_position <- function(sma, tgt_position_id) {
   }
 
   # Create new target position for SMA
-  new_position <- create_position(
+  create_position(
     portfolio_short_name = sma$get_short_name(),
     id = sma_position_id,
     qty = rebal_qty
   )
-  # Remove existing postion and add new target position
-  sma$remove_target_position(sma_position_id)
-  sma$add_target_position(new_position)
-  invisible(NULL)
 }
