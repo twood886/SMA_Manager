@@ -39,13 +39,54 @@ rebalance_sma <- function(sma = NULL) {
 #' @param sma SMA Portfolio object
 #' @param position_id Position ID to rebalance
 #' @return Null
-rebalance_sma_position <- function(sma, tgt_position_id) {
-  tgt_portfolio <- sma$get_target_portfolio()
+rebalance_sma_position <- function(sma, base_position_id) {
+  base_portfolio <- sma$get_target_portfolio()
 
   # Get the SMA & Target Portfolio NAVs to Calc Scaling Factor
   sma_nav <- sma$get_nav()
-  tgt_nav <- tgt_portfolio$get_nav()
-  sma_scale_factor <- sma_nav / tgt_nav
+  base_nav <- base_portfolio$get_nav()
+  sma_scale_factor <- sma_nav / base_nav
+
+  # START NEW ------------------------------------------------------------------
+
+  base_position <- base_portfolio$get_position(base_position_id)
+
+  sma_position_id <- base_position_id
+  replacement_securities <- sma$get_replacement_security(base_position_id)
+  if (!is.null(replacement_security)) {
+    sma_position_id <- replacement_securities
+  }
+
+  max_pos <- sapply(
+    sma_position_id,
+    function(sec, rules) {
+      max_pos_rule <- sapply(
+        rules,
+        function(sec, rule) rule$get_security_max_value(sec),
+        sec = sec
+      )
+      min(max_pos_rule)
+    },
+    rules = sma$get_sma_rules()
+  )
+
+  min_pos <- sapply(
+    sma_position_id,
+    function(sec, rules) {
+      min_pos_rule <- sapply(
+        rules,
+        function(sec, rule) rule$get_security_max_value(sec),
+        sec = sec
+      )
+      max(min_pos_rule)
+    },
+    rules = sma$get_sma_rules()
+  )
+
+  
+
+
+  # END NEW --------------------------------------------------------------------
 
   # Check SMA replacements
   sma_replacement_security <- sma$get_replacement_security(tgt_position_id)
