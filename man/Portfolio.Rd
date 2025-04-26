@@ -19,7 +19,6 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
 \item \href{#method-Portfolio-remove_position}{\code{Portfolio$remove_position()}}
 \item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
-\item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -179,23 +178,6 @@ Remove existing Target Positiion from Portfolio
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{position_id}}{Position ID}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$clone(deep = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
 }
 \if{html}{\out{</div>}}
 }

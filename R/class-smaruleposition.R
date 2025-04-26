@@ -44,7 +44,7 @@ SMARulePosition <- R6::R6Class( #nolint
           return(Inf)
         }
       }
-      exp * max_threshold_
+      private$max_threshold_ / exp
     },
     #' Get Security Min Value
     #' @description Get the minimum value of the security based on the rule
@@ -59,7 +59,7 @@ SMARulePosition <- R6::R6Class( #nolint
           return(-Inf)
         }
       }
-      exp * min_threshold_
+      private$min_threshold_ / exp
     }
   ),
   private = list(

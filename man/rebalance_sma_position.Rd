@@ -4,7 +4,7 @@
 \alias{rebalance_sma_position}
 \title{Rebalance SMA Position}
 \usage{
-rebalance_sma_position(sma, tgt_position_id)
+rebalance_sma_position(sma, base_position_id)
 }
 \arguments{
 \item{sma}{SMA Portfolio object}

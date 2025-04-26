@@ -53,38 +53,54 @@ rebalance_sma_position <- function(sma, base_position_id) {
 
   sma_position_id <- base_position_id
   replacement_securities <- sma$get_replacement_security(base_position_id)
-  if (!is.null(replacement_security)) {
+  if (!is.null(replacement_securities)) {
     sma_position_id <- replacement_securities
   }
 
-  max_pos <- sapply(
+  sma_tgt_position <- lapply(
     sma_position_id,
-    function(sec, rules) {
-      max_pos_rule <- sapply(
-        rules,
-        function(sec, rule) rule$get_security_max_value(sec),
-        sec = sec
+    function(sec, sma) {
+      tryCatch(
+        {sma$get_tatget_position(sec)},
+        error = function(e) {
+          pos <- create_position(sma$get_short_name(), sec, 0)
+          sma$add_target_position(pos)
+          pos
+        }
       )
-      min(max_pos_rule)
     },
-    rules = sma$get_sma_rules()
+    sma = sma
   )
 
-  min_pos <- sapply(
-    sma_position_id,
-    function(sec, rules) {
-      min_pos_rule <- sapply(
-        rules,
-        function(sec, rule) rule$get_security_max_value(sec),
-        sec = sec
-      )
-      max(min_pos_rule)
-    },
-    rules = sma$get_sma_rules()
+  tgt_position <- create_position(
+    sma$get_short_name(),
+    base_position_id,
+    base_position$get_qty() * sma_scale_factor
   )
 
-  
+  for (pos in sma_tgt_position) {
+    max_shares <- floor(min(sapply(
+      sma$get_rules(),
+      \(sec, rule) rule$get_security_max_value(sec),
+      sec = pos$get_id()
+    )))
+    min_shares <- ceiling(max(sapply(
+      sma$get_rules(),
+      \(sec, rule) rule$get_security_min_value(sec),
+      sec = pos$get_id()
+    )))
 
+
+    if (pos$get_id() == tgt_position$get_id()) {
+      max_shares <- 
+
+
+      base_position[[1]]$get_qty() * sma_scale_factor
+      tgt_shares_remaining <- tgt_shares_remaining - pos$get_qty()
+    } else {
+      tgt_shares_remaining <- tgt_shares_remaining + pos$get_qty()
+    }
+  }
 
   # END NEW --------------------------------------------------------------------
 

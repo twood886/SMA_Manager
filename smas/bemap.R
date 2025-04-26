@@ -83,3 +83,15 @@ create_smarule(
   max_threshold = 1.83,
   min_threshold = -1.83
 )
+
+create_smarule(
+  sma_name = "bemap",
+  rule_name = "max position size 5%",
+  scope = "position",
+  definition = function(security_id, sma) {
+    price <- Rblpapi::bdp(security_id, "PX_LAST")$PX_LAST
+    price / sma$get_nav()
+  },
+  max_threshold = 0.05,
+  min_threshold = -0.05
+)

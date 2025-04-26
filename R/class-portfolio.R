@@ -7,6 +7,7 @@
 #' @include create_position.R
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
+  cloneable = FALSE,
   public = list(
     #' @description
     #' Create New Portfolio R6 object

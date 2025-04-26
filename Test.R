@@ -22,17 +22,6 @@ test <- lapply(bemap$get_sma_rules(), function(rule) rule$check_rule_target())
 
 unlist(test)
 
-create_smarule(
-  sma_name = "bemap",
-  rule_name = "max position size 5%",
-  scope = "position",
-  definition = function(security_id, sma) {
-    price <- Rblpapi::bdp(security_id, "PX_LAST")$PX_LAST
-    price / sma$get_nav()
-  },
-  max_threshold = 0.05,
-  min_threshold = -0.05
-)
 
 test <- create_position("bemap", "aapl us equity", 0)
 t1 <- Sys.time()
