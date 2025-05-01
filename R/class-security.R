@@ -12,12 +12,19 @@
 #' @export
 Security <- R6::R6Class( #nolint
   "Security",
+  private = list(
+    bbid_ = NULL,
+    description_ = NULL,
+    instrument_type_ = NULL,
+    price_ = NULL,
+    delta_ = NULL,
+  ),
   public = list(
     #' @description Create new Security R6 object
     #' @param id Character string. Security identifier (e.g., "AAPL").
-    initialize = function(id = NULL) {
-      stopifnot(is.character(id), length(id) == 1)
-      private$id_ <- id
+    initialize = function(bbid = NULL) {
+      asset_string(bbid, "bbid")
+      private$bbid_ <- bbdid
       private$description_ <- Rblpapi::bdp(id, "DX615")$DX615
       private$instrument_type_ <- Rblpapi::bdp(id, "EX028")$EX028
       self$update_price()
@@ -34,21 +41,6 @@ Security <- R6::R6Class( #nolint
     get_price = function() private$price_,
     #' @description Get Delta
     get_delta = function() private$delta_,
-    #' @description Get an items from \code{data} as a named value
-    #' @param item String name of the list item in \code{data}
-    get_data_item = function(item = NULL) {
-      if (is.null(item)) stop("Item must be specified")
-      if (!item %in% names(private$data_)) stop("Item not in data")
-      return(private$data_[[item]])
-    },
-    #' @description Get an item from \code{ts_data} as a named vector.
-    #' @param item String name of the time-series vector in \code{ts_data}.
-    get_ts_data_item = function(item = NULL) {
-      if (is.null(item)) stop("Item must be specified")
-      if (!item %in% names(private$ts_data_)) stop("Item not in ts_data")
-      ts <- private$ts_data_[item]
-      return(ts)
-    },
 
     # Update Data --------------------------------------------------
     #' @description Update Price
@@ -66,25 +58,6 @@ Security <- R6::R6Class( #nolint
       }
       private$delta_ <- delta
       delta
-    },
-
-    #' Setters -----------------------------------------------------------------
-    #' @description Add or overwrite an item in \code{data}
-    #' @param ... Named values to store in \code{data} list.
-    set_data_item = function(...) {
-      args_list <- list(...)
-      existing_keys <- intersect(names(args_list), names(private$data_))
-      new_keys <- setdiff(names(args_list), names(private$data_))
-      private$data_[existing_keys] <<- args_list[existing_keys]
-      private$data_[new_keys] <<- args_list[new_keys]
     }
-  ),
-  private = list(
-    id_ = NULL,
-    description_ = NULL,
-    instrument_type_ = NULL,
-    price_ = NULL,
-    delta_ = NULL,
-    data_ = list()
   )
 )
