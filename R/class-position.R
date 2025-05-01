@@ -7,6 +7,7 @@
 #' @import R6
 #' @include get_or_create_security.R
 #' @include get_portfolio.R
+#' @export
 Position <- R6::R6Class(  #nolint
   "Position",
   public = list(

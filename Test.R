@@ -11,27 +11,42 @@ ccmf <- create_portfolio_from_enfusion(
   enfusion_url = ccmf_url
 )
 
+ccmf$add_flow(39200000)
+
 source("smas/bemap.R")
+source("smas/fmap.R")
+
 rebalance_sma(bemap)
+rebalance_sma(fmap)
 
-pos <- bemap$get_target_position()
-rules <- bemap$get_sma_rules()
+trades <- mget(
+  ls(envir = .trade_registry, all.names = TRUE),
+  envir = .trade_registry, 
+  inherits = TRUE
+)
 
-test <- lapply(bemap$get_sma_rules(), function(rule) rule$check_rule_target())
+trade_df <- dplyr::bind_rows(lapply(trades, \(trade) trade$to_df()))
+row.names(trade_df) <- NULL
 
+library(tidyverse)
+out <- trade_df %>%
+  dplyr::group_by(security_id, swap) %>%
+  tidyr::pivot_wider(
+    names_from = portfolio_short_name,
+    values_from = c(shares, allocation_pct)
+  ) %>%
+  dplyr::mutate(across(contains("shares_"), ~replace_na(.x, 0))) %>%
+  dplyr::mutate(`quantity` = rowSums(across(contains("shares_")))) %>%
+  dplyr::select(
+    security_id,
+    swap,
+    quantity,
+    contains("allocation_pct_"),
+  )
+write.csv(
+  out,
+  file = "sma_trades.csv",
+  row.names = FALSE
+)
 
-unlist(test)
-
-
-test <- create_position("bemap", "aapl us equity", 0)
-t1 <- Sys.time()
-test <- create_position("bemap", "aapl us equity", 0)
-t2 <- Sys.time()
-a <- t2 - t1
-
-
-t3 <- Sys.time()
-test2 <- test$clone(deep = TRUE)
-test2$set_qty(0)
-t4 <- Sys.time()
-b <- t4 - t3
+add_trade("et us equity", "ccmf", -1, T, T)

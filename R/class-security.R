@@ -9,6 +9,7 @@
 #'
 #' @importFrom R6 R6Class
 #' @import Rblpapi
+#' @export
 Security <- R6::R6Class( #nolint
   "Security",
   public = list(
@@ -17,36 +18,22 @@ Security <- R6::R6Class( #nolint
     initialize = function(id = NULL) {
       stopifnot(is.character(id), length(id) == 1)
       private$id_ <- id
-      private$description <- Rblpapi::bdp(id, "DX615")$DX615
-      private$instrument_type <- Rblpapi::bdp(id, "EX028")$EX028
+      private$description_ <- Rblpapi::bdp(id, "DX615")$DX615
+      private$instrument_type_ <- Rblpapi::bdp(id, "EX028")$EX028
+      self$update_price()
+      self$update_delta()
     },
     # Getters ------------------------------------------------------------------
     #' @description Get ID
-    get_id = function() {
-      return(private$id_)
-    },
+    get_id = function() private$id_,
     #' @description Get Description
-    get_description = function() {
-      return(private$description)
-    },
+    get_description = function() private$description_,
     #' @description Get Instrument Type
-    get_instrument_type = function() {
-      return(private$instrument_type)
-    },
+    get_instrument_type = function() private$instrument_type_,
+    #' @description Get Price
+    get_price = function() private$price_,
     #' @description Get Delta
-    get_delta = function() {
-      if (private$instrument_type == "Option") {
-        delta <- (Rblpapi::bdp(private$id_, "OP006")$OP006)
-      }else {
-        delta <- 1
-      }
-      return(delta)
-    },
-    #' @description Get price
-    get_price = function() {
-      price <- Rblpapi::bdp(private$id_, "PX_LAST")$PX_LAST
-      return(price)
-    },
+    get_delta = function() private$delta_,
     #' @description Get an items from \code{data} as a named value
     #' @param item String name of the list item in \code{data}
     get_data_item = function(item = NULL) {
@@ -62,6 +49,25 @@ Security <- R6::R6Class( #nolint
       ts <- private$ts_data_[item]
       return(ts)
     },
+
+    # Update Data --------------------------------------------------
+    #' @description Update Price
+    update_price = function() {
+      price <- Rblpapi::bdp(private$id_, "PX_LAST")$PX_LAST
+      private$price_ <- price
+      price
+    },
+    #' @description Update Delta
+    update_delta = function() {
+      if (private$instrument_type_ == "Option") {
+        delta <- (Rblpapi::bdp(private$id_, "OP006")$OP006)
+      }else {
+        delta <- 1
+      }
+      private$delta_ <- delta
+      delta
+    },
+
     #' Setters -----------------------------------------------------------------
     #' @description Add or overwrite an item in \code{data}
     #' @param ... Named values to store in \code{data} list.
@@ -75,10 +81,10 @@ Security <- R6::R6Class( #nolint
   ),
   private = list(
     id_ = NULL,
-    description = NULL,
-    instrument_type = NULL,
-    delta = NULL,
-    ts_data_ = list(),
+    description_ = NULL,
+    instrument_type_ = NULL,
+    price_ = NULL,
+    delta_ = NULL,
     data_ = list()
   )
 )

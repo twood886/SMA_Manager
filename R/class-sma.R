@@ -6,10 +6,11 @@
 #'
 #' @import R6
 #' @import enfusion
+#' @import parallel
 #' @include create_position.R
 #' @include class-portfolio.R
 #' @include get_portfolio.R
-#'
+#' @export
 SMA <- R6::R6Class(   #nolint
   "SMA",
   inherit = Portfolio,
@@ -19,17 +20,17 @@ SMA <- R6::R6Class(   #nolint
     #' @param long_name Character. SMA Long Name.
     #' @param short_name Character. SMA Short Name.
     #' @param nav Numeric. SMA Net Asset Value.
-    #' @param target_portfolio An object representing the target portfolio.
+    #' @param base_portfolio An object representing the base portfolio.
     #' @param positions Optional. SMA Positions. Default is NULL.
     #' @return A new instance of the SMA class.
     initialize = function(
-      long_name, short_name, nav, target_portfolio = NULL, positions = NULL
+      long_name, short_name, nav, base_portfolio = NULL, positions = NULL
     ) {
       private$id_ <- length(ls(envir = .portfolio_registry)) + 1
       private$long_name_ <- long_name
       private$short_name_ <- short_name
       private$nav_ <- nav
-      private$target_portfolio_ <- target_portfolio
+      private$base_portfolio_ <- base_portfolio
       private$positions_ <- positions
       private$target_positions_ <- positions
       private$sma_rules_ <- list()
@@ -67,74 +68,143 @@ SMA <- R6::R6Class(   #nolint
     },
 
     # Getters ------------------------------------------------------------------
-    #' Get Target Portfolio
+    #' Get Base Portfolio
     #' @description Get the tagret portfolio
-    get_target_portfolio = function() private$target_portfolio_,
+    get_base_portfolio = function() private$base_portfolio_,
 
-    #' Get Target Portfolio Position
-    #' @description Get a position in the target portfolio
+    #' Get Base Portfolio Position
+    #' @description Get a position in the Base portfolio
     #' @param security_id Security ID
-    get_target_portfolio_position = function(security_id = NULL) {
-      self$get_targert_portfolio()$get_position(security_id)
-    },
-
-    #' Compare Weights to Target Portfolio
-    #' @description Compare the current weight in the sma
-    #' @param security_id Security ID
-    #' to the current weight in the target portfolio
-    compare_weight_current = function(security_id = NULL) {
-      self$get_position(security_id)
+    get_base_portfolio_position = function(security_id = NULL) {
+      self$get_base_portfolio()$get_position(security_id)
     },
 
     #' @description Get the SMA Rules
     #' @return A list of SMA rules
     get_sma_rules = function() {
-      if (length(private$sma_rules_) == 0) {
-        stop("No SMA rules defined")
-      }
+      if (length(private$sma_rules_) == 0) stop("No SMA rules defined")
       private$sma_rules_
     },
 
     #' @description Get replacement security for a given replaced security
-    #' @param replaced_security_id Security ID of the replaced security (in target ptfl) #nolint
+    #' @param replaced_security_id Security ID of the replaced security (in base ptfl) #nolint
     get_replacement_security = function(replaced_security_id = NULL) {
-      if (is.null(replaced_security_id)) {
-        stop("Security ID must be supplied")
-      }
+      if (is.null(replaced_security_id)) private$replacements_
       if (!replaced_security_id %in% names(private$replacements_)) {
-        return(NULL)
+        return(replaced_security_id)
       }
-      replacement <- private$replacements_[[replaced_security_id]]
-      replacement
+      private$replacements_[[replaced_security_id]]
     },
 
     #' @description Get replaced security for a given replacement security
     #' @param replacement_security_id Security ID of the replacement security (in SMA) #nolint
     get_replaced_security = function(replacement_security_id = NULL) {
-      if (is.null(replacement_security_id)) {
-        stop("Security ID must be supplied")
-      }
+      if (is.null(replacement_security_id)) names(private$replacements_)
       u <- unlist(private$replacements_, use.names = TRUE)
       idx <- which(u == replacement_security_id)
-
-      if (length(idx) == 0) {
-        return(NULL)
-      }
-      replaced_security <- names(u)[idx]
-      replaced_security
+      if (length(idx) == 0) return(NULL)
+      names(u)[idx]
     },
 
     #' @description Check SMA rules against the target positions
     check_sma_rules_target = function() {
-      if (length(private$sma_rules_) == 0) {
-        stop("No SMA rules defined")
-      }
-      lapply(private$sma_rules_, function(x) x$check_rule_target())
-    }
+      lapply(self$get_sma_rules_, function(x) x$check_rule_target())
+    },
 
+    #' @description Get Maximum Position Size given all SMA Rules
+    #' @param security_id Security ID
+    #' @param cl Cluster object for parallel processing (optional)
+    get_max_position_rules = function(security_id = NULL, cl = NULL) {
+      if (is.null(security_id)) stop("Security ID must be supplied")
+      if (is.null(cl) || !inherits(cl, "cluster")) {
+        return(min(sapply(
+          private$sma_rules_,
+          \(rule) rule$get_security_max_value(security_id)
+        )))
+      }
+    },
+
+    #' @description Get Minimum Position Size given all SMA Rules
+    #' @param security_id Security ID
+    #' @param cl Cluster object for parallel processing (optional)
+    get_min_position_rules = function(security_id = NULL, cl = NULL) {
+      if (is.null(security_id)) stop("Security ID must be supplied")
+      if (is.null(cl) | !inherits(cl, "cluster")) {
+        return(max(sapply(
+          private$sma_rules_,
+          \(sec, rule) rule$get_security_min_value(sec),
+          sec = security_id
+        )))
+      }
+    },
+
+    #' @description Rebalance SMA Position
+    #' @param security_id Security ID
+    #' @param cl Cluster object for parallel processing (optional)
+    #' @param assign_position Logical. If TRUE, assign the position to the SMA Target Position
+    rebalance_position = function(security_id, assign_position = FALSE) {
+      if (is.null(security_id)) stop("Security ID must be supplied")
+
+      base_pos <- private$base_portfolio_$get_position(security_id)
+      nav_ratio  <- self$get_nav() / private$base_portfolio_$get_nav()
+
+      replacements <- self$get_replacement_security(security_id)
+
+      get_or_create_target <- function(sec) {
+        pos <- try(self$get_target_position(sec), silent = TRUE)
+        if (inherits(pos, "try-error")) {
+          pos <- create_position(private$short_name_, sec, 0)
+        }
+        pos
+      }
+
+      tgt_pos <- lapply(replacements, get_or_create_target)
+
+      scaled_qty <- base_pos$get_qty() * nav_ratio
+      scaled_pos <- create_position(private$short_name_, security_id, scaled_qty)
+
+      for (pos in tgt_pos) {
+        sec_id <- pos$get_id()
+        existing_qty <- pos$get_qty()
+        price <- pos$get_security()$get_price()
+        scaled_price <- scaled_pos$get_security()$get_price()
+
+        max_shares <- self$get_max_position_rules(sec_id)
+        min_shares <- self$get_min_position_rules(sec_id)
+        if (sec_id == security_id) {
+          full_trade_qty <- scaled_pos$get_qty()
+        } else{
+          full_trade_qty <- scaled_pos$get_mkt_val() / price
+        }
+
+        target_qty <- pmin(pmax(existing_qty + full_trade_qty, min_shares), max_shares)
+        trade_qty <- target_qty - existing_qty
+        pos$set_qty(target_qty)
+
+        if (sec_id == security_id) {
+          used_qty <- trade_qty
+        } else {
+          used_qty <- (trade_qty * price) / scaled_price
+        }
+
+        scaled_pos$set_qty(scaled_pos$get_qty() - used_qty)
+      }
+
+      if (abs(scaled_pos$get_qty()) > .Machine$double.eps ^ 0.5) {
+        stop(sprintf(
+          "Non-zero residual after rebalancing ‘%s’: %.6f shares remaining",
+          security_id, scaled_pos$get_qty()
+        ))
+      }
+
+      if (assign_position) {
+        lapply(tgt_pos, \(p) self$add_target_position(p, overwrite = TRUE))
+      }
+      tgt_pos
+    }
   ),
   private = list(
-    target_portfolio_ = NULL,
+    base_portfolio_ = NULL,
     sma_rules_ = list(),
     replacements_ = list()
   )

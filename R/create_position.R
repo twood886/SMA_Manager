@@ -31,6 +31,7 @@ create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
 }
 
 #' @importFrom dplyr case_when
+#' @export
 create_position_from_enfusion <- function(x, portfolio_short_name = NULL) {
   # Values to create security
   instrument_type <- x[["Instrument Type"]]
@@ -41,7 +42,6 @@ create_position_from_enfusion <- function(x, portfolio_short_name = NULL) {
     .default = x[["Description"]]
   )
   id <- tolower(id)
-
   # Values to create position
   if (instrument_type == "Listed Option") {
     qty <- as.numeric(x[["Option Quantity"]])

@@ -13,5 +13,5 @@ rebalance_sma(sma = NULL)
 Null
 }
 \description{
-Function to rebalance an SMA portfolio to match the target portfolio
+Function to rebalance an SMA portfolio to match the base portfolio
 }

@@ -17,8 +17,8 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_target_position}{\code{Portfolio$get_target_position()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
-\item \href{#method-Portfolio-remove_position}{\code{Portfolio$remove_position()}}
 \item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
+\item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -149,12 +149,12 @@ Add New Target Position to Portfolio
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-remove_position"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-remove_position}{}}}
-\subsection{Method \code{remove_position()}}{
-Remove existing Position from Portfolio
+\if{html}{\out{<a id="method-Portfolio-remove_target_position"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-remove_target_position}{}}}
+\subsection{Method \code{remove_target_position()}}{
+Remove existing Target Position from Portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$remove_position(position_id)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$remove_target_position(position_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -166,18 +166,18 @@ Remove existing Position from Portfolio
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-remove_target_position"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-remove_target_position}{}}}
-\subsection{Method \code{remove_target_position()}}{
-Remove existing Target Positiion from Portfolio
+\if{html}{\out{<a id="method-Portfolio-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$remove_target_position(position_id)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{position_id}}{Position ID}
+\item{\code{deep}}{Whether to make a deep clone.}
 }
 \if{html}{\out{</div>}}
 }

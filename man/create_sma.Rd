@@ -7,7 +7,7 @@
 create_sma(
   long_name,
   short_name,
-  target_portfolio = NULL,
+  base_portfolio = NULL,
   enfusion_url = NULL,
   nav = NULL
 )
@@ -17,7 +17,7 @@ create_sma(
 
 \item{short_name}{Short identifying name of SMA object.}
 
-\item{target_portfolio}{Short name of portfolio the SMA is
+\item{base_portfolio}{Short name of portfolio the SMA is
 intended to mimick. This portfolio must already be created for
 the SMA to be created.}
 
@@ -27,8 +27,7 @@ positions in the SMA will be created based on the holdings
 in the enfusion report. If not supplied, NAV must be supplied.}
 
 \item{nav}{Optional NAV of SMA. If enfusion_url is supplied, arguement will
-be ignored. If enfusion_url is not supplied, target_positions will be based
-on the target portfolio allocations, scaled to the NAV specified.}
+be ignored.}
 }
 \value{
 A \code{SMA} object.

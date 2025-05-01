@@ -17,13 +17,15 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-add_rule}{\code{SMA$add_rule()}}
 \item \href{#method-SMA-add_replacement}{\code{SMA$add_replacement()}}
-\item \href{#method-SMA-get_target_portfolio}{\code{SMA$get_target_portfolio()}}
-\item \href{#method-SMA-get_target_portfolio_position}{\code{SMA$get_target_portfolio_position()}}
-\item \href{#method-SMA-compare_weight_current}{\code{SMA$compare_weight_current()}}
+\item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
+\item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
 \item \href{#method-SMA-get_sma_rules}{\code{SMA$get_sma_rules()}}
 \item \href{#method-SMA-get_replacement_security}{\code{SMA$get_replacement_security()}}
 \item \href{#method-SMA-get_replaced_security}{\code{SMA$get_replaced_security()}}
 \item \href{#method-SMA-check_sma_rules_target}{\code{SMA$check_sma_rules_target()}}
+\item \href{#method-SMA-get_max_position_rules}{\code{SMA$get_max_position_rules()}}
+\item \href{#method-SMA-get_min_position_rules}{\code{SMA$get_min_position_rules()}}
+\item \href{#method-SMA-rebalance_position}{\code{SMA$rebalance_position()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -37,7 +39,6 @@ R6 Class representing a seperately managed account.
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="print"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-print'><code>SMAManager::Portfolio$print()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_position'><code>SMAManager::Portfolio$remove_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
 </ul>
 </details>
@@ -48,7 +49,7 @@ R6 Class representing a seperately managed account.
 \subsection{Method \code{new()}}{
 Create a new SMA R6 object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$new(long_name, short_name, nav, target_portfolio = NULL, positions = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$new(long_name, short_name, nav, base_portfolio = NULL, positions = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -60,7 +61,7 @@ Create a new SMA R6 object.
 
 \item{\code{nav}}{Numeric. SMA Net Asset Value.}
 
-\item{\code{target_portfolio}}{An object representing the target portfolio.}
+\item{\code{base_portfolio}}{An object representing the base portfolio.}
 
 \item{\code{positions}}{Optional. SMA Positions. Default is NULL.}
 }
@@ -104,54 +105,35 @@ Add replacement securitity
 \item{\code{original_security}}{The original Security id}
 
 \item{\code{replacement_security}}{The replacement Security id
-Get Target Portfolio}
+Get Base Portfolio}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_target_portfolio"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_target_portfolio}{}}}
-\subsection{Method \code{get_target_portfolio()}}{
+\if{html}{\out{<a id="method-SMA-get_base_portfolio"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_base_portfolio}{}}}
+\subsection{Method \code{get_base_portfolio()}}{
 Get the tagret portfolio
-Get Target Portfolio Position
+Get Base Portfolio Position
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_base_portfolio()}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_target_portfolio_position"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_target_portfolio_position}{}}}
-\subsection{Method \code{get_target_portfolio_position()}}{
-Get a position in the target portfolio
+\if{html}{\out{<a id="method-SMA-get_base_portfolio_position"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_base_portfolio_position}{}}}
+\subsection{Method \code{get_base_portfolio_position()}}{
+Get a position in the Base portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_target_portfolio_position(security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_base_portfolio_position(security_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID
-Compare Weights to Target Portfolio}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-compare_weight_current"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-compare_weight_current}{}}}
-\subsection{Method \code{compare_weight_current()}}{
-Compare the current weight in the sma
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$compare_weight_current(security_id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID
-to the current weight in the target portfolio}
+\item{\code{security_id}}{Security ID}
 }
 \if{html}{\out{</div>}}
 }
@@ -181,7 +163,7 @@ Get replacement security for a given replaced security
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{replaced_security_id}}{Security ID of the replaced security (in target ptfl) #nolint}
+\item{\code{replaced_security_id}}{Security ID of the replaced security (in base ptfl) #nolint}
 }
 \if{html}{\out{</div>}}
 }
@@ -212,6 +194,65 @@ Check SMA rules against the target positions
 \if{html}{\out{<div class="r">}}\preformatted{SMA$check_sma_rules_target()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_max_position_rules"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_max_position_rules}{}}}
+\subsection{Method \code{get_max_position_rules()}}{
+Get Maximum Position Size given all SMA Rules
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_max_position_rules(security_id = NULL, cl = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+
+\item{\code{cl}}{Cluster object for parallel processing (optional)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_min_position_rules"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_min_position_rules}{}}}
+\subsection{Method \code{get_min_position_rules()}}{
+Get Minimum Position Size given all SMA Rules
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_min_position_rules(security_id = NULL, cl = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+
+\item{\code{cl}}{Cluster object for parallel processing (optional)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-rebalance_position"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-rebalance_position}{}}}
+\subsection{Method \code{rebalance_position()}}{
+Rebalance SMA Position
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$rebalance_position(security_id, assign_position = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+
+\item{\code{assign_position}}{Logical. If TRUE, assign the position to the SMA Target Position}
+
+\item{\code{cl}}{Cluster object for parallel processing (optional)}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-clone"></a>}}

@@ -5,8 +5,10 @@ bemap <- create_sma(
   long_name = "BEMAP SMA",
   short_name = "bemap",
   nav = 100000000,
-  target_portfolio = "ccmf"
+  base_portfolio = "ccmf"
 )
+
+bemap <- bemap$add_replacement("oci na equity", c("meoh us equity"))
 
 # Create bemap rules
 create_smarule(
@@ -14,7 +16,11 @@ create_smarule(
   rule_name = "position under 4.99% shares outstanding",
   scope = "position",
   definition = function(security_id, sma) {
-    1 / Rblpapi::bdp(security_id, "DS381")$DS381
+    sec_type <- Rblpapi::bdp(security_id, "EX028")$EX028
+    dplyr::case_when(
+      sec_type == "Equity" ~ 1 / Rblpapi::bdp(security_id, "DS381")$DS381,
+      TRUE ~ 0
+    )
   },
   max_threshold = 0.0499,
   min_threshold = -Inf
@@ -60,8 +66,6 @@ create_smarule(
   swap_only = TRUE
 )
 
-
-
 create_smarule(
   sma_name = "bemap",
   rule_name = "only US securities",
@@ -78,20 +82,12 @@ create_smarule(
   rule_name = "liquidity",
   scope = "position",
   definition = function(security_id, sma) {
-    1 / Rblpapi::bdp(security_id, "HS020")$HS020
+    sec_type <- Rblpapi::bdp(security_id, "EX028")$EX028
+    dplyr::case_when(
+      sec_type == "Equity" ~ 1 / Rblpapi::bdp(security_id, "HS020")$HS020,
+      TRUE ~ 0
+    )
   },
   max_threshold = 1.83,
   min_threshold = -1.83
-)
-
-create_smarule(
-  sma_name = "bemap",
-  rule_name = "max position size 5%",
-  scope = "position",
-  definition = function(security_id, sma) {
-    price <- Rblpapi::bdp(security_id, "PX_LAST")$PX_LAST
-    price / sma$get_nav()
-  },
-  max_threshold = 0.05,
-  min_threshold = -0.05
 )

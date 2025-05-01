@@ -5,9 +5,9 @@
 #' @import enfusion
 #' @importFrom dplyr filter
 #' @include create_position.R
+#' @export
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
-  cloneable = FALSE,
   public = list(
     #' @description
     #' Create New Portfolio R6 object
@@ -144,25 +144,18 @@ Portfolio <- R6::R6Class( #nolint
     },
 
     #' @description
-    #' Remove existing Position from Portfolio
+    #' Remove existing Target Position from Portfolio
     #' @param position_id Position ID
-    remove_position = function(position_id) {
-      position_ids <- sapply(private$positions_, \(x) x$get_id())
-      if (position_id %in% position_ids) {
-        private$positions_ <- private$positions_[position_ids != position_id] #nolint
+    remove_target_position = function(position_id = NULL) {
+      if(is.null(position_id)) {
+        private$target_positions_ <- list()
+        return(invisible(NULL))
       }
-    },
-
-    #' @description
-    #' Remove existing Target Positiion from Portfolio
-    #' @param position_id Position ID
-    remove_target_position = function(position_id) {
       position_ids <- sapply(private$target_positions_, \(x) x$get_id())
       if (position_id %in% position_ids) {
         private$target_positions_ <- private$target_positions_[position_ids != position_id] #nolint
       }
     }
-
   ),
   private = list(
     id_ = NULL,

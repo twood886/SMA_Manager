@@ -5,7 +5,7 @@
 #'
 #' @param long_name Long name of SMA object.
 #' @param short_name Short identifying name of SMA object.
-#' @param target_portfolio Short name of portfolio the SMA is
+#' @param base_portfolio Short name of portfolio the SMA is
 #'  intended to mimick. This portfolio must already be created for
 #'  the SMA to be created.
 #' @param enfusion_url Optional Web URL to Enfusion
@@ -13,26 +13,25 @@
 #'  positions in the SMA will be created based on the holdings
 #'  in the enfusion report. If not supplied, NAV must be supplied.
 #' @param nav Optional NAV of SMA. If enfusion_url is supplied, arguement will
-#'  be ignored. If enfusion_url is not supplied, target_positions will be based
-#'  on the target portfolio allocations, scaled to the NAV specified.
+#'  be ignored.
 #'
 #' @return A \code{SMA} object.
 #' @export
 #' @include get_portfolio.R
 #' @include class-sma.R
 create_sma <- function(
-  long_name, short_name, target_portfolio = NULL,
+  long_name, short_name, base_portfolio = NULL,
   enfusion_url = NULL, nav = NULL
 ) {
 
-  # Check that target portfolio is supplied
-  if (is.null(target_portfolio)) {
-    stop("Target Portfolio Must be Supplied")
+  # Check that base portfolio is supplied
+  if (is.null(base_portfolio)) {
+    stop("Base Portfolio Must be Supplied")
   }
-  # Check that target portfolio has already been created
-  tgt_ptfl <- get_portfolio(target_portfolio)
-  if (is.null(tgt_ptfl)) {
-    stop("Target Portfolio has not been created")
+  # Check that base portfolio has already been created
+  base_ptfl <- get_portfolio(base_portfolio)
+  if (is.null(base_ptfl)) {
+    stop("Base Portfolio has not been created")
   }
 
   # Check enfusion url or NAV is supplied
@@ -55,7 +54,7 @@ create_sma <- function(
       long_name = long_name,
       short_name = short_name,
       nav = nav,
-      target_portfolio = tgt_ptfl,
+      base_portfolio = base_ptfl,
       positions = positions
     )
   } else {
@@ -63,7 +62,7 @@ create_sma <- function(
       long_name = long_name,
       short_name = short_name,
       nav = nav,
-      target_portfolio = tgt_ptfl
+      base_portfolio = base_ptfl
     )
   }
   assign(short_name, sma, envir = .portfolio_registry)
