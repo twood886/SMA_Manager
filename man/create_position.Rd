@@ -4,7 +4,7 @@
 \alias{create_position}
 \title{Create Position}
 \usage{
-create_position(portfolio_short_name, id, qty, sec_id = NULL)
+create_position(portfolio_short_name, id, qty, sec_id = NULL, swap = FALSE)
 }
 \arguments{
 \item{portfolio_short_name}{Portfolio Short Name the security belongs to}

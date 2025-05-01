@@ -17,11 +17,13 @@ Position <- R6::R6Class(  #nolint
     #' @param id Security Ticker
     #' @param qty Stock Quantity
     #' @param sec Security
-    initialize = function(portfolio_short_name, id, qty, sec) {
+    #' @param swap Swap Flag
+    initialize = function(portfolio_short_name, id, qty, sec, swap = FALSE) {
       private$portfolio_short_name_ <- portfolio_short_name
       private$id_ <- id
       private$qty_ <- qty
       private$security_ <- sec
+      private$swap_ <- swap
     },
 
     # Getter Functions ---------------------------------------------------------
@@ -31,6 +33,8 @@ Position <- R6::R6Class(  #nolint
     get_security = function() private$security_,
     #' @description Get position Quantity
     get_qty = function() private$qty_,
+    #' @description Get Swap flag
+    get_swap = function() private$swap_,
     #' @description Get position Delta Quantity
     get_delta_qty = function() {
       if (is.null(private$delta_qty_)) {
@@ -90,15 +94,26 @@ Position <- R6::R6Class(  #nolint
       private$delta_pct_nav_ <- new_delta_pct_nav
     },
 
-
     # Calculators --------------------------------------------------------------
+    #' @description Update Position Values
+    #' @param nav Portfolio NAV
+    update = function(nav = NULL) {
+      if (is.null(nav)) {
+        nav <- get_portfolio(private$portfolio_short_name_)$get_nav()
+      }
+      self$calc_delta_qty()
+      self$calc_mkt_val()
+      self$calc_delta_val()
+      self$calc_stock_pct_nav(nav)
+      self$calc_delta_pct_nav(nav)
+    },
     #' @description Calc delta_qty
     calc_delta_qty = function() {
       private$delta_qty_ <- private$qty_ * private$security_$get_delta()
     },
     #' @description Calc mkt_val
     calc_mkt_val = function() {
-      private$mkt_val_ <- private$qty_ * private$security_$get_price()
+      self$set_mkt_val(self$get_qty() * self$get_security()$get_price())
     },
     #' @description Calc delta_val
     calc_delta_val = function() {
@@ -131,6 +146,7 @@ Position <- R6::R6Class(  #nolint
     delta_val_ = NULL,
     stock_pct_nav_ = NULL,
     delta_pct_nav_ = NULL,
-    security_ = NULL
+    security_ = NULL,
+    swap_ = NULL
   )
 )

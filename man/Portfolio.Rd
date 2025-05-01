@@ -15,9 +15,11 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_nav}{\code{Portfolio$get_nav()}}
 \item \href{#method-Portfolio-get_position}{\code{Portfolio$get_position()}}
 \item \href{#method-Portfolio-get_target_position}{\code{Portfolio$get_target_position()}}
+\item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
 \item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
+\item \href{#method-Portfolio-get_target_trade_qty}{\code{Portfolio$get_target_trade_qty()}}
 \item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
 }
@@ -111,6 +113,23 @@ Get list of target positions in portfolio
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-add_flow"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_flow}{}}}
+\subsection{Method \code{add_flow()}}{
+Add flow to portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_flow(flow = 0)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{flow}}{flow amount}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-add_position"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-add_position}{}}}
 \subsection{Method \code{add_position()}}{
@@ -163,6 +182,26 @@ Remove existing Target Position from Portfolio
 \item{\code{position_id}}{Position ID}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_target_trade_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_target_trade_qty}{}}}
+\subsection{Method \code{get_target_trade_qty()}}{
+Get Target Trade Amount
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_target_trade_qty(security_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Target Trade Amount
 }
 }
 \if{html}{\out{<hr>}}

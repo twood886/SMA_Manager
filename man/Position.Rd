@@ -16,6 +16,7 @@ A position object contains information about the size of the
 \item \href{#method-Position-get_id}{\code{Position$get_id()}}
 \item \href{#method-Position-get_security}{\code{Position$get_security()}}
 \item \href{#method-Position-get_qty}{\code{Position$get_qty()}}
+\item \href{#method-Position-get_swap}{\code{Position$get_swap()}}
 \item \href{#method-Position-get_delta_qty}{\code{Position$get_delta_qty()}}
 \item \href{#method-Position-get_mkt_val}{\code{Position$get_mkt_val()}}
 \item \href{#method-Position-get_delta_val}{\code{Position$get_delta_val()}}
@@ -39,7 +40,7 @@ A position object contains information about the size of the
 \subsection{Method \code{new()}}{
 Create New PositionR6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Position$new(portfolio_short_name, id, qty, sec)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Position$new(portfolio_short_name, id, qty, sec, swap = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -52,6 +53,8 @@ Create New PositionR6 object
 \item{\code{qty}}{Stock Quantity}
 
 \item{\code{sec}}{Security}
+
+\item{\code{swap}}{Swap Flag}
 }
 \if{html}{\out{</div>}}
 }
@@ -83,6 +86,16 @@ Get position security
 Get position Quantity
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Position$get_qty()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-get_swap"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_swap}{}}}
+\subsection{Method \code{get_swap()}}{
+Get Swap flag
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_swap()}\if{html}{\out{</div>}}
 }
 
 }

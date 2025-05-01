@@ -60,6 +60,14 @@ SMARulePosition <- R6::R6Class( #nolint
         }
       }
       private$min_threshold_ / exp
+    },
+    #' @description Get the swap flag for a given security
+    #' @param security_id Security ID
+    check_swap_security = function(security_id) {
+      if (!private$swap_only_) {
+        return(FALSE)
+      }
+      private$definition_(security_id)
     }
   ),
   private = list(
@@ -77,15 +85,9 @@ SMARulePosition <- R6::R6Class( #nolint
       comply <- sapply(positions, private$check_rule_position_, sma = sma)
       sapply(positions[which(!comply)], function(x) x$get_id())
     },
-    check_swap_security_ = function(security_id) {
-      if (!private$swap_only_) {
-        return(FALSE)
-      }
-      private$definition_(security_id)
-    },
     check_swap_position_ = function(position) {
       security_id <- position$get_security()$get_id()
-      private$check_swap_security_(security_id)
+      self$check_swap_security_(security_id)
     },
     check_swap_multi_position_ = function(positions) {
       swap_only <- sapply(positions, private$check_swap_position_)

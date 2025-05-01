@@ -138,6 +138,13 @@ SMA <- R6::R6Class(   #nolint
       }
     },
 
+    #' @description Get Swap Flag for a given security
+    #' @param security_id Security ID
+    get_swap_flag_position_rules = function(security_id = NULL) {
+      if (is.null(security_id)) stop("Security ID must be supplied")
+      any(vapply(private$sma_rules_, \(rule) rule$check_swap_security(security_id), logical(1)))
+    },
+
     #' @description Rebalance SMA Position
     #' @param security_id Security ID
     #' @param cl Cluster object for parallel processing (optional)
@@ -153,7 +160,8 @@ SMA <- R6::R6Class(   #nolint
       get_or_create_target <- function(sec) {
         pos <- try(self$get_target_position(sec), silent = TRUE)
         if (inherits(pos, "try-error")) {
-          pos <- create_position(private$short_name_, sec, 0)
+          swap_only <- self$get_swap_flag_position_rules(sec)
+          pos <- create_position(private$short_name_, sec, 0, swap = swap_only)
         }
         pos
       }
@@ -168,7 +176,6 @@ SMA <- R6::R6Class(   #nolint
         existing_qty <- pos$get_qty()
         price <- pos$get_security()$get_price()
         scaled_price <- scaled_pos$get_security()$get_price()
-
         max_shares <- self$get_max_position_rules(sec_id)
         min_shares <- self$get_min_position_rules(sec_id)
         if (sec_id == security_id) {

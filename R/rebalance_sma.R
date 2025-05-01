@@ -5,18 +5,21 @@
 #' @return Null
 #' @import parallel
 #' @import Rblpapi
+#' @include remove_all_portfolio_trades.R
+#' @include create_trade.R
 #' @export
 rebalance_sma <- function(sma = NULL) {
   stopifnot(inherits(sma, "SMA"))
+
+  sma$remove_target_position()
+  remove_all_portfolio_trades(sma$get_short_name())
 
   base_ids <- vapply(
     sma$get_base_portfolio()$get_target_position(),
     function(x) x$get_id(),
     character(1)
   )
-
-  sma$remove_target_position()
-
+  
   replacements <- vapply(base_ids, sma$get_replacement_security, character(1))
   has_replacement <- replacements != base_ids
 
@@ -53,6 +56,21 @@ rebalance_sma <- function(sma = NULL) {
     results_noreplace[!noreplace_success],
     results_replace[!replace_success]
   )
+
+  tgt_pos <- sma$get_target_position()
+
+  lapply(
+    tgt_pos,
+    function(pos) {
+      add_trade(
+        security_id = pos$get_security()$get_id(),
+        portfolio_id = sma$get_short_name(),
+        qty = pos$get_qty(),
+        swap = pos$get_swap()
+      )
+    }
+  )
+
 
   if (length(errors) > 0) {
     warning(paste0("Rebalance failed for: ", paste(unlist(errors), collapse = ", ")))

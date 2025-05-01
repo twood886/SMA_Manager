@@ -9,7 +9,7 @@
 #' @include class-position.R
 #' @include get_or_create_security.R
 #' @export
-create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
+create_position <- function(portfolio_short_name, id, qty, sec_id = NULL, swap = FALSE) {
   id <- tolower(id)
   if (is.null(sec_id)) {
     sec_id <- id
@@ -20,7 +20,8 @@ create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
     portfolio_short_name = portfolio_short_name,
     id = id,
     qty = qty,
-    sec = get_or_create_security(sec_id)
+    sec = get_or_create_security(sec_id),
+    swap = swap
   )
   pos$calc_delta_qty()
   pos$calc_mkt_val()
@@ -32,7 +33,7 @@ create_position <- function(portfolio_short_name, id, qty, sec_id = NULL) {
 
 #' @importFrom dplyr case_when
 #' @export
-create_position_from_enfusion <- function(x, portfolio_short_name = NULL) {
+create_position_from_enfusion <- function(x, portfolio_short_name, nav) {
   # Values to create security
   instrument_type <- x[["Instrument Type"]]
   id <- dplyr::case_when(
@@ -53,6 +54,7 @@ create_position_from_enfusion <- function(x, portfolio_short_name = NULL) {
   delta_val <- as.numeric(x[["Delta Value"]])
   stock_pct_nav <- as.numeric(x[["Stock % NAV"]])
   delta_pct_nav <- as.numeric(x[["Delta % NAV"]])
+  swap <- as.logical(x[["Is Financed"]])
 
   sec <- get_or_create_security(id = id)
 
@@ -60,12 +62,13 @@ create_position_from_enfusion <- function(x, portfolio_short_name = NULL) {
     portfolio_short_name = portfolio_short_name,
     id = id,
     qty = qty,
-    sec = sec
+    sec = sec,
+    swap = swap
   )
-  pos$set_delta_qty(delta_qty)
-  pos$set_mkt_val(mkt_val)
-  pos$set_delta_val(delta_val)
-  pos$set_stock_pct_nav(stock_pct_nav)
-  pos$set_delta_pct_nav(delta_pct_nav)
+  pos$calc_delta_qty()
+  pos$calc_mkt_val()
+  pos$calc_delta_val()
+  pos$calc_stock_pct_nav(nav)
+  pos$calc_delta_pct_nav(nav)
   return(pos)
 }

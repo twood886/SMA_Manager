@@ -25,6 +25,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-check_sma_rules_target}{\code{SMA$check_sma_rules_target()}}
 \item \href{#method-SMA-get_max_position_rules}{\code{SMA$get_max_position_rules()}}
 \item \href{#method-SMA-get_min_position_rules}{\code{SMA$get_min_position_rules()}}
+\item \href{#method-SMA-get_swap_flag_position_rules}{\code{SMA$get_swap_flag_position_rules()}}
 \item \href{#method-SMA-rebalance_position}{\code{SMA$rebalance_position()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
@@ -32,12 +33,14 @@ R6 Class representing a seperately managed account.
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_flow"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_flow'><code>SMAManager::Portfolio$add_flow()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_target_position'><code>SMAManager::Portfolio$add_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_trade_qty"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_trade_qty'><code>SMAManager::Portfolio$get_target_trade_qty()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="print"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-print'><code>SMAManager::Portfolio$print()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
 </ul>
@@ -229,6 +232,23 @@ Get Minimum Position Size given all SMA Rules
 \item{\code{security_id}}{Security ID}
 
 \item{\code{cl}}{Cluster object for parallel processing (optional)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_swap_flag_position_rules"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_swap_flag_position_rules}{}}}
+\subsection{Method \code{get_swap_flag_position_rules()}}{
+Get Swap Flag for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_swap_flag_position_rules(security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
 }
 \if{html}{\out{</div>}}
 }

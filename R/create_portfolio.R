@@ -55,7 +55,7 @@ create_portfolio_from_enfusion <- function(long_name, short_name = NULL, enfusio
 
   parallel::clusterExport(
     cl,
-    varlist = c("enfusion_rep", "short_name"),
+    varlist = c("enfusion_rep", "short_name", "nav"),
     envir   = environment()
   )
   # Create a postion for each row in the enfusion file
@@ -65,7 +65,8 @@ create_portfolio_from_enfusion <- function(long_name, short_name = NULL, enfusio
     fun = function(i) {
       create_position_from_enfusion(
         x = enfusion_rep[i, , drop = FALSE],
-        portfolio_short_name = short_name
+        portfolio_short_name = short_name,
+        nav = nav
       )
     }
   )

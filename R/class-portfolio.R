@@ -92,6 +92,17 @@ Portfolio <- R6::R6Class( #nolint
       }
       return(positions[[which(position_ids == id)]])
     },
+    #' @description
+    #' Add flow to portfolio
+    #' @param flow flow amount
+    add_flow = function(flow = 0) {
+      private$nav_ <- private$nav_ + flow
+      lapply(private$positions_, \(x) x$calc_stock_pct_nav(private$nav_))
+      lapply(private$target_positions_, \(x) x$calc_stock_pct_nav(private$nav_))
+      lapply(private$positions_, \(x) x$calc_delta_pct_nav(private$nav_))
+      lapply(private$target_positions_, \(x) x$calc_delta_pct_nav(private$nav_))
+      invisible(NULL)
+    },
 
     #' @description
     #' Add Position to Portfolio
@@ -155,6 +166,17 @@ Portfolio <- R6::R6Class( #nolint
       if (position_id %in% position_ids) {
         private$target_positions_ <- private$target_positions_[position_ids != position_id] #nolint
       }
+    },
+    #' @description Get Target Trade Amount
+    #' @param security_id Security ID
+    #' @return Target Trade Amount
+    get_target_trade_qty = function(security_id) {
+      if (!is.null(security_id)) {
+        return(private$get_target_trade_qty_security_(security_id))
+      }
+      all_sec_id <- sapply(private$target_positions_, \(x) x$get_id())
+      trade_qty <- lapply(all_sec_id, \(sec_id) private$get_target_trade_qty_security_(sec_id))
+      setNames(trade_qty, all_sec_id)
     }
   ),
   private = list(
@@ -163,6 +185,25 @@ Portfolio <- R6::R6Class( #nolint
     short_name_ = NULL,
     nav_ = NULL,
     positions_ = NULL,
-    target_positions_ = NULL
+    target_positions_ = NULL,
+    get_target_trade_qty_security_ = function(security_id) {
+      if (is.null(security_id)) stop("Security ID must be supplied")
+      
+      tgt_position <- self$get_target_position(security_id)
+      if (inherits(tgt_position, "Position")) {
+        tgt_qty <- tgt_position$get_qty()
+      } else {
+        tgt_qty <- 0
+      }
+
+      cur_position <- self$get_position(security_id)
+      if (inherits(cur_position, "Position")) {
+        cur_qty <- cur_position$get_qty()
+      } else {
+        cur_qty <- 0
+      }
+
+      tgt_qty - cur_qty
+    }
   )
 )

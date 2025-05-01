@@ -1,18 +1,18 @@
 library(SMAManager)
 library(Rblpapi)
 con <- blpConnect()
-bemap <- create_sma(
-  long_name = "Citco Bank Canada Ref BEMAP Master Fund Ltd.",
-  short_name = "bemap",
+fmap <- create_sma(
+  long_name = "Citco Bank Canada Ref Blackstone CSP-MST FMAP Fund",
+  short_name = "fmap",
   nav = 100000000,
   base_portfolio = "ccmf"
 )
 
-bemap <- bemap$add_replacement("oci na equity", c("meoh us equity"))
+fmap <- fmap$add_replacement("oci na equity", c("meoh us equity"))
 
-# Create bemap rules
+# Create fmap rules
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "position under 4.99% shares outstanding",
   scope = "position",
   definition = function(security_id, sma) {
@@ -27,7 +27,7 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "no mlps except on swap",
   scope = "position",
   definition = function(security_id, sma) {
@@ -37,7 +37,7 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "no partnerships except on swap",
   scope = "position",
   definition = function(security_id, sma) {
@@ -47,7 +47,7 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "no etps except on swap",
   scope = "position",
   definition = function(security_id, sma) {
@@ -57,8 +57,8 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
-  rule_name = "no ents except on swap",
+  sma_name = "fmap",
+  rule_name = "no etns except on swap",
   scope = "position",
   definition = function(security_id, sma) {
     Rblpapi::bdp(security_id, "DS213")$DS213 == "ETN"
@@ -67,7 +67,7 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "no bdcs except on swap",
   scope = "position",
   definition = function(security_id, sma) {
@@ -77,7 +77,7 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "only US securities",
   scope = "position",
   definition = function(security_id, sma) {
@@ -88,7 +88,7 @@ create_smarule(
 )
 
 create_smarule(
-  sma_name = "bemap",
+  sma_name = "fmap",
   rule_name = "liquidity",
   scope = "position",
   definition = function(security_id, sma) {

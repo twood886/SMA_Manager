@@ -18,6 +18,7 @@ R6 Class that encapsulates rule for SMAs
 \item \href{#method-SMARulePosition-check_swap_target}{\code{SMARulePosition$check_swap_target()}}
 \item \href{#method-SMARulePosition-get_security_max_value}{\code{SMARulePosition$get_security_max_value()}}
 \item \href{#method-SMARulePosition-get_security_min_value}{\code{SMARulePosition$get_security_min_value()}}
+\item \href{#method-SMARulePosition-check_swap_security}{\code{SMARulePosition$check_swap_security()}}
 \item \href{#method-SMARulePosition-clone}{\code{SMARulePosition$clone()}}
 }
 }
@@ -115,6 +116,23 @@ Get the minimum value of the security based on the rule
 }
 \subsection{Returns}{
 Number of Shares
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePosition-check_swap_security"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-check_swap_security}{}}}
+\subsection{Method \code{check_swap_security()}}{
+Get the swap flag for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_swap_security(security_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
