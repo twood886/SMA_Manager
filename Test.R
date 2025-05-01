@@ -1,5 +1,21 @@
-library(SMAManager)
+registries <- new.env(parent = emptyenv())
+registries$portfolios <- new.env(parent = emptyenv())
+registries$securities <- new.env(parent = emptyenv())
+registries$smarules <- new.env(parent = emptyenv())
+registries$trades <- new.env(parent = emptyenv())
+
+source("R/zzz.R")
+source("R/utils.R")
+source("R/class-security.R")
+source("R/class-position.R")
+source("R/class-portfolio.R")
+source("R/api-functions.R")
+source("R/from_enfusion.R")
+
+library(tidyverse)
+library(enfusion)
 library(Rblpapi)
+
 
 con <- blpConnect()
 

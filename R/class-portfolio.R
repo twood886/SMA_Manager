@@ -11,7 +11,6 @@ Portfolio <- R6::R6Class( #nolint
   public = list(
     #' @description
     #' Create New Portfolio R6 object
-    #' @param id Portfolio id
     #' @param long_name Portfolio Long Name
     #' @param short_name Portfolio Short Name
     #' @param nav NAV of portfolio
@@ -19,7 +18,6 @@ Portfolio <- R6::R6Class( #nolint
     initialize = function(
       long_name, short_name, nav, positions
     ) {
-      private$id_ <- length(ls(envir = .portfolio_registry)) + 1
       private$long_name_ <- long_name
       private$short_name_ <- short_name
       private$nav_ <- nav
@@ -180,7 +178,6 @@ Portfolio <- R6::R6Class( #nolint
     }
   ),
   private = list(
-    id_ = NULL,
     long_name_ = NULL,
     short_name_ = NULL,
     nav_ = NULL,

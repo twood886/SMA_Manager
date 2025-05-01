@@ -10,19 +10,28 @@
 #' @export
 Position <- R6::R6Class(  #nolint
   "Position",
+  private = list(
+    portfolio_short_name_ = NULL,
+    id_ = NULL,
+    qty_ = NULL,
+    security_ = NULL,
+    swap_ = NULL
+  ),
   public = list(
     #' @description
     #' Create New PositionR6 object
     #' @param portfolio_short_name Portfolio_Short_name
-    #' @param id Security Ticker
     #' @param qty Stock Quantity
-    #' @param sec Security
+    #' @param security Security
     #' @param swap Swap Flag
-    initialize = function(portfolio_short_name, id, qty, sec, swap = FALSE) {
+    initialize = function(portfolio_short_name, security, qty, swap = FALSE) {
+      assert_inherits(security, "Security", "security")
+      assert_numeric(qty, "qty")
+      assert_bool(swap, "swap")
       private$portfolio_short_name_ <- portfolio_short_name
-      private$id_ <- id
+      private$security_ <- security
+      private$id_ <- security$get_id()
       private$qty_ <- qty
-      private$security_ <- sec
       private$swap_ <- swap
     },
 
@@ -36,117 +45,43 @@ Position <- R6::R6Class(  #nolint
     #' @description Get Swap flag
     get_swap = function() private$swap_,
     #' @description Get position Delta Quantity
-    get_delta_qty = function() {
-      if (is.null(private$delta_qty_)) {
-        self$calc_delta_qty()
-      }
-      private$delta_qty_
-    },
+    get_delta_qty = function() private$qty_ * private$security_$get_delta(),
     #' @description Get position Market Value
-    get_mkt_val = function() {
-      if (is.null(private$mkt_val_)) {
-        self$calc_mkt_val()
-      }
-      private$mkt_val_
-    },
+    get_mkt_val = function() private$qty_ * private$security_$get_price(),
     #' @description Get position Delta Value
-    get_delta_val = function() {
-      if (is.null(private$delta_val_)) {
-        self$calc_delta_val()
-      }
-      private$delta_val_
+    get_delta_val = function() self$get_delta_qty * private$security_$get_price(),
+    #' @decscription Get position Stock Percent of NAV
+    #' @param nav Portfolio NAV
+    get_mkt_pct_nav = function(nav = NULL) {
+      tryCatch(
+        {
+          assert_numeric(nav, "nav")
+          self$get_mkt_val() / nav
+        },
+        error = function(e) {
+          self$get_mkt_val() / get_portfolio(private$portfolio_short_name_)$get_nav()
+        }
+      )
     },
-
+    #' @description Get position Delta Percent of NAV
+    #' @param nav Portfolio NAV
+    get_delta_pct_nav = function(nav = NULL) {
+      tryCatch(
+        {
+          assert_numeric(nav, "nav")
+          self$get_delta_val() / nav
+        },
+        error = function(e) {
+          self$get_delta_val() / get_portfolio(private$portfolio_short_name_)$get_nav()
+        }
+      )
+    },
     # Setter Functions ---------------------------------------------------------
     #' @description Set Qty
-    #' @param new_qty New Quantity
-    set_qty = function(new_qty) {
-      private$qty_ <- new_qty
-      self$calc_delta_qty()
-      self$calc_mkt_val()
-      self$calc_delta_val()
-      self$calc_stock_pct_nav()
-      self$calc_delta_pct_nav()
-    },
-    #' @description Set Delta Qty
-    #' @param new_delta_qty New Delta Quantity
-    set_delta_qty = function(new_delta_qty) {
-      private$delta_qty_ <- new_delta_qty
-    },
-    #' @description Set Market Value
-    #' @param new_mkt_val New Market Value
-    set_mkt_val = function(new_mkt_val) {
-      private$mkt_val_ <- new_mkt_val
-    },
-    #' @description Set Delta Value
-    #' @param new_delta_val New Delta Value
-    set_delta_val = function(new_delta_val) {
-      private$delta_val_ <- new_delta_val
-    },
-    #' @description Set Stock Percent of NAV
-    #' @param new_stock_pct_nav New Stock Percent of NAV
-    set_stock_pct_nav = function(new_stock_pct_nav) {
-      private$stock_pct_nav_ <- new_stock_pct_nav
-    },
-    #' @description Set Delta Percent of NAV
-    #' @param new_delta_pct_nav New Delta Percent of NAV
-    set_delta_pct_nav = function(new_delta_pct_nav) {
-      private$delta_pct_nav_ <- new_delta_pct_nav
-    },
-
-    # Calculators --------------------------------------------------------------
-    #' @description Update Position Values
-    #' @param nav Portfolio NAV
-    update = function(nav = NULL) {
-      if (is.null(nav)) {
-        nav <- get_portfolio(private$portfolio_short_name_)$get_nav()
-      }
-      self$calc_delta_qty()
-      self$calc_mkt_val()
-      self$calc_delta_val()
-      self$calc_stock_pct_nav(nav)
-      self$calc_delta_pct_nav(nav)
-    },
-    #' @description Calc delta_qty
-    calc_delta_qty = function() {
-      private$delta_qty_ <- private$qty_ * private$security_$get_delta()
-    },
-    #' @description Calc mkt_val
-    calc_mkt_val = function() {
-      self$set_mkt_val(self$get_qty() * self$get_security()$get_price())
-    },
-    #' @description Calc delta_val
-    calc_delta_val = function() {
-      private$delta_val_ <- private$delta_qty_ * private$security_$get_price()
-    },
-    #' @description Calc stock_pct_nav
-    #' @param nav Portfolio NAV
-    calc_stock_pct_nav = function(nav = NULL) {
-      if (is.null(nav)) {
-        nav <- get_portfolio(private$portfolio_short_name_)$get_nav()
-      }
-      private$stock_pct_nav_ <- self$get_mkt_val() / nav
-    },
-    #' @description Calc delta_pct_nav
-    #' @param nav Portfolio NAV
-    calc_delta_pct_nav = function(nav = NULL) {
-      if (is.null(nav)) {
-        nav <- get_portfolio(private$portfolio_short_name_)$get_nav()
-      }
-      private$delta_pct_nav_ <- self$get_delta_val() / nav
+    #' @param qty New Quantity
+    set_qty = function(qty) {
+      assert_numeric(qty, "qty")
+      private$qty_ <- qty
     }
-  ),
-
-  private = list(
-    portfolio_short_name_ = NULL,
-    id_ = NULL,
-    qty_ = NULL,
-    delta_qty_ = NULL,
-    mkt_val_ = NULL,
-    delta_val_ = NULL,
-    stock_pct_nav_ = NULL,
-    delta_pct_nav_ = NULL,
-    security_ = NULL,
-    swap_ = NULL
   )
 )

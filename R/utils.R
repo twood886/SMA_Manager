@@ -45,3 +45,56 @@ assert_inherits <- function(x, class, name) {
     stop(sprintf("%s must be a %s object", name, class), call. = FALSE)
   }
 }
+
+#' Assert Numeric
+#'
+#' This function checks if the input is a single, non-missing numeric value.
+#' If the input does not meet these criteria, an error is raised.
+#'
+#' @param x The value to check.
+#' @param name A character string representing the name of the variable being checked.
+#'   This is used in the error message for better debugging.
+#'
+#' @return None. The function is used for its side effect of throwing an error
+#'   if the input does not meet the criteria.
+#'
+#' @throws An error if `x` is not numeric, has a length other than 1, or is `NA`.
+#'
+#' @examples
+#' assert_numeric(5, "my_var")  # Passes without error
+#' assert_numeric("a", "my_var")  # Throws an error
+#' assert_numeric(NA, "my_var")  # Throws an error
+assert_numeric <- function(x, name) {
+  if (!is.numeric(x) || length(x) != 1 || is.na(x)) {
+    stop(sprintf("%s must be a non-missing single numeric", name), call. = FALSE)
+  }
+}
+
+
+#' Assert Boolean Value
+#'
+#' This function checks if the input is a single, non-missing logical value.
+#' If the input does not meet these criteria, an error is raised.
+#'
+#' @param x The value to check.
+#' @param name A character string representing the name of the variable being checked.
+#'   This is used in the error message for better debugging.
+#'
+#' @return None. The function is used for its side effect of throwing an error
+#'   if the input does not meet the criteria.
+#' 
+#' @throws An error if `x` is not logical, has a length other than 1, or is `NA`.
+#'
+#' @examples
+#' assert_bool(TRUE, "my_var")  # Passes validation
+#' assert_bool(FALSE, "my_var") # Passes validation
+#' \dontrun{
+#' assert_bool(NA, "my_var")    # Throws an error
+#' assert_bool(1, "my_var")     # Throws an error
+#' assert_bool(c(TRUE, FALSE), "my_var") # Throws an error
+#' }
+assert_bool <- function(x, name) {
+  if (!is.logical(x) || length(x) != 1 || is.na(x)) {
+    stop(sprintf("%s must be a non-missing single logical", name), call. = FALSE)
+  }
+}
