@@ -7,9 +7,11 @@
 #' @import R6
 #' @import enfusion
 #' @import parallel
-#' @include create_position.R
 #' @include class-portfolio.R
-#' @include get_portfolio.R
+#' @include class-position.R
+#' @include class-security.R
+#' @include utils.R
+#' @include api-functions.R
 #' @export
 SMA <- R6::R6Class(   #nolint
   "SMA",
@@ -20,13 +22,12 @@ SMA <- R6::R6Class(   #nolint
     #' @param long_name Character. SMA Long Name.
     #' @param short_name Character. SMA Short Name.
     #' @param nav Numeric. SMA Net Asset Value.
-    #' @param base_portfolio An object representing the base portfolio.
     #' @param positions Optional. SMA Positions. Default is NULL.
+    #' @param base_portfolio An object representing the base portfolio.
     #' @return A new instance of the SMA class.
     initialize = function(
-      long_name, short_name, nav, base_portfolio = NULL, positions = NULL
+      long_name, short_name, nav, positions = NULL, base_portfolio = NULL
     ) {
-      private$id_ <- length(ls(envir = .portfolio_registry)) + 1
       private$long_name_ <- long_name
       private$short_name_ <- short_name
       private$nav_ <- nav
@@ -41,12 +42,7 @@ SMA <- R6::R6Class(   #nolint
     #' @description Create SMA Rule and Add to SMA
     #' @param rule An object of class SMARule
     add_rule = function(rule) {
-      if (is.null(rule)) {
-        stop("rule must be supplied")
-      }
-      if (!inherits(rule, "SMARule")) {
-        stop("rule must be of class SMARule")
-      }
+      assert_inherits(rule, "SMARule", "rule")
       private$sma_rules_[[rule$get_name()]] <- rule
       invisible(self)
     },
@@ -161,7 +157,7 @@ SMA <- R6::R6Class(   #nolint
         pos <- try(self$get_target_position(sec), silent = TRUE)
         if (inherits(pos, "try-error")) {
           swap_only <- self$get_swap_flag_position_rules(sec)
-          pos <- create_position(private$short_name_, sec, 0, swap = swap_only)
+          pos <- .position(private$short_name_, sec, 0, swap = swap_only)
         }
         pos
       }
@@ -169,7 +165,7 @@ SMA <- R6::R6Class(   #nolint
       tgt_pos <- lapply(replacements, get_or_create_target)
 
       scaled_qty <- base_pos$get_qty() * nav_ratio
-      scaled_pos <- create_position(private$short_name_, security_id, scaled_qty)
+      scaled_pos <- .position(private$short_name_, security_id, scaled_qty)
 
       for (pos in tgt_pos) {
         sec_id <- pos$get_id()

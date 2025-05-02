@@ -4,14 +4,7 @@ registries$securities <- new.env(parent = emptyenv())
 registries$smarules <- new.env(parent = emptyenv())
 registries$trades <- new.env(parent = emptyenv())
 
-source("R/zzz.R")
-source("R/utils.R")
-source("R/class-security.R")
-source("R/class-position.R")
-source("R/class-portfolio.R")
-source("R/api-functions.R")
-source("R/from_enfusion.R")
-
+library(SMAManager)
 library(tidyverse)
 library(enfusion)
 library(Rblpapi)
@@ -27,8 +20,6 @@ ccmf <- create_portfolio_from_enfusion(
   enfusion_url = ccmf_url
 )
 
-ccmf$add_flow(39200000)
-
 source("smas/bemap.R")
 source("smas/fmap.R")
 
@@ -36,15 +27,14 @@ rebalance_sma(bemap)
 rebalance_sma(fmap)
 
 trades <- mget(
-  ls(envir = .trade_registry, all.names = TRUE),
-  envir = .trade_registry, 
+  ls(envir = registries$trades, all.names = TRUE),
+  envir = registries$trades, 
   inherits = TRUE
 )
 
 trade_df <- dplyr::bind_rows(lapply(trades, \(trade) trade$to_df()))
 row.names(trade_df) <- NULL
 
-library(tidyverse)
 out <- trade_df %>%
   dplyr::group_by(security_id, swap) %>%
   tidyr::pivot_wider(

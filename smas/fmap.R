@@ -1,17 +1,16 @@
-library(SMAManager)
-library(Rblpapi)
-con <- blpConnect()
-fmap <- create_sma(
+fmap_url <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=shared%2FTaylor%2FSMA_Mgr_Reports%2FFMAP+Consolidated+Position+Listing+-+Options.ppr" #nolint
+
+fmap <- create_sma_from_enfusion(
   long_name = "Citco Bank Canada Ref Blackstone CSP-MST FMAP Fund",
   short_name = "fmap",
-  nav = 100000000,
-  base_portfolio = "ccmf"
+  base_portfolio = "ccmf",
+  enfusion_url = fmap_url
 )
 
 fmap <- fmap$add_replacement("oci na equity", c("meoh us equity"))
 
 # Create fmap rules
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "position under 4.99% shares outstanding",
   scope = "position",
@@ -24,9 +23,9 @@ create_smarule(
   },
   max_threshold = 0.0499,
   min_threshold = -Inf
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "no mlps except on swap",
   scope = "position",
@@ -34,9 +33,9 @@ create_smarule(
     Rblpapi::bdp(security_id, "DS213")$DS213 == "MLP"
   },
   swap_only = TRUE
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "no partnerships except on swap",
   scope = "position",
@@ -44,9 +43,9 @@ create_smarule(
     Rblpapi::bdp(security_id, "DS674")$DS674 == "Partnership Shares"
   },
   swap_only = TRUE
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "no etps except on swap",
   scope = "position",
@@ -54,9 +53,9 @@ create_smarule(
     Rblpapi::bdp(security_id, "DS213")$DS213 == "ETP"
   },
   swap_only = TRUE
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "no etns except on swap",
   scope = "position",
@@ -64,9 +63,9 @@ create_smarule(
     Rblpapi::bdp(security_id, "DS213")$DS213 == "ETN"
   },
   swap_only = TRUE
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "no bdcs except on swap",
   scope = "position",
@@ -74,9 +73,9 @@ create_smarule(
     Rblpapi::bdp(security_id, "BI005")$BI005 == "BDCs"
   },
   swap_only = TRUE
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "only US securities",
   scope = "position",
@@ -85,9 +84,9 @@ create_smarule(
   },
   max_threshold = 0,
   min_threshold = 0
-)
+))
 
-create_smarule(
+fmap$add_rule(.sma_rule(
   sma_name = "fmap",
   rule_name = "liquidity",
   scope = "position",
@@ -100,4 +99,4 @@ create_smarule(
   },
   max_threshold = 1.83,
   min_threshold = -1.83
-)
+))

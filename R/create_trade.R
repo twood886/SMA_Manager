@@ -12,7 +12,7 @@ add_trade <- function(
   if (is.null(security_id)) stop("security_id is required")
   if (is.null(portfolio_id)) stop("portfolio_id is required")
   if (!is.logical(swap)) stop("swap must be logical")
-  if (!exists(portfolio_id, envir = .portfolio_registry, inherits = FALSE)) {
+  if (!exists(portfolio_id, envir = registries$portfolios, inherits = FALSE)) {
     stop("Specified portfolio has not been created")
   }
 
@@ -21,7 +21,7 @@ add_trade <- function(
       get_trade(security_id, swap)
     }, error = function(e) {
       t <- Trade$new(security_id, swap)
-      assign(security_id, t, envir = .trade_registry)
+      assign(security_id, t, envir = registries$trades)
       t
     }
   )
@@ -29,7 +29,7 @@ add_trade <- function(
   trade$add_trade_qty(portfolio_id, qty)
 
   if (update_portfolio) {
-    portfolio <- get_portfolio(portfolio_id)
+    portfolio <- .portfolio(portfolio_id, create = FALSE)
     tgt_pos <- portfolio$get_target_position(security_id)
     tgt_pos$set_qty(tgt_pos$get_qty() + qty)
     portfolio$add_target_position(tgt_pos, overwrite = TRUE)

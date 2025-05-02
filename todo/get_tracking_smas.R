@@ -7,8 +7,8 @@ get_tracking_smas <- function(portfolio = NULL) {
     stop("The input must be an object of class 'Portfolio'.")
   }
   portfolios <- mget(
-    ls(envir = .portfolio_registry, all.names = TRUE),
-    envir = .portfolio_registry,
+    ls(envir = registries$portfolios, all.names = TRUE),
+    envir = registries$portfolios,
     inherits = TRUE
   )
   smas <- portfolios[sapply(portfolios, function(x) inherits(x, "SMA"))]

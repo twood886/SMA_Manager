@@ -8,6 +8,15 @@
 #' @export
 SMARule <- R6::R6Class( #nolint
   "SMARule",
+  private = list(
+    sma_name_ = NULL,
+    name_ = NULL,
+    scope_ = NULL,
+    definition_ = NULL,
+    max_threshold_ = NULL,
+    min_threshold_ = NULL,
+    swap_only_ = NULL
+  ),
   public = list(
     #' @param sma_name Character
     #' @param name Character
@@ -24,36 +33,6 @@ SMARule <- R6::R6Class( #nolint
       max_threshold = NULL, min_threshold = NULL,
       swap_only = FALSE
     ) {
-      # Check if sma_name is valid
-      if (is.null(sma_name) | !is.character(sma_name)) {
-        stop("sma_name must be provided as a string")
-      }
-      if (!exists(sma_name, envir = .portfolio_registry, inherits = FALSE)) {
-        stop("SMA not defined")
-      }
-      # Check if name is valid
-      if (is.null(name) | !is.character(name)) {
-        stop("name must be provided as a string")
-      }
-      # Check if scope is valid
-      if (is.null(scope) | !is.character(scope)) {
-        stop("scope must be provided as a string")
-      }
-      if (!scope %in% c("position", "portfolio", "all")) {
-        stop("scope not valid")
-      }
-      # Check if definition is valid
-      if (!is.function(definition)) {
-        stop("definition is not a function")
-      }
-      # Check if threshold is valid
-      if (is.null(max_threshold) | !is.numeric(max_threshold)) {
-        stop("max threshold is not valid")
-      }
-      if (is.null(min_threshold) | !is.numeric(min_threshold)) {
-        stop("max threshold is not valid")
-      }
-      private$id_ <- length(ls(envir = .smarule_registry)) + 1
       private$sma_name_ <- sma_name
       private$name_ <- name
       private$scope_ <- scope
@@ -89,15 +68,5 @@ SMARule <- R6::R6Class( #nolint
     #' Get Swap Only Flag
     #' @description Get the swap only flag of the SMA Rule
     get_swap_only = function() private$swap_only_
-  ),
-  private = list(
-    sma_name_ = NULL,
-    id_ = NULL,
-    name_ = NULL,
-    scope_ = NULL,
-    definition_ = NULL,
-    max_threshold_ = NULL,
-    min_threshold_ = NULL,
-    swap_only_ = NULL
   )
 )

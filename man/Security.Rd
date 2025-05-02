@@ -16,11 +16,8 @@ R6 class for a security with time-series and non-time-series data.
 \item \href{#method-Security-get_instrument_type}{\code{Security$get_instrument_type()}}
 \item \href{#method-Security-get_price}{\code{Security$get_price()}}
 \item \href{#method-Security-get_delta}{\code{Security$get_delta()}}
-\item \href{#method-Security-get_data_item}{\code{Security$get_data_item()}}
-\item \href{#method-Security-get_ts_data_item}{\code{Security$get_ts_data_item()}}
 \item \href{#method-Security-update_price}{\code{Security$update_price()}}
 \item \href{#method-Security-update_delta}{\code{Security$update_delta()}}
-\item \href{#method-Security-set_data_item}{\code{Security$set_data_item()}}
 \item \href{#method-Security-clone}{\code{Security$clone()}}
 }
 }
@@ -30,13 +27,13 @@ R6 class for a security with time-series and non-time-series data.
 \subsection{Method \code{new()}}{
 Create new Security R6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$new(id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Security$new(bbid = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{id}}{Character string. Security identifier (e.g., "AAPL").}
+\item{\code{bbid}}{Character string. Security identifier (e.g., "AAPL").}
 }
 \if{html}{\out{</div>}}
 }
@@ -92,40 +89,6 @@ Get Delta
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Security-get_data_item"></a>}}
-\if{latex}{\out{\hypertarget{method-Security-get_data_item}{}}}
-\subsection{Method \code{get_data_item()}}{
-Get an items from \code{data} as a named value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$get_data_item(item = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{item}}{String name of the list item in \code{data}}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Security-get_ts_data_item"></a>}}
-\if{latex}{\out{\hypertarget{method-Security-get_ts_data_item}{}}}
-\subsection{Method \code{get_ts_data_item()}}{
-Get an item from \code{ts_data} as a named vector.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$get_ts_data_item(item = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{item}}{String name of the time-series vector in \code{ts_data}.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-update_price"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-update_price}{}}}
 \subsection{Method \code{update_price()}}{
@@ -140,28 +103,10 @@ Update Price
 \if{latex}{\out{\hypertarget{method-Security-update_delta}{}}}
 \subsection{Method \code{update_delta()}}{
 Update Delta
-Setters -----------------------------------------------------------------
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Security$update_delta()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Security-set_data_item"></a>}}
-\if{latex}{\out{\hypertarget{method-Security-set_data_item}{}}}
-\subsection{Method \code{set_data_item()}}{
-Add or overwrite an item in \code{data}
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$set_data_item(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Named values to store in \code{data} list.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-clone"></a>}}

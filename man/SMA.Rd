@@ -41,7 +41,6 @@ R6 Class representing a seperately managed account.
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_trade_qty"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_trade_qty'><code>SMAManager::Portfolio$get_target_trade_qty()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="print"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-print'><code>SMAManager::Portfolio$print()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
 </ul>
 </details>
@@ -52,7 +51,7 @@ R6 Class representing a seperately managed account.
 \subsection{Method \code{new()}}{
 Create a new SMA R6 object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$new(long_name, short_name, nav, base_portfolio = NULL, positions = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$new(long_name, short_name, nav, positions = NULL, base_portfolio = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -64,9 +63,9 @@ Create a new SMA R6 object.
 
 \item{\code{nav}}{Numeric. SMA Net Asset Value.}
 
-\item{\code{base_portfolio}}{An object representing the base portfolio.}
-
 \item{\code{positions}}{Optional. SMA Positions. Default is NULL.}
+
+\item{\code{base_portfolio}}{An object representing the base portfolio.}
 }
 \if{html}{\out{</div>}}
 }

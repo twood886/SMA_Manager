@@ -5,8 +5,9 @@
 #'  position (in relation to a portfolio or SMA object) as well as
 #'  underlying security R6 object.
 #' @import R6
-#' @include get_or_create_security.R
-#' @include get_portfolio.R
+#' @include utils.R
+#' @include api-functions.R
+#' @include class-security.R
 #' @export
 Position <- R6::R6Class(  #nolint
   "Position",
@@ -50,7 +51,7 @@ Position <- R6::R6Class(  #nolint
     get_mkt_val = function() private$qty_ * private$security_$get_price(),
     #' @description Get position Delta Value
     get_delta_val = function() self$get_delta_qty * private$security_$get_price(),
-    #' @decscription Get position Stock Percent of NAV
+    #' @description Get position Stock Percent of NAV
     #' @param nav Portfolio NAV
     get_mkt_pct_nav = function(nav = NULL) {
       tryCatch(

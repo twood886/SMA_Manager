@@ -30,7 +30,6 @@ assert_string <- function(x, name) {
 #' @param name A character string representing the name of the object (used in the error message).
 #'
 #' @return This function does not return a value. It is called for its side effect of throwing an error if the check fails.
-#' @throws An error if the object does not inherit from the specified class.
 #'
 #' @examples
 #' # Example usage:
@@ -58,8 +57,6 @@ assert_inherits <- function(x, class, name) {
 #' @return None. The function is used for its side effect of throwing an error
 #'   if the input does not meet the criteria.
 #'
-#' @throws An error if `x` is not numeric, has a length other than 1, or is `NA`.
-#'
 #' @examples
 #' assert_numeric(5, "my_var")  # Passes without error
 #' assert_numeric("a", "my_var")  # Throws an error
@@ -82,8 +79,6 @@ assert_numeric <- function(x, name) {
 #'
 #' @return None. The function is used for its side effect of throwing an error
 #'   if the input does not meet the criteria.
-#' 
-#' @throws An error if `x` is not logical, has a length other than 1, or is `NA`.
 #'
 #' @examples
 #' assert_bool(TRUE, "my_var")  # Passes validation

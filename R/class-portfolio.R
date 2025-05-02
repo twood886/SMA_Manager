@@ -4,7 +4,8 @@
 #' @import R6
 #' @import enfusion
 #' @importFrom dplyr filter
-#' @include create_position.R
+#' @include api-functions.R
+#' @include utils.R
 #' @export
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
@@ -24,81 +25,36 @@ Portfolio <- R6::R6Class( #nolint
       private$positions_ <- positions
       private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
     },
-
-    #' @description Print
-    print = function() {
-      long_col_width <- max(15, nchar(private$long_name_) + 2)
-      short_col_width <- max(12, nchar(private$short_name_) + 2)
-      nav_col_width <- 16
-      nav_formatted <- formatC(
-        private$nav_,
-        format = "f",
-        big.mark = ",",
-        digits = 0
-      )
-
-      # Print the headers with dynamic spacing
-      cat(sprintf(
-        "%-*s %-*s %-*s\n",
-        long_col_width, "Long Name",
-        short_col_width, "Short Name",
-        nav_col_width, "NAV ($)"
-      ))
-      cat(strrep("-", long_col_width + short_col_width + nav_col_width + 2), "\n") #nolint
-
-      # Print the values with aligned formatting
-      cat(sprintf(
-        "%-*s %-*s %-*s\n",
-        long_col_width, private$long_name_,
-        short_col_width, private$short_name_,
-        nav_col_width, nav_formatted
-      ))
-    },
-
     # Getter Functions ---------------------------------------------------------
     #' @description Get Portfolio short name
     get_short_name = function() private$short_name_,
     #' @description Get Fund NAV
     get_nav = function() private$nav_,
-
     #' @description
     #' Get list of positions in portfolio
     #' @param id Ticker
     get_position = function(id = NULL) {
       positions <- private$positions_
-      if (is.null(id)) {
-        return(positions)
-      }
+      if (is.null(id)) return(positions)
       position_ids <- sapply(positions, \(x) x$get_id())
-      if (!id %in% position_ids) {
-        stop("No position in portfolio with id")
-      }
-      return(positions[[which(position_ids == id)]])
+      if (!id %in% position_ids) stop("No position in portfolio with id")
+      positions[[which(position_ids == id)]]
     },
-
     #' @description
     #' Get list of target positions in portfolio
     #' @param id Ticker
     get_target_position = function(id = NULL) {
       positions <- private$target_positions_
-      if (is.null(id)) {
-        return(positions)
-      }
+      if (is.null(id)) return(positions)
       position_ids <- sapply(positions, \(x) x$get_id())
-      if (!id %in% position_ids) {
-        stop("No position in portfolio with id")
-      }
-      return(positions[[which(position_ids == id)]])
+      if (!id %in% position_ids) stop("No target position in portfolio with id")
+      positions[[which(position_ids == id)]]
     },
     #' @description
     #' Add flow to portfolio
     #' @param flow flow amount
     add_flow = function(flow = 0) {
       private$nav_ <- private$nav_ + flow
-      lapply(private$positions_, \(x) x$calc_stock_pct_nav(private$nav_))
-      lapply(private$target_positions_, \(x) x$calc_stock_pct_nav(private$nav_))
-      lapply(private$positions_, \(x) x$calc_delta_pct_nav(private$nav_))
-      lapply(private$target_positions_, \(x) x$calc_delta_pct_nav(private$nav_))
       invisible(NULL)
     },
 
@@ -107,9 +63,7 @@ Portfolio <- R6::R6Class( #nolint
     #' @param position Position S6 Object
     #' @param overwrite Logical. Overwrite existing position if TRUE
     add_position = function(position, overwrite = FALSE) {
-      if (!inherits(position, "Position")) {
-        stop("position must be a Position object")
-      }
+      assert_inherits(position, "Position", "position")
       existing_pos <- tryCatch(
         self$get_position(position$get_id()),
         error = function(e) {
@@ -168,7 +122,7 @@ Portfolio <- R6::R6Class( #nolint
     #' @description Get Target Trade Amount
     #' @param security_id Security ID
     #' @return Target Trade Amount
-    get_target_trade_qty = function(security_id) {
+    get_target_trade_qty = function(security_id = NULL) {
       if (!is.null(security_id)) {
         return(private$get_target_trade_qty_security_(security_id))
       }
@@ -183,7 +137,7 @@ Portfolio <- R6::R6Class( #nolint
     nav_ = NULL,
     positions_ = NULL,
     target_positions_ = NULL,
-    get_target_trade_qty_security_ = function(security_id) {
+    get_target_trade_qty_security_ = function(security_id = NULL) {
       if (is.null(security_id)) stop("Security ID must be supplied")
       
       tgt_position <- self$get_target_position(security_id)
@@ -193,14 +147,25 @@ Portfolio <- R6::R6Class( #nolint
         tgt_qty <- 0
       }
 
-      cur_position <- self$get_position(security_id)
+      cur_position <- tryCatch(
+        {
+          self$get_position(security_id)
+        },
+        error = function(e) {
+          NULL
+        }
+      )
       if (inherits(cur_position, "Position")) {
         cur_qty <- cur_position$get_qty()
       } else {
         cur_qty <- 0
       }
 
-      tgt_qty - cur_qty
+      list(
+        "security_id" = security_id,
+        "portfolio_id" = self$get_short_name(),
+        "amt" = tgt_qty - cur_qty, 
+        "swap" = tgt_position$get_swap())
     }
   )
 )

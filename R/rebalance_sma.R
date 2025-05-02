@@ -9,7 +9,7 @@
 #' @include create_trade.R
 #' @export
 rebalance_sma <- function(sma = NULL) {
-  stopifnot(inherits(sma, "SMA"))
+  assert_inherits(sma, "SMA", "sma")
 
   sma$remove_target_position()
   remove_all_portfolio_trades(sma$get_short_name())
@@ -35,12 +35,12 @@ rebalance_sma <- function(sma = NULL) {
   ncores <- max(1L, parallel::detectCores() - 1L)
   cl <- parallel::makeCluster(ncores - 1)
   on.exit(parallel::stopCluster(cl), add = TRUE)
-  parallel::clusterExport(cl, c("sma", ".security_registry"), envir = environment())
+  parallel::clusterExport(cl, c("sma", "registries"), envir = environment())
   parallel::clusterEvalQ(cl, {
     library(Rblpapi)
     library(SMAManager)
     blpConnect()
-    assign(sma$get_short_name(), sma, envir = .portfolio_registry)
+    assign(sma$get_short_name(), sma, envir = registries$portfolios)
     invisible(NULL)
   })
 
@@ -57,16 +57,16 @@ rebalance_sma <- function(sma = NULL) {
     results_replace[!replace_success]
   )
 
-  tgt_pos <- sma$get_target_position()
+  tgt_trade <- sma$get_target_trade_qty(security_id = NULL)
 
   lapply(
-    tgt_pos,
-    function(pos) {
+    tgt_trade,
+    function(t) {
       add_trade(
-        security_id = pos$get_security()$get_id(),
-        portfolio_id = sma$get_short_name(),
-        qty = pos$get_qty(),
-        swap = pos$get_swap()
+        security_id = t$security_id,
+        portfolio_id = t$portfolio_id,
+        qty = t$amt,
+        swap = t$swap
       )
     }
   )

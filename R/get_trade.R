@@ -6,8 +6,8 @@ get_trade <- function(security_id = NULL, swap = FALSE) {
   if (is.null(security_id)) stop("security_id is required", call. = FALSE)
   if (!is.logical(swap)) stop("swap must be logical", call. = FALSE)
   all_trades <- mget(
-    ls(envir = .trade_registry, all.names = TRUE),
-    envir = .trade_registry, 
+    ls(envir = registries$trades, all.names = TRUE),
+    envir = registries$trades, 
     inherits = TRUE
   )
   all_trades_ids <- vapply(all_trades, function(x) x$get_security_id(), character(1))

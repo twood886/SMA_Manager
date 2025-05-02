@@ -10,7 +10,6 @@ R6 Class representing a portfolio object.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Portfolio-new}{\code{Portfolio$new()}}
-\item \href{#method-Portfolio-print}{\code{Portfolio$print()}}
 \item \href{#method-Portfolio-get_short_name}{\code{Portfolio$get_short_name()}}
 \item \href{#method-Portfolio-get_nav}{\code{Portfolio$get_nav()}}
 \item \href{#method-Portfolio-get_position}{\code{Portfolio$get_position()}}
@@ -42,21 +41,9 @@ Create New Portfolio R6 object
 \item{\code{nav}}{NAV of portfolio}
 
 \item{\code{positions}}{list of position items}
-
-\item{\code{id}}{Portfolio id}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-print"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-print}{}}}
-\subsection{Method \code{print()}}{
-Print
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$print()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-get_short_name"></a>}}
@@ -190,7 +177,7 @@ Remove existing Target Position from Portfolio
 \subsection{Method \code{get_target_trade_qty()}}{
 Get Target Trade Amount
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_target_trade_qty(security_id)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_target_trade_qty(security_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

@@ -11,7 +11,6 @@
 #'   - `"Stock Quantity"`: The quantity of stocks (used for equities and other instruments).
 #'   - `"Is Financed"`: A logical value indicating whether the position is financed.
 #' @param portfolio_short_name A string representing the short name of the portfolio.
-#' @param nav A numeric value representing the net asset value (NAV) of the portfolio.
 #'
 #' @return A position object created using the `position()` function.
 #'
@@ -39,14 +38,15 @@
 #' @importFrom dplyr case_when
 #' @include api-functions.R
 #' @export
-create_position_from_enfusion <- function(x, portfolio_short_name, nav) {
+create_position_from_enfusion <- function(x, portfolio_short_name) {
   # Values to create security
   instrument_type <- x[["Instrument Type"]]
-  id <- dplyr::case_when(
-    instrument_type == "Bond" ~ Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
-    instrument_type == "Listed Option" ~ x[["BB Yellow Key Position"]],
-    instrument_type == "Equity" ~ x[["BB Yellow Key Position"]],
-    .default = x[["Description"]]
+  id <- switch(
+    instrument_type,
+    "Bond" = Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
+    "Listed Option" = x[["BB Yellow Key Position"]],
+    "Equity" = x[["BB Yellow Key Position"]],
+    x[["Description"]]
   )
   id <- tolower(id)
   # Values to create position
@@ -103,7 +103,7 @@ create_portfolio_from_enfusion <- function(long_name, short_name = NULL, enfusio
 
   parallel::clusterExport(
     cl,
-    varlist = c("enfusion_rep", "short_name", "nav", "registries"),
+    varlist = c("enfusion_rep", "short_name", "registries"),
     envir   = environment()
   )
   # Create a postion for each row in the enfusion file
@@ -113,8 +113,7 @@ create_portfolio_from_enfusion <- function(long_name, short_name = NULL, enfusio
     fun = function(i) {
       create_position_from_enfusion(
         x = enfusion_rep[i, , drop = FALSE],
-        portfolio_short_name = short_name,
-        nav = nav
+        portfolio_short_name = short_name
       )
     }
   )
@@ -132,4 +131,72 @@ create_portfolio_from_enfusion <- function(long_name, short_name = NULL, enfusio
     }
   }
   .portfolio(short_name, long_name, nav, positions, create = TRUE)
+}
+
+
+#' @title Create Portfolio from Enfusion
+#' @description
+#' Function to create an R6 Portfolio Object
+#' @param long_name Portfolio Long Name
+#' @param short_name Portfolio Short Name
+#' @param enfusion_url Enfusion Web URL to
+#' @include class-portfolio.R
+#' @import parallel
+#' @return A \code{Portfolio} object.
+#' @export
+create_sma_from_enfusion <- function(long_name, short_name = NULL, base_portfolio, enfusion_url) {
+
+  enfusion_rep <- dplyr::filter(
+    enfusion::get_enfusion_report(enfusion_url),
+    !is.na(`Description`)
+  )
+  nav <- as.numeric(enfusion_rep$`$ GL NAV`[[1]])
+
+  # parallelize the positions
+  nCores <- parallel::detectCores(logical = FALSE)
+  cl <- parallel::makeCluster(nCores - 1)
+  parallel::clusterEvalQ(cl,{
+    library(Rblpapi)
+    library(SMAManager)
+    blpConnect()
+  })
+  short_name <- short_name
+  base_portfolio <- base_portfolio
+
+  parallel::clusterExport(
+    cl,
+    varlist = "create_position_from_enfusion",
+    envir   = .GlobalEnv
+  )
+
+  parallel::clusterExport(
+    cl,
+    varlist = c("enfusion_rep", "short_name", "registries", "base_portfolio"),
+    envir   = environment()
+  )
+  # Create a postion for each row in the enfusion file
+  positions <- parallel::parLapply(
+    cl,
+    X = seq_len(nrow(enfusion_rep)),
+    fun = function(i) {
+      create_position_from_enfusion(
+        x = enfusion_rep[i, , drop = FALSE],
+        portfolio_short_name = short_name
+      )
+    }
+  )
+  parallel::stopCluster(cl)
+
+  # Add securities to registry
+  securities <- lapply(
+    positions,
+    \(pos) pos$get_security()
+  )
+
+  for (sec in securities) {
+    if (!exists(sec$get_id(), envir = registries$securities)) {
+      assign(sec$get_id(), sec, envir = registries$securities)
+    }
+  }
+  .sma(short_name, long_name, nav, positions, base_portfolio ,create = TRUE)
 }

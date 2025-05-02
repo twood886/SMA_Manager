@@ -135,3 +135,118 @@
   sec <- .security(bbid, create = TRUE)
   Position$new(portfolio_name, sec, qty, swap)
 }
+
+
+#' Create or Retrieve an SMA Object
+#'
+#' This function creates or retrieves an SMA (Separately Managed Account) object. 
+#' If the SMA already exists in the registry, it is returned. Otherwise, a new 
+#' SMA object is created if the `create` parameter is set to `TRUE`.
+#'
+#' @param short_name A string representing the short name of the SMA. Must be unique.
+#' @param long_name A string representing the long name of the SMA.
+#' @param nav A numeric value representing the net asset value (NAV) of the SMA. Defaults to 0.
+#' @param positions A list of `Position` objects representing the positions in the SMA. Defaults to an empty list.
+#' @param base_portfolio A string representing the name of the base portfolio associated with the SMA.
+#' @param create A boolean indicating whether to create the SMA if it does not exist. Defaults to `FALSE`.
+#'
+#' @return An SMA object.
+#' @details The function checks if the SMA with the given `short_name` exists in the 
+#' `registries$portfolios` environment. If it exists, the SMA is retrieved and returned. 
+#' If it does not exist and `create` is `TRUE`, a new SMA object is created using the 
+#' provided parameters and added to the registry. If `create` is `FALSE` and the SMA 
+#' does not exist, an error is raised.
+#'
+#' @examples
+#' # Retrieve an existing SMA
+#' existing_sma <- .sma("short_name", "long_name", base_portfolio = "base_portfolio")
+#'
+#' # Create a new SMA
+#' new_sma <- .sma("new_short_name", "New Long Name", nav = 1000000, 
+#'                 positions = list(position1, position2), 
+#'                 base_portfolio = "base_portfolio", create = TRUE)
+#'
+#' @seealso \code{\link{Portfolio}}, \code{\link{SMA}}
+#' @export
+.sma <- function(short_name, long_name, nav = 0, positions = list(), base_portfolio, create = FALSE) {
+  assert_string(short_name, "short_name")
+  assert_bool(create, "create")
+  env <- registries$portfolios
+  if (exists(short_name, envir=env)) return(get(short_name, envir=env))
+  if (!create) stop("SMA does not exist and create is set to FALSE")
+  assert_string(long_name, "long_name")
+  assert_numeric(nav, "nav")
+  lapply(positions, function(position) assert_inherits(position, "Position", "positions"))
+  assert_string(base_portfolio, "base_portfolio")
+  base_ptfl <- .portfolio(base_portfolio, create = FALSE)
+  sma <- SMA$new(long_name, short_name, nav, positions, base_ptfl)
+  assign(short_name, sma, envir=env)
+  sma
+}
+
+
+#' Create or Retrieve an SMA Rule
+#'
+#' This function creates or retrieves an SMA (Simple Moving Average) rule object 
+#' associated with a specific SMA. The rule defines certain conditions or thresholds 
+#' for the SMA and can be scoped to positions, portfolios, or all.
+#'
+#' @param sma_name A string representing the name of the SMA. Must be a valid SMA name.
+#' @param rule_name A string representing the name of the rule. Must be unique within the SMA.
+#' @param scope A string indicating the scope of the rule. Valid values are "position", 
+#'   "portfolio", or "all".
+#' @param definition A function defining the rule's logic. Must be a valid function object.
+#' @param max_threshold (Optional) A numeric value specifying the maximum threshold for the rule.
+#' @param min_threshold (Optional) A numeric value specifying the minimum threshold for the rule.
+#' @param swap_only A logical value indicating whether the rule applies only to swaps. Defaults to `FALSE`.
+#'
+#' @return An object of class `SMARulePosition` representing the SMA rule.
+#'
+#' @details
+#' The function first checks if the rule already exists in the `smarules` registry. 
+#' If it exists, the existing rule is returned. Otherwise, a new rule is created 
+#' and stored in the registry. The rule's scope determines whether it applies to 
+#' individual positions, the entire portfolio, or all.
+#'
+#' @examples
+#' # Example usage:
+#' my_rule <- .sma_rule(
+#'   sma_name = "example_sma",
+#'   rule_name = "example_rule",
+#'   scope = "position",
+#'   definition = function(x) x > 0,
+#'   max_threshold = 100,
+#'   min_threshold = 10
+#' )
+#'
+#' @seealso \code{\link{SMARule}}, \code{\Link{SMARulePosition}}
+#'
+#' @export
+.sma_rule <- function(sma_name, rule_name, scope, definition, max_threshold = Inf, min_threshold = -Inf, swap_only = FALSE) {
+  assert_string(sma_name, "sma_name")
+  sma <- .sma(sma_name, create = FALSE)
+  assert_inherits(sma, "SMA", "sma")
+  assert_string(rule_name, "name")
+  name <- paste(sma_name, rule_name)
+  env <- registries$smarules
+  if (exists(name, envir = env)) return(get(name, envir = env))
+  assert_string(scope, "scope")
+  assert_inherits(definition, "function", "definition")
+  assert_numeric(max_threshold, "max_threshold")
+  assert_numeric(min_threshold, "min_threshold")
+
+  if (!scope %in% c("position", "portfolio", "all")) stop("scope not valid")
+  if (scope == "position") {
+    smarule <- SMARulePosition$new(
+      sma_name = sma_name,
+      name = name,
+      scope = scope,
+      definition = definition,
+      max_threshold = max_threshold,
+      min_threshold = min_threshold,
+      swap_only = swap_only
+    )
+  }
+  assign(name, smarule, envir = env)
+  smarule
+}

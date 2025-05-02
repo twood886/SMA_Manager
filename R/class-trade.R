@@ -5,13 +5,21 @@
 #' @import R6
 Trade <- R6::R6Class(  #nolint
   "Trade",
+    private = list(
+    trade_id_ = NULL,
+    security_id_ = NULL,
+    total_qty_ = NULL,
+    allocation_shares_ = NULL,
+    allocation_pct_ = NULL,
+    swap_ = NULL
+  ),
   public = list(
     #' @description
     #' Create New Trade R6 object
     #' @param security_id Security id
     #' @param swap Swap flag
     initialize = function(security_id = NULL, swap = FALSE) {
-      private$trade_id_ <- length(ls(envir = .trade_registry)) + 1
+      private$trade_id_ <- length(ls(envir = registries$trades)) + 1
       private$security_id_ <- security_id
       private$total_qty_ <- 0
       private$allocation_shares_ <- list()
@@ -38,7 +46,7 @@ Trade <- R6::R6Class(  #nolint
       if (is.null(portfolio_short_name)) {
         stop("Portfolio short name must be provided.")
       }
-      if (!exists(portfolio_short_name, envir = .portfolio_registry, inherits = FALSE)) {
+      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) {
         stop("Specified portfolio has not been created")
       }
       if (!portfolio_short_name %in% names(private$allocation_shares_)) {
@@ -54,7 +62,7 @@ Trade <- R6::R6Class(  #nolint
       if (is.null(portfolio_short_name) || is.null(quantity)) {
         stop("Portfolio short name and quantity must be provided.")
       }
-      if (!exists(portfolio_short_name, envir = .portfolio_registry, inherits = FALSE)) {
+      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) {
         stop("Specified portfolio has not been created")
       }
       private$allocation_shares_[[portfolio_short_name]] <- quantity
@@ -82,7 +90,7 @@ Trade <- R6::R6Class(  #nolint
       if (is.null(portfolio_short_name)) {
         stop("Portfolio short name must be provided.")
       }
-      if (!exists(portfolio_short_name, envir = .portfolio_registry, inherits = FALSE)) {
+      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) {
         stop("Specified portfolio has not been created")
       }
       if (!portfolio_short_name %in% names(private$allocation_shares_)) {
@@ -105,13 +113,5 @@ Trade <- R6::R6Class(  #nolint
         "security_id" = private$security_id_
       )
     }
-  ),
-  private = list(
-    trade_id_ = NULL,
-    security_id_ = NULL,
-    total_qty_ = NULL,
-    allocation_shares_ = NULL,
-    allocation_pct_ = NULL,
-    swap_ = NULL
   )
 )

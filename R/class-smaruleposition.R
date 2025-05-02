@@ -72,7 +72,7 @@ SMARulePosition <- R6::R6Class( #nolint
   ),
   private = list(
     get_sma_ = function() {
-      get(private$sma_name_, envir = .portfolio_registry, inherits = FALSE)
+      get(private$sma_name_, envir = registries$portfolios, inherits = FALSE)
     },
     check_rule_position_ = function(position, sma) {
       security_id <- position$get_security()$get_id()
