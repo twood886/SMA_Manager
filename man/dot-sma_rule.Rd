@@ -57,5 +57,5 @@ my_rule <- .sma_rule(
 
 }
 \seealso{
-\code{\link{SMARule}}, \code{\Link{SMARulePosition}}
+[SMARule()]
 }

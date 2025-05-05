@@ -106,32 +106,17 @@ SMA <- R6::R6Class(   #nolint
     check_sma_rules_target = function() {
       lapply(self$get_sma_rules_, function(x) x$check_rule_target())
     },
-
-    #' @description Get Maximum Position Size given all SMA Rules
+    
+    #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
     #' @param cl Cluster object for parallel processing (optional)
-    get_max_position_rules = function(security_id = NULL, cl = NULL) {
+    get_security_position_limits = function(security_id = NULL) {
       if (is.null(security_id)) stop("Security ID must be supplied")
-      if (is.null(cl) || !inherits(cl, "cluster")) {
-        return(min(sapply(
-          private$sma_rules_,
-          \(rule) rule$get_security_max_value(security_id)
-        )))
-      }
-    },
-
-    #' @description Get Minimum Position Size given all SMA Rules
-    #' @param security_id Security ID
-    #' @param cl Cluster object for parallel processing (optional)
-    get_min_position_rules = function(security_id = NULL, cl = NULL) {
-      if (is.null(security_id)) stop("Security ID must be supplied")
-      if (is.null(cl) | !inherits(cl, "cluster")) {
-        return(max(sapply(
-          private$sma_rules_,
-          \(sec, rule) rule$get_security_min_value(sec),
-          sec = security_id
-        )))
-      }
+      non_swap_rules <- private$sma_rules_[!vapply(private$sma_rules_, \(rule) rule$get_swap_only(), logical(1))]
+      limits <- lapply(non_swap_rules, \(rule) rule$get_security_limits(security_id))
+      max_limits <- sapply(limits, \(x) x$max)
+      min_limits <- sapply(limits, \(x) x$min)
+      list(max_shares = min(max_limits), min_shares = max(min_limits))
     },
 
     #' @description Get Swap Flag for a given security
@@ -150,7 +135,6 @@ SMA <- R6::R6Class(   #nolint
 
       base_pos <- private$base_portfolio_$get_position(security_id)
       nav_ratio  <- self$get_nav() / private$base_portfolio_$get_nav()
-
       replacements <- self$get_replacement_security(security_id)
 
       get_or_create_target <- function(sec) {
@@ -172,8 +156,9 @@ SMA <- R6::R6Class(   #nolint
         existing_qty <- pos$get_qty()
         price <- pos$get_security()$get_price()
         scaled_price <- scaled_pos$get_security()$get_price()
-        max_shares <- self$get_max_position_rules(sec_id)
-        min_shares <- self$get_min_position_rules(sec_id)
+        limit_shares <- self$get_security_position_limits(sec_id)
+        max_shares <- limit_shares$max_shares
+        min_shares <- limit_shares$min_shares
         if (sec_id == security_id) {
           full_trade_qty <- scaled_pos$get_qty()
         } else{

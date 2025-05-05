@@ -31,35 +31,22 @@ SMARulePosition <- R6::R6Class( #nolint
       private$check_swap_multi_position_(positions)
     },
 
-    #' Get Security Max Value
-    #' @description Get the maximum value of the security based on the rule
+    #' @description Get the Max and Min Value of the security based on the rule
     #' @param security_id Security ID
-    #' @return Number of Shares
-    get_security_max_value = function(security_id) {
+    #' @return List of Max and Min Value
+    get_security_limits = function(security_id) {
       exp <- private$definition_(security_id, private$get_sma_())
       if (is.logical(exp)) {
         if (exp) {
-          return(private$max_threshold_)
+          return(list(max = private$max_threshold_, min = private$min_threshold_))
         } else {
-          return(Inf)
+          return(list(max = Inf, min = -Inf))
         }
       }
-      private$max_threshold_ / exp
-    },
-    #' Get Security Min Value
-    #' @description Get the minimum value of the security based on the rule
-    #' @param security_id Security ID
-    #' @return Number of Shares
-    get_security_min_value = function(security_id) {
-      exp <- private$definition_(security_id, private$get_sma_())
-      if (is.logical(exp)) {
-        if (exp) {
-          return(private$min_threshold_)
-        } else {
-          return(-Inf)
-        }
-      }
-      private$min_threshold_ / exp
+      list(
+        max = private$max_threshold_ / exp,
+        min = private$min_threshold_ / exp
+      )
     },
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID

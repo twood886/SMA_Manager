@@ -22,7 +22,7 @@ Collate:
     'class-trade.R'
     'get_trade.R'
     'create_trade.R'
-    'from_enfusion.R'
+    'enfusion_loading.R'
     'remove_all_portfolio_trades.R'
     'rebalance_sma.R'
     'zzz.R'

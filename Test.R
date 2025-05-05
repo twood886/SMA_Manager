@@ -1,9 +1,3 @@
-registries <- new.env(parent = emptyenv())
-registries$portfolios <- new.env(parent = emptyenv())
-registries$securities <- new.env(parent = emptyenv())
-registries$smarules <- new.env(parent = emptyenv())
-registries$trades <- new.env(parent = emptyenv())
-
 library(SMAManager)
 library(tidyverse)
 library(enfusion)
@@ -51,7 +45,7 @@ out <- trade_df %>%
   )
 write.csv(
   out,
-  file = "sma_trades.csv",
+  file = "20250505_sma_trades.csv",
   row.names = FALSE
 )
 

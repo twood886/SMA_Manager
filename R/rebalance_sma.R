@@ -70,8 +70,7 @@ rebalance_sma <- function(sma = NULL) {
       )
     }
   )
-
-
+  
   if (length(errors) > 0) {
     warning(paste0("Rebalance failed for: ", paste(unlist(errors), collapse = ", ")))
   }

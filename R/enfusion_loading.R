@@ -1,0 +1,165 @@
+#' Internal helper: create positions in parallel
+#'
+#' @param enfusion_report Data frame of Enfusion report rows
+#' @param short_name Character portfolio short name
+#' @param position_fn Function(x, portfolio_short_name) that returns a Position
+#' @import furrr
+#' @import parallel
+#' @include utils.R
+#' 
+#' @return List of Position objects
+.make_positions <- function(enfusion_report, short_name, position_fn) {
+  nCores <- parallel::detectCores(logical = FALSE)
+  cl <- parallel::makeCluster(nCores - 1)
+  parallel::clusterEvalQ(cl,{
+    library(Rblpapi)
+    library(SMAManager)
+    blpConnect()
+  })
+  parallel::clusterExport(
+    cl,
+    varlist = c("enfusion_report", "short_name", "registries", "position_fn"),
+    envir   = environment()
+  )
+  positions <- parallel::parLapply(
+    cl,
+    X = seq_len(nrow(enfusion_report)),
+    fun = function(i) {
+      position_fn(
+        x = enfusion_report[i, , drop = FALSE],
+        portfolio_short_name = short_name
+      )
+    }
+  )
+  on.exit(parallel::stopCluster(cl), add = TRUE)
+  positions
+}
+
+#' Create a Position from Enfusion Data
+#'
+#' @param x A list or single-row data.frame of enfusion data
+#' @param portfolio_short_name Character short name of the portfolio
+#' @return Position R6 object
+#' @import Rblpapi
+#' @include api-functions.R
+#' @export
+create_position_from_enfusion <- function(x, portfolio_short_name) {
+
+  if (is.null(tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)))
+    Rblpapi::blpConnect()
+
+  if (!is.list(x) && !is.data.frame(x)) {
+    stop("`x` must be a list or data.frame row", call. = FALSE)
+  }
+  if (length(portfolio_short_name) != 1 || !nzchar(portfolio_short_name)) {
+    stop("`portfolio_short_name` must be a non-empty string", call. = FALSE)
+  }
+
+  instrument_type <- x[["Instrument Type"]]
+  id <- switch(
+    instrument_type,
+    "Bond" = Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
+    "Listed Option" = x[["BB Yellow Key Position"]],
+    "Equity" = x[["BB Yellow Key Position"]],
+    x[["Description"]]
+  )
+
+  id <- tolower(id)
+
+  # determine quantity
+  qty <- if (instrument_type == "Listed Option") {
+    as.numeric(x[["Option Quantity"]])
+  } else {
+    as.numeric(x[["Stock Quantity"]])
+  }
+  if (is.na(qty)) {
+    stop("Quantity is not numeric for row", call. = FALSE)
+  }
+
+  swap <- as.logical(x[["Is Financed"]]) %||% FALSE
+  .position(portfolio_short_name, id, qty, swap = swap)
+}
+
+#' Create Portfolio from Enfusion
+#'
+#' @param long_name Character long name
+#' @param short_name Character short name
+#' @param enfusion_url URL to fetch Enfusion report
+#' @return Portfolio R6 object
+#' @export
+create_portfolio_from_enfusion <- function(long_name, short_name, enfusion_url) {
+  enfusion_report <- dplyr::filter(
+    enfusion::get_enfusion_report(enfusion_url),
+    !is.na(.data$Description)
+  )
+  nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
+
+  positions <- .make_positions(
+    enfusion_report = enfusion_report,
+    short_name = short_name,
+    position_fn = create_position_from_enfusion
+  )
+
+  .register_securities(positions)
+  .portfolio(short_name, long_name, nav, positions, create = TRUE)
+}
+
+#' Create SMA from Enfusion
+#'
+#' @param long_name Character long name
+#' @param short_name Character short name
+#' @param base_portfolio Portfolio object
+#' @param enfusion_url URL to fetch Enfusion report
+#' @return SMA R6 object
+#' @export
+create_sma_from_enfusion <- function(long_name, short_name, base_portfolio, enfusion_url) {
+  enfusion_report <- dplyr::filter(
+    enfusion::get_enfusion_report(enfusion_url),
+    !is.na(.data$Description)
+  )
+  nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
+
+  positions <- .make_positions(
+    enfusion_report = enfusion_report,
+    short_name = short_name,
+    position_fn = create_position_from_enfusion
+  )
+  .register_securities(positions)
+  .sma(short_name, long_name, nav, positions, base_portfolio, create = TRUE)
+}
+
+
+#' Register Securities in the Securities Registry
+#'
+#' This function iterates over a list of `Position` objects, validates their type, 
+#' and registers their associated `Security` objects in the securities registry 
+#' if they are not already present.
+#'
+#' @param positions A list of `Position` objects. Each `Position` object must 
+#'   have a method `get_security()` that returns a `Security` object, and each 
+#'   `Security` object must have a method `get_id()` that returns a unique identifier.
+#'
+#' @return Returns `NULL` invisibly.
+#'
+#' @details The function ensures that each `Position` object in the input list 
+#'   is of the correct class by calling `SMAManager:::assert_inherits`. If the 
+#'   associated `Security` object is not already registered in the `registries$securities` 
+#'   environment, it is added using its unique identifier as the key.
+#'
+#' @note This function relies on the `registries$securities` environment being 
+#'   pre-defined and accessible. It also assumes that the `SMAManager` package 
+#'   provides the `assert_inherits` function for type validation.
+#'
+#' @examples
+#' # Assuming `positions` is a list of Position objects:
+#' .register_securities(positions)
+.register_securities <- function(positions) {
+  for (pos in positions) {
+    SMAManager:::assert_inherits(pos, "Position", "pos")
+    sec <- pos$get_security()
+    if (!exists(sec$get_id(), envir = registries$securities)) {
+      assign(sec$get_id(), sec, envir = registries$securities)
+    }
+  }
+  invisible(NULL) 
+}

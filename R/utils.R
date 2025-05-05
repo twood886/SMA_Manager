@@ -93,3 +93,20 @@ assert_bool <- function(x, name) {
     stop(sprintf("%s must be a non-missing single logical", name), call. = FALSE)
   }
 }
+
+#' Retrieve Registries from Package Namespace
+#'
+#' This function accesses the `registries` object from the namespace of the 
+#' specified package (`yourpkg`). It assumes that the `registries` object 
+#' exists within the package's namespace.
+#'
+#' @return The `registries` object from the namespace of the package `yourpkg`.
+#' @examples
+#' \dontrun{
+#'   registries <- get_registries()
+#' }
+#' 
+#' @export
+get_registries <- function() {
+  asNamespace("SMAManager")$registries
+}

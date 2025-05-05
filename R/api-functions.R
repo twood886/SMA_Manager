@@ -219,7 +219,7 @@
 #'   min_threshold = 10
 #' )
 #'
-#' @seealso \code{\link{SMARule}}, \code{\Link{SMARulePosition}}
+#' @seealso [SMARule()]
 #'
 #' @export
 .sma_rule <- function(sma_name, rule_name, scope, definition, max_threshold = Inf, min_threshold = -Inf, swap_only = FALSE) {
