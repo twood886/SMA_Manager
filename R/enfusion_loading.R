@@ -6,14 +6,16 @@
 #' @import furrr
 #' @import parallel
 #' @include utils.R
-#' 
+#'
 #' @return List of Position objects
 .make_positions <- function(enfusion_report, short_name, position_fn) {
-  nCores <- parallel::detectCores(logical = FALSE)
-  cl <- parallel::makeCluster(nCores - 1)
-  parallel::clusterEvalQ(cl,{
-    library(Rblpapi)
-    library(SMAManager)
+  ncores <- parallel::detectCores(logical = FALSE)
+  cl <- parallel::makeCluster(ncores - 1)
+  on.exit(parallel::stopCluster(cl), add = TRUE)
+  parallel::clusterEvalQ(cl, options(renv.verbose = FALSE))
+  parallel::clusterEvalQ(cl, {
+    suppressPackageStartupMessages(library(SMAManager))
+    suppressPackageStartupMessages(library(Rblpapi))
     blpConnect()
   })
   parallel::clusterExport(
@@ -31,7 +33,6 @@
       )
     }
   )
-  on.exit(parallel::stopCluster(cl), add = TRUE)
   positions
 }
 
@@ -87,10 +88,12 @@ create_position_from_enfusion <- function(x, portfolio_short_name) {
 #' @param enfusion_url URL to fetch Enfusion report
 #' @return Portfolio R6 object
 #' @export
-create_portfolio_from_enfusion <- function(long_name, short_name, enfusion_url) {
+create_portfolio_from_enfusion <- function(
+  long_name, short_name, enfusion_url
+) {
   enfusion_report <- dplyr::filter(
     enfusion::get_enfusion_report(enfusion_url),
-    !is.na(.data$Description)
+    !is.na(.data$Description) #nolint
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
 
@@ -112,10 +115,12 @@ create_portfolio_from_enfusion <- function(long_name, short_name, enfusion_url) 
 #' @param enfusion_url URL to fetch Enfusion report
 #' @return SMA R6 object
 #' @export
-create_sma_from_enfusion <- function(long_name, short_name, base_portfolio, enfusion_url) {
+create_sma_from_enfusion <- function(
+  long_name, short_name, base_portfolio, enfusion_url
+) {
   enfusion_report <- dplyr::filter(
     enfusion::get_enfusion_report(enfusion_url),
-    !is.na(.data$Description)
+    !is.na(.data$Description) #nolint
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
 
@@ -131,24 +136,26 @@ create_sma_from_enfusion <- function(long_name, short_name, base_portfolio, enfu
 
 #' Register Securities in the Securities Registry
 #'
-#' This function iterates over a list of `Position` objects, validates their type, 
-#' and registers their associated `Security` objects in the securities registry 
-#' if they are not already present.
+#' This function iterates over a list of `Position` objects, validates their
+#'  type and registers their associated `Security` objects in the securities
+#'  registry if they are not already present.
 #'
-#' @param positions A list of `Position` objects. Each `Position` object must 
-#'   have a method `get_security()` that returns a `Security` object, and each 
-#'   `Security` object must have a method `get_id()` that returns a unique identifier.
+#' @param positions A list of `Position` objects. Each `Position` object must
+#'  have a method `get_security()` that returns a `Security` object, and each
+#' `Security` object must have a method `get_id()` that returns a unique
+#'  identifier.
 #'
 #' @return Returns `NULL` invisibly.
 #'
-#' @details The function ensures that each `Position` object in the input list 
-#'   is of the correct class by calling `SMAManager:::assert_inherits`. If the 
-#'   associated `Security` object is not already registered in the `registries$securities` 
-#'   environment, it is added using its unique identifier as the key.
+#' @details The function ensures that each `Position` object in the input list
+#'  is of the correct class by calling `SMAManager:::assert_inherits`. If the
+#'  associated `Security` object is not already registered in the
+#'  `registries$securities` environment, it is added using its unique
+#'  identifier as the key.
 #'
-#' @note This function relies on the `registries$securities` environment being 
-#'   pre-defined and accessible. It also assumes that the `SMAManager` package 
-#'   provides the `assert_inherits` function for type validation.
+#' @note This function relies on the `registries$securities` environment being
+#'  pre-defined and accessible. It also assumes that the `SMAManager` package
+#'  provides the `assert_inherits` function for type validation.
 #'
 #' @examples
 #' # Assuming `positions` is a list of Position objects:

@@ -7,28 +7,30 @@
 .register_securities(positions)
 }
 \arguments{
-\item{positions}{A list of `Position` objects. Each `Position` object must 
-have a method `get_security()` that returns a `Security` object, and each 
-`Security` object must have a method `get_id()` that returns a unique identifier.}
+\item{positions}{A list of `Position` objects. Each `Position` object must
+ have a method `get_security()` that returns a `Security` object, and each
+`Security` object must have a method `get_id()` that returns a unique
+ identifier.}
 }
 \value{
 Returns `NULL` invisibly.
 }
 \description{
-This function iterates over a list of `Position` objects, validates their type, 
-and registers their associated `Security` objects in the securities registry 
-if they are not already present.
+This function iterates over a list of `Position` objects, validates their
+ type and registers their associated `Security` objects in the securities
+ registry if they are not already present.
 }
 \details{
-The function ensures that each `Position` object in the input list 
-  is of the correct class by calling `SMAManager:::assert_inherits`. If the 
-  associated `Security` object is not already registered in the `registries$securities` 
-  environment, it is added using its unique identifier as the key.
+The function ensures that each `Position` object in the input list
+ is of the correct class by calling `SMAManager:::assert_inherits`. If the
+ associated `Security` object is not already registered in the
+ `registries$securities` environment, it is added using its unique
+ identifier as the key.
 }
 \note{
-This function relies on the `registries$securities` environment being 
-  pre-defined and accessible. It also assumes that the `SMAManager` package 
-  provides the `assert_inherits` function for type validation.
+This function relies on the `registries$securities` environment being
+ pre-defined and accessible. It also assumes that the `SMAManager` package
+ provides the `assert_inherits` function for type validation.
 }
 \examples{
 # Assuming `positions` is a list of Position objects:
