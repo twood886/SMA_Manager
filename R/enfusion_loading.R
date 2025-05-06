@@ -10,7 +10,11 @@
 #' @return List of Position objects
 .make_positions <- function(enfusion_report, short_name, position_fn) {
   ncores <- parallel::detectCores(logical = FALSE)
-  cl <- parallel::makeCluster(ncores - 1)
+  cl <- parallel::makeCluster(
+    ncores - 1,
+    type = "PSOCK",
+    rscriptArgs = c("--vanilla")
+  )
   on.exit(parallel::stopCluster(cl), add = TRUE)
   parallel::clusterEvalQ(cl, options(renv.verbose = FALSE))
   parallel::clusterEvalQ(cl, {
