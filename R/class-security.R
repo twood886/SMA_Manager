@@ -45,7 +45,11 @@ Security <- R6::R6Class( #nolint
     # Update Data --------------------------------------------------
     #' @description Update Price
     update_price = function() {
-      price <- Rblpapi::bdp(private$bbid_, "PX_LAST")$PX_LAST
+      if(private$instrument_type_ == "FixedIncome") {
+        price <- (Rblpapi::bdp(private$bbid_, "OP006")$OP006)
+      } else{
+        price <- Rblpapi::bdp(private$bbid_, "PX_LAST")$PX_LAST
+      }
       private$price_ <- price
       price
     },

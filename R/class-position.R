@@ -50,7 +50,7 @@ Position <- R6::R6Class(  #nolint
     #' @description Get position Market Value
     get_mkt_val = function() private$qty_ * private$security_$get_price(),
     #' @description Get position Delta Value
-    get_delta_val = function() self$get_delta_qty * private$security_$get_price(),
+    get_delta_val = function() self$get_delta_qty() * private$security_$get_price(),
     #' @description Get position Stock Percent of NAV
     #' @param nav Portfolio NAV
     get_mkt_pct_nav = function(nav = NULL) {
@@ -60,7 +60,8 @@ Position <- R6::R6Class(  #nolint
           self$get_mkt_val() / nav
         },
         error = function(e) {
-          self$get_mkt_val() / get_portfolio(private$portfolio_short_name_)$get_nav()
+          nav <- .portfolio(private$portfolio_short_name_, create = FALSE)$get_nav()
+          self$get_mkt_val() / nav
         }
       )
     },
@@ -73,7 +74,8 @@ Position <- R6::R6Class(  #nolint
           self$get_delta_val() / nav
         },
         error = function(e) {
-          self$get_delta_val() / get_portfolio(private$portfolio_short_name_)$get_nav()
+          nav <- .portfolio(private$portfolio_short_name_, create = FALSE)$get_nav()
+          self$get_delta_val() / nav
         }
       )
     },
