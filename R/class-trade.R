@@ -5,7 +5,7 @@
 #' @import R6
 Trade <- R6::R6Class(  #nolint
   "Trade",
-    private = list(
+  private = list(
     trade_id_ = NULL,
     security_id_ = NULL,
     total_qty_ = NULL,
@@ -46,7 +46,7 @@ Trade <- R6::R6Class(  #nolint
       if (is.null(portfolio_short_name)) {
         stop("Portfolio short name must be provided.")
       }
-      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) {
+      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) { #nolint
         stop("Specified portfolio has not been created")
       }
       if (!portfolio_short_name %in% names(private$allocation_shares_)) {
@@ -62,7 +62,7 @@ Trade <- R6::R6Class(  #nolint
       if (is.null(portfolio_short_name) || is.null(quantity)) {
         stop("Portfolio short name and quantity must be provided.")
       }
-      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) {
+      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) { #nolint
         stop("Specified portfolio has not been created")
       }
       private$allocation_shares_[[portfolio_short_name]] <- quantity
@@ -90,7 +90,7 @@ Trade <- R6::R6Class(  #nolint
       if (is.null(portfolio_short_name)) {
         stop("Portfolio short name must be provided.")
       }
-      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) {
+      if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) { #nolint
         stop("Specified portfolio has not been created")
       }
       if (!portfolio_short_name %in% names(private$allocation_shares_)) {

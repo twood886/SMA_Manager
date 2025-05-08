@@ -106,14 +106,19 @@ SMA <- R6::R6Class(   #nolint
     check_sma_rules_target = function() {
       lapply(self$get_sma_rules_, function(x) x$check_rule_target())
     },
-    
+
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
     #' @param cl Cluster object for parallel processing (optional)
     get_security_position_limits = function(security_id = NULL) {
       if (is.null(security_id)) stop("Security ID must be supplied")
-      non_swap_rules <- private$sma_rules_[!vapply(private$sma_rules_, \(rule) rule$get_swap_only(), logical(1))]
-      limits <- lapply(non_swap_rules, \(rule) rule$get_security_limits(security_id))
+      non_swap_rules <- private$sma_rules_[
+        !vapply(private$sma_rules_, \(rule) rule$get_swap_only(), logical(1))
+      ]
+      limits <- lapply(
+        non_swap_rules,
+        \(rule) rule$get_security_limits(security_id)
+      )
       max_limits <- sapply(limits, \(x) x$max)
       min_limits <- sapply(limits, \(x) x$min)
       list(max_shares = min(max_limits), min_shares = max(min_limits))
@@ -123,13 +128,18 @@ SMA <- R6::R6Class(   #nolint
     #' @param security_id Security ID
     get_swap_flag_position_rules = function(security_id = NULL) {
       if (is.null(security_id)) stop("Security ID must be supplied")
-      any(vapply(private$sma_rules_, \(rule) rule$check_swap_security(security_id), logical(1)))
+      any(vapply(
+        private$sma_rules_,
+        \(rule) rule$check_swap_security(security_id),
+        logical(1)
+      ))
     },
 
     #' @description Rebalance SMA Position
     #' @param security_id Security ID
     #' @param cl Cluster object for parallel processing (optional)
-    #' @param assign_position Logical. If TRUE, assign the position to the SMA Target Position
+    #' @param assign_position Logical. If TRUE, assign the position to the
+    #'  SMA Target Position
     rebalance_position = function(security_id, assign_position = FALSE) {
       if (is.null(security_id)) stop("Security ID must be supplied")
 
@@ -165,7 +175,7 @@ SMA <- R6::R6Class(   #nolint
           full_trade_qty <- scaled_pos$get_mkt_val() / price
         }
 
-        target_qty <- pmin(pmax(existing_qty + full_trade_qty, min_shares), max_shares)
+        target_qty <- pmin(pmax(existing_qty + full_trade_qty, min_shares), max_shares) #nolint
         trade_qty <- target_qty - existing_qty
         pos$set_qty(target_qty)
 
@@ -195,5 +205,6 @@ SMA <- R6::R6Class(   #nolint
     base_portfolio_ = NULL,
     sma_rules_ = list(),
     replacements_ = list()
+    portfolio_constructor = NULL
   )
 )

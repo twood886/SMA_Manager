@@ -127,7 +127,10 @@ Portfolio <- R6::R6Class( #nolint
         return(private$get_target_trade_qty_security_(security_id))
       }
       all_sec_id <- sapply(private$target_positions_, \(x) x$get_id())
-      trade_qty <- lapply(all_sec_id, \(sec_id) private$get_target_trade_qty_security_(sec_id))
+      trade_qty <- lapply(
+        all_sec_id,
+        \(sec_id) private$get_target_trade_qty_security_(sec_id)
+      )
       setNames(trade_qty, all_sec_id)
     }
   ),
@@ -139,7 +142,7 @@ Portfolio <- R6::R6Class( #nolint
     target_positions_ = NULL,
     get_target_trade_qty_security_ = function(security_id = NULL) {
       if (is.null(security_id)) stop("Security ID must be supplied")
-      
+
       tgt_position <- self$get_target_position(security_id)
       if (inherits(tgt_position, "Position")) {
         tgt_qty <- tgt_position$get_qty()
@@ -165,7 +168,8 @@ Portfolio <- R6::R6Class( #nolint
         "security_id" = security_id,
         "portfolio_id" = self$get_short_name(),
         "amt" = tgt_qty - cur_qty, 
-        "swap" = tgt_position$get_swap())
+        "swap" = tgt_position$get_swap()
+      )
     }
   )
 )

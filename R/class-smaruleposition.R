@@ -31,30 +31,43 @@ SMARulePosition <- R6::R6Class( #nolint
       private$check_swap_multi_position_(positions)
     },
 
+    #' @definition Apply the rule definition to a security
+    #' @param security_id Security ID
+    #' @param sma SMA object
+    apply_rule_definition = function(security_id, sma) {
+      exp <- setNames(
+        as.list(private$definition_(security_id, sma)),
+        security_id
+      )
+      if (length(exp) == 1) return(exp[[1]])
+      exp
+    },
+
     #' @description Get the Max and Min Value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
     get_security_limits = function(security_id) {
-      exp <- private$definition_(security_id, private$get_sma_())
-      if (is.logical(exp)) {
-        if (exp) {
-          return(list(max = private$max_threshold_, min = private$min_threshold_))
-        } else {
-          return(list(max = Inf, min = -Inf))
+      exp <- self$apply_rule_definition(security_id, private$get_sma_())
+      .set_ind_sec_limits <- function(exp) {
+        if (is.logical(exp)) {
+          if (exp) {
+            return(list(max = private$max_threshold_, min = private$min_threshold_))
+          } else {
+            return(list(max = Inf, min = -Inf))
+          }
         }
+        list(max = private$max_threshold_ / exp, min = private$min_threshold_ / exp)
       }
-      list(
-        max = private$max_threshold_ / exp,
-        min = private$min_threshold_ / exp
-      )
+      if (length(exp) == 1) return(.set_ind_sec_limits(exp))
+      lapply(exp, .set_ind_sec_limits)
     },
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
-      if (!private$swap_only_) {
-        return(FALSE)
-      }
-      private$definition_(security_id)
+      if (!private$swap_only_) return(FALSE)
+      exp <- self$apply_rule_definition(security_id, private$get_sma_())
+      if (length(exp) == 1) return(exp[[1]])
+      exp
     }
   ),
   private = list(

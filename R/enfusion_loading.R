@@ -50,7 +50,7 @@
 #' @export
 create_position_from_enfusion <- function(x, portfolio_short_name) {
 
-  if (is.null(tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)))
+  if (is.null(tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL))) #nolint
     Rblpapi::blpConnect()
 
   if (!is.list(x) && !is.data.frame(x)) {

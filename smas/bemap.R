@@ -8,7 +8,7 @@ bemap <- create_sma_from_enfusion(
   enfusion_url = bemap_url
 )
 
-bemap <- bemap$add_replacement("oci na equity", c("meoh us equity"))
+#bemap <- bemap$add_replacement("oci na equity", c("meoh us equity"))
 
 # Create bemap rules
 bemap$add_rule(.sma_rule(

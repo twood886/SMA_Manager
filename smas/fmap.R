@@ -7,7 +7,7 @@ fmap <- create_sma_from_enfusion(
   enfusion_url = fmap_url
 )
 
-fmap <- fmap$add_replacement("oci na equity", c("meoh us equity"))
+#fmap <- fmap$add_replacement("oci na equity", c("meoh us equity"))
 
 # Create fmap rules
 fmap$add_rule(.sma_rule(

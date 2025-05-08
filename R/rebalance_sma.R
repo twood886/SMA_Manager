@@ -19,7 +19,7 @@ rebalance_sma <- function(sma = NULL) {
     function(x) x$get_id(),
     character(1)
   )
-  
+
   replacements <- vapply(base_ids, sma$get_replacement_security, character(1))
   has_replacement <- replacements != base_ids
 

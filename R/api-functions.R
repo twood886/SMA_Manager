@@ -27,21 +27,64 @@
 #'
 #' # Attempt to retrieve a security without creating it
 #' security("GOOG US Equity", create = FALSE)
-#' 
+#'
 #' @seealso \code{\link{Security}} for the Security class.
 #'
 #' @importFrom Rblpapi bdp
 #' @export
-.security <- function(bbid, create = TRUE) { 
+.security <- function(bbid, create = TRUE) {
   assert_string(bbid, "bbid")
   bbid <- tolower(bbid)
   env <- registries$securities
-  if (exists(bbid, envir = env, inherits = FALSE)) return(get(bbid, envir = env))
+  if (exists(bbid, envir = env, inherits = FALSE)) {
+    return(get(bbid, envir = env))
+  }
   if (!create) return(NULL)
-  if (Rblpapi::bdp(bbid, "DX194")$DX194 == "") stop("Security not found in Bloomberg")
+  if (Rblpapi::bdp(bbid, "DX194")$DX194 == "") {
+    stop("Security not found in Bloomberg")
+  }
   security <- Security$new(bbid)
   assign(bbid, security, envir = env)
   security
+}
+
+#' Create or Update a Position in a Portfolio
+#'
+#' This function creates or updates a position in a specified portfolio. It ensures
+#' that the input parameters are valid and initializes a new position object.
+#'
+#' @param portfolio_name A string specifying the name of the portfolio. The portfolio
+#'   must already exist.
+#' @param bbid A string representing the Bloomberg identifier (BBID) of the security.
+#'   This will be converted to lowercase.
+#' @param qty A numeric value indicating the quantity of the position. Defaults to 0.
+#' @param swap A logical value (TRUE or FALSE) indicating whether the position is a swap.
+#'   Defaults to FALSE.
+#'
+#' @return An object of class `Position` representing the created or updated position.
+#'
+#' @details The function validates the input parameters using assertion checks. If the
+#'   security does not already exist, it will be created. The position is then initialized
+#'   using the `Position$new` method.
+#'
+#' @examples
+#' # Create a position with 100 shares of a security
+#' position("MyPortfolio", "AAPL US Equity", qty = 100)
+#'
+#' # Create a swap position
+#' position("MyPortfolio", "AAPL US Equity", qty = 50, swap = TRUE)
+#'
+#' @seealso \code{\link{Position}} for the Position class.
+#' 
+#' @export
+.position <- function(portfolio_name, bbid, qty = 0, swap = FALSE) {
+  assert_string(portfolio_name, "portfolio_name")
+  assert_string(bbid, "id")
+  assert_numeric(qty, "qty")
+  assert_bool(swap, "swap")
+  bbid <- tolower(bbid) 
+  sec <- .security(bbid, create = TRUE)
+  Position$new(portfolio_name, sec, qty, swap)
 }
 
 #' Create or Retrieve a Portfolio Object
@@ -82,59 +125,28 @@
 #' @seealso \code{\link{Portfolio}} for the Portfolio class.
 #'
 #' @export
-.portfolio <- function(short_name, long_name, nav = 0, positions = list(), create = FALSE) {
+.portfolio <- function(
+  short_name, long_name, nav = 0, positions = list(), create = FALSE
+) {
   assert_string(short_name, "short_name")
   assert_bool(create, "create")
   env <- registries$portfolios
-  if (exists(short_name, envir=env, inherits=FALSE)) return(get(short_name, envir=env))
+  if (exists(short_name, envir = env, inherits = FALSE)) {
+    return(get(short_name, envir = env))
+  }
   if (!create) stop("Portfolio does not exist and create is set to FALSE")
   assert_string(long_name, "long_name")
   assert_numeric(nav, "nav")
-  lapply(positions, function(position) assert_inherits(position, "Position", "positions"))
+  lapply(
+    positions,
+    function(position) assert_inherits(position, "Position", "positions")
+  )
   portfolio <- Portfolio$new(long_name, short_name, nav, positions)
-  assign(short_name, portfolio, envir=env)
+  assign(short_name, portfolio, envir = env)
   portfolio
 }
 
 
-#' Create or Update a Position in a Portfolio
-#'
-#' This function creates or updates a position in a specified portfolio. It ensures
-#' that the input parameters are valid and initializes a new position object.
-#'
-#' @param portfolio_name A string specifying the name of the portfolio. The portfolio
-#'   must already exist.
-#' @param bbid A string representing the Bloomberg identifier (BBID) of the security.
-#'   This will be converted to lowercase.
-#' @param qty A numeric value indicating the quantity of the position. Defaults to 0.
-#' @param swap A logical value (TRUE or FALSE) indicating whether the position is a swap.
-#'   Defaults to FALSE.
-#'
-#' @return An object of class `Position` representing the created or updated position.
-#'
-#' @details The function validates the input parameters using assertion checks. If the
-#'   security does not already exist, it will be created. The position is then initialized
-#'   using the `Position$new` method.
-#'
-#' @examples
-#' # Create a position with 100 shares of a security
-#' position("MyPortfolio", "AAPL US Equity", qty = 100)
-#'
-#' # Create a swap position
-#' position("MyPortfolio", "AAPL US Equity", qty = 50, swap = TRUE)
-#'
-#' @seealso \code{\link{Position}} for the Position class.
-#' 
-#' @export
-.position <- function(portfolio_name, bbid, qty = 0, swap = FALSE) {
-  assert_string(portfolio_name, "portfolio_name")
-  assert_string(bbid, "id")
-  assert_numeric(qty, "qty")
-  assert_bool(swap, "swap")
-  bbid <- tolower(bbid) 
-  sec <- .security(bbid, create = TRUE)
-  Position$new(portfolio_name, sec, qty, swap)
-}
 
 
 #' Create or Retrieve an SMA Object
@@ -249,4 +261,70 @@
   }
   assign(name, smarule, envir = env)
   smarule
+}
+
+
+#' Create or Retrieve a Trade Object
+#'
+#' This function manages trades for a given security and portfolio. It retrieves or creates a trade object,
+#' updates the trade quantity, and adjusts the target position in the portfolio accordingly.
+#'
+#' @param security_id A string representing the ID of the security. Must be a valid string.
+#' @param portfolio_id A string representing the ID of the portfolio. Must be a valid string.
+#' @param qty A numeric value representing the quantity of the trade. Must be a valid numeric value.
+#' @param swap A boolean indicating whether the trade is a swap. Must be `TRUE` or `FALSE`.
+#' @param create A boolean indicating whether to create a new trade if it does not exist. Must be `TRUE` or `FALSE`.
+#'
+#' @return If `create` is `FALSE`, returns a list of existing trades for the given security and swap flag.
+#'         If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's target position.
+#'
+#' @details
+#' The function first validates the input parameters. It retrieves all existing trades from the `registries$trades`
+#' environment and filters them based on the `security_id` and `swap` flag. If `create` is `FALSE`, it returns the
+#' filtered trades. If `create` is `TRUE`, it creates a new trade if none exists, updates the trade quantity, and
+#' adjusts the target position in the portfolio.
+#'
+#' @examples
+#' # Example usage:
+#' # Retrieve existing trades
+#' trades <- .trade("SEC123", "PORT456", qty = 0, swap = FALSE, create = FALSE)
+#'
+#' # Create or update a trade
+#' trade <- .trade("SEC123", "PORT456", qty = 100, swap = FALSE, create = TRUE)
+#'
+#' @seealso \code{\link{Trade}}, \code{\link{Portfolio}}
+.trade <- function(
+  security_id, portfolio_id, qty, swap, create
+) {
+  assert_string(security_id, "security_id")
+  assert_string(portfolio_id, "portfolio_id")
+  portfolio <- .portfolio(portfolio_id, create = FALSE)
+  assert_inherits(portfolio, "Portfolio", "portfolio")
+  assert_numeric(qty, "qty")
+  assert_bool(swap, "swap")
+  assert_bool(create, "create")
+  all_trades <- mget(
+    ls(envir = registries$trades, all.names = TRUE),
+    envir = registries$trades,
+    inherits = TRUE
+  )
+  all_trades_ids <- vapply(all_trades, function(x) x$get_security_id(), character(1)) #nolint
+  all_trades_swap_flag <- vapply(all_trades, function(x) x$get_swap_flag(), logical(1)) #nolint
+  sec_trades <- all_trades[all_trades_ids == security_id & all_trades_swap_flag == swap] #nolint
+
+  if (!create) return(sec_trades)
+
+  if (length(sec_trades) == 0) {
+    trade <- Trade$new(security_id, swap)
+    assign(security_id, trade, envir = registries$trades)
+  } else {
+    trade <- sec_trades[[1]]
+  }
+
+  trade$add_trade_qty(portfolio_id, qty)
+
+  tgt_pos <- portfolio$get_target_position(security_id)
+  tgt_pos$set_qty(tgt_pos$get_qty() + qty)
+  portfolio$add_target_position(tgt_pos, overwrite = TRUE)
+  trade
 }
