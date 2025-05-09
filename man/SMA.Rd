@@ -20,12 +20,13 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
 \item \href{#method-SMA-get_sma_rules}{\code{SMA$get_sma_rules()}}
+\item \href{#method-SMA-get_portfolio_constructor}{\code{SMA$get_portfolio_constructor()}}
 \item \href{#method-SMA-get_replacement_security}{\code{SMA$get_replacement_security()}}
 \item \href{#method-SMA-get_replaced_security}{\code{SMA$get_replaced_security()}}
 \item \href{#method-SMA-check_sma_rules_target}{\code{SMA$check_sma_rules_target()}}
 \item \href{#method-SMA-get_security_position_limits}{\code{SMA$get_security_position_limits()}}
 \item \href{#method-SMA-get_swap_flag_position_rules}{\code{SMA$get_swap_flag_position_rules()}}
-\item \href{#method-SMA-rebalance_position}{\code{SMA$rebalance_position()}}
+\item \href{#method-SMA-mimic_base_portfolio}{\code{SMA$mimic_base_portfolio()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -153,6 +154,19 @@ A list of SMA rules
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_portfolio_constructor"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_portfolio_constructor}{}}}
+\subsection{Method \code{get_portfolio_constructor()}}{
+Get the Portfolio Constructor
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_portfolio_constructor()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The portfolio constructor object
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-get_replacement_security"></a>}}
 \if{latex}{\out{\hypertarget{method-SMA-get_replacement_security}{}}}
 \subsection{Method \code{get_replacement_security()}}{
@@ -209,8 +223,6 @@ Get Max and Min Value of the security given all SMA Rules
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
-
-\item{\code{cl}}{Cluster object for parallel processing (optional)}
 }
 \if{html}{\out{</div>}}
 }
@@ -233,22 +245,18 @@ Get Swap Flag for a given security
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-rebalance_position"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-rebalance_position}{}}}
-\subsection{Method \code{rebalance_position()}}{
-Rebalance SMA Position
+\if{html}{\out{<a id="method-SMA-mimic_base_portfolio"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-mimic_base_portfolio}{}}}
+\subsection{Method \code{mimic_base_portfolio()}}{
+Calculate the rebalance quantity for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$rebalance_position(security_id, assign_position = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(security_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
-
-\item{\code{assign_position}}{Logical. If TRUE, assign the position to the SMA Target Position}
-
-\item{\code{cl}}{Cluster object for parallel processing (optional)}
 }
 \if{html}{\out{</div>}}
 }

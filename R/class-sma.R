@@ -12,10 +12,17 @@
 #' @include class-security.R
 #' @include utils.R
 #' @include api-functions.R
+#' @include class-smaconstructor.R
 #' @export
 SMA <- R6::R6Class(   #nolint
   "SMA",
   inherit = Portfolio,
+  private = list(
+    base_portfolio_ = NULL,
+    sma_rules_ = list(),
+    replacements_ = list(),
+    portfolio_constructor = SMAConstructor$new()
+  ),
   public = list(
     #' @description
     #' Create a new SMA R6 object.
@@ -82,10 +89,16 @@ SMA <- R6::R6Class(   #nolint
       private$sma_rules_
     },
 
+    #' @description Get the Portfolio Constructor
+    #' @return The portfolio constructor object
+    get_portfolio_constructor = function() {
+      private$portfolio_constructor
+    },
+
     #' @description Get replacement security for a given replaced security
     #' @param replaced_security_id Security ID of the replaced security (in base ptfl) #nolint
     get_replacement_security = function(replaced_security_id = NULL) {
-      if (is.null(replaced_security_id)) private$replacements_
+      if (is.null(replaced_security_id)) return(private$replacements_)
       if (!replaced_security_id %in% names(private$replacements_)) {
         return(replaced_security_id)
       }
@@ -109,102 +122,51 @@ SMA <- R6::R6Class(   #nolint
 
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
-    #' @param cl Cluster object for parallel processing (optional)
     get_security_position_limits = function(security_id = NULL) {
-      if (is.null(security_id)) stop("Security ID must be supplied")
-      non_swap_rules <- private$sma_rules_[
-        !vapply(private$sma_rules_, \(rule) rule$get_swap_only(), logical(1))
-      ]
-      limits <- lapply(
-        non_swap_rules,
-        \(rule) rule$get_security_limits(security_id)
-      )
-      max_limits <- sapply(limits, \(x) x$max)
-      min_limits <- sapply(limits, \(x) x$min)
-      list(max_shares = min(max_limits), min_shares = max(min_limits))
+      private$portfolio_constructor$get_security_position_limits(self, security_id)
     },
 
     #' @description Get Swap Flag for a given security
     #' @param security_id Security ID
     get_swap_flag_position_rules = function(security_id = NULL) {
-      if (is.null(security_id)) stop("Security ID must be supplied")
-      any(vapply(
-        private$sma_rules_,
-        \(rule) rule$check_swap_security(security_id),
-        logical(1)
-      ))
+      private$portfolio_constructor$get_swap_flag_position_rules(self, security_id)
     },
 
-    #' @description Rebalance SMA Position
+    #' @description Calculate the rebalance quantity for a given security
     #' @param security_id Security ID
-    #' @param cl Cluster object for parallel processing (optional)
-    #' @param assign_position Logical. If TRUE, assign the position to the
-    #'  SMA Target Position
-    rebalance_position = function(security_id, assign_position = FALSE) {
-      if (is.null(security_id)) stop("Security ID must be supplied")
-
-      base_pos <- private$base_portfolio_$get_position(security_id)
-      nav_ratio  <- self$get_nav() / private$base_portfolio_$get_nav()
-      replacements <- self$get_replacement_security(security_id)
-
-      get_or_create_target <- function(sec) {
-        pos <- try(self$get_target_position(sec), silent = TRUE)
-        if (inherits(pos, "try-error")) {
-          swap_only <- self$get_swap_flag_position_rules(sec)
-          pos <- .position(private$short_name_, sec, 0, swap = swap_only)
+    mimic_base_portfolio = function(security_id = NULL) {
+      constructor <- self$get_portfolio_constructor()
+      rebal <- constructor$calc_rebalance_qty(private$base_portfolio_, self, security_id)
+      swap <- constructor$get_swap_flag_position_rules(self, names(rebal$position_qty))
+      
+      tgt_positions <- lapply(
+        seq_along(rebal$position_qty),
+        function(i) {
+          .position(
+            portfolio_name = "bemap",
+            bbid = names(rebal$position_qty)[i], 
+            qty = rebal$position_qty[[i]],
+            swap = swap[[i]]
+          )
         }
-        pos
+      )
+      for (pos in tgt_positions) {
+        self$add_target_position(pos, overwrite = TRUE)
       }
 
-      tgt_pos <- lapply(replacements, get_or_create_target)
 
-      scaled_qty <- base_pos$get_qty() * nav_ratio
-      scaled_pos <- .position(private$short_name_, security_id, scaled_qty)
-
-      for (pos in tgt_pos) {
-        sec_id <- pos$get_id()
-        existing_qty <- pos$get_qty()
-        price <- pos$get_security()$get_price()
-        scaled_price <- scaled_pos$get_security()$get_price()
-        limit_shares <- self$get_security_position_limits(sec_id)
-        max_shares <- limit_shares$max_shares
-        min_shares <- limit_shares$min_shares
-        if (sec_id == security_id) {
-          full_trade_qty <- scaled_pos$get_qty()
-        } else{
-          full_trade_qty <- scaled_pos$get_mkt_val() / price
+      for (i in seq_along(rebal$trade_qty)) {
+        if (rebal$trade_qty[[i]] != 0) {
+          t <- .trade(
+            security_id = names(rebal$trade_qty)[i],
+            portfolio_id = self$get_short_name(),
+            qty = rebal$trade_qty[[i]],
+            swap = swap[[i]],
+            create = TRUE
+          )
         }
-
-        target_qty <- pmin(pmax(existing_qty + full_trade_qty, min_shares), max_shares) #nolint
-        trade_qty <- target_qty - existing_qty
-        pos$set_qty(target_qty)
-
-        if (sec_id == security_id) {
-          used_qty <- trade_qty
-        } else {
-          used_qty <- (trade_qty * price) / scaled_price
-        }
-
-        scaled_pos$set_qty(scaled_pos$get_qty() - used_qty)
       }
-
-      if (abs(scaled_pos$get_qty()) > .Machine$double.eps ^ 0.5) {
-        stop(sprintf(
-          "Non-zero residual after rebalancing ‘%s’: %.6f shares remaining",
-          security_id, scaled_pos$get_qty()
-        ))
-      }
-
-      if (assign_position) {
-        lapply(tgt_pos, \(p) self$add_target_position(p, overwrite = TRUE))
-      }
-      tgt_pos
+      invisible(self)
     }
-  ),
-  private = list(
-    base_portfolio_ = NULL,
-    sma_rules_ = list(),
-    replacements_ = list()
-    portfolio_constructor = NULL
   )
 )

@@ -31,16 +31,14 @@ SMARulePosition <- R6::R6Class( #nolint
       private$check_swap_multi_position_(positions)
     },
 
-    #' @definition Apply the rule definition to a security
+    #' @description Apply the rule definition to a security
     #' @param security_id Security ID
     #' @param sma SMA object
     apply_rule_definition = function(security_id, sma) {
-      exp <- setNames(
+      setNames(
         as.list(private$definition_(security_id, sma)),
         security_id
       )
-      if (length(exp) == 1) return(exp[[1]])
-      exp
     },
 
     #' @description Get the Max and Min Value of the security based on the rule
@@ -58,16 +56,15 @@ SMARulePosition <- R6::R6Class( #nolint
         }
         list(max = private$max_threshold_ / exp, min = private$min_threshold_ / exp)
       }
-      if (length(exp) == 1) return(.set_ind_sec_limits(exp))
       lapply(exp, .set_ind_sec_limits)
     },
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
-      if (!private$swap_only_) return(FALSE)
-      exp <- self$apply_rule_definition(security_id, private$get_sma_())
-      if (length(exp) == 1) return(exp[[1]])
-      exp
+      if (!private$swap_only_) {
+        return(setNames(lapply(security_id, \(x) FALSE), security_id))
+      }
+      self$apply_rule_definition(security_id, private$get_sma_())
     }
   ),
   private = list(

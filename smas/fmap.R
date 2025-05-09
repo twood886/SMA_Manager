@@ -77,17 +77,6 @@ fmap$add_rule(.sma_rule(
 
 fmap$add_rule(.sma_rule(
   sma_name = "fmap",
-  rule_name = "only US securities",
-  scope = "position",
-  definition = function(security_id, sma) {
-    Rblpapi::bdp(security_id, "DS290")$DS290 != "US"
-  },
-  max_threshold = 0,
-  min_threshold = 0
-))
-
-fmap$add_rule(.sma_rule(
-  sma_name = "fmap",
   rule_name = "liquidity",
   scope = "position",
   definition = function(security_id, sma) {
