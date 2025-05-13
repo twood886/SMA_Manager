@@ -45,7 +45,7 @@
   }
   security <- Security$new(bbid)
   assign(bbid, security, envir = env)
-  security
+  invisible(security)
 }
 
 #' Create or Update a Position in a Portfolio
@@ -84,7 +84,7 @@
   assert_bool(swap, "swap")
   bbid <- tolower(bbid) 
   sec <- .security(bbid, create = TRUE)
-  Position$new(portfolio_name, sec, qty, swap)
+  invisible(Position$new(portfolio_name, sec, qty, swap))
 }
 
 #' Create or Retrieve a Portfolio Object
@@ -143,7 +143,7 @@
   )
   portfolio <- Portfolio$new(long_name, short_name, nav, positions)
   assign(short_name, portfolio, envir = env)
-  portfolio
+  invisible(portfolio)
 }
 
 
@@ -193,7 +193,7 @@
   base_ptfl <- .portfolio(base_portfolio, create = FALSE)
   sma <- SMA$new(long_name, short_name, nav, positions, base_ptfl)
   assign(short_name, sma, envir=env)
-  sma
+  invisible(sma)
 }
 
 
@@ -260,7 +260,7 @@
     )
   }
   assign(name, smarule, envir = env)
-  smarule
+  invisible(smarule)
 }
 
 
@@ -293,6 +293,8 @@
 #' trade <- .trade("SEC123", "PORT456", qty = 100, swap = FALSE, create = TRUE)
 #'
 #' @seealso \code{\link{Trade}}, \code{\link{Portfolio}}
+#' @include class-trade.R
+#' @export
 .trade <- function(
   security_id, portfolio_id, qty, swap, create
 ) {
@@ -316,15 +318,21 @@
 
   if (length(sec_trades) == 0) {
     trade <- Trade$new(security_id, swap)
-    assign(security_id, trade, envir = registries$trades)
+    assign(as.character(trade$get_id()), trade, envir = registries$trades)
   } else {
     trade <- sec_trades[[1]]
   }
 
   trade$add_trade_qty(portfolio_id, qty)
 
-  tgt_pos <- portfolio$get_target_position(security_id)
+  tgt_pos <- tryCatch(
+    {portfolio$get_target_position(security_id)},
+    error = function(e) {
+      .position(portfolio_id, security_id, qty = 0, swap = swap)
+    }
+  )
+  
   tgt_pos$set_qty(tgt_pos$get_qty() + qty)
   portfolio$add_target_position(tgt_pos, overwrite = TRUE)
-  trade
+  invisible(trade)
 }

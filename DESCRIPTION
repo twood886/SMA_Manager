@@ -11,6 +11,7 @@ LazyData: true
 RoxygenNote: 7.3.2.9000
 Collate: 
     'SMAManager-package.R'
+    'class-trade.R'
     'api-functions.R'
     'utils.R'
     'class-portfolio.R'
@@ -20,9 +21,8 @@ Collate:
     'class-smaruleposition.R'
     'class-smaconstructor.R'
     'class-sma.R'
-    'class-trade.R'
+    'create_trade.R'
     'enfusion_loading.R'
     'get_tracking_smas.R'
     'remove_all_portfolio_trades.R'
-    'rebalance_sma.R'
     'zzz.R'

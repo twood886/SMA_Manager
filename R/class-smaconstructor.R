@@ -12,9 +12,7 @@ SMAConstructor <- R6::R6Class( #nolint
     get_security_position_limits = function(sma, security_id = NULL) {
       if (is.null(security_id)) stop("Security ID must be supplied")
       rules <- sma$get_sma_rules()
-      non_swap_rules <- rules[
-        !vapply(rules, \(rule) rule$get_swap_only(), logical(1))
-      ]
+      non_swap_rules <- rules[!vapply(rules, \(rule) rule$get_swap_only(), logical(1))]
 
       limits <- lapply(non_swap_rules, \(rule) rule$get_security_limits(security_id))
 
@@ -46,9 +44,12 @@ SMAConstructor <- R6::R6Class( #nolint
     },
 
     get_scale_qty = function(base_portfolio, sma_portfolio, base_security_id) {
-      base_pos <- base_portfolio$get_position(base_security_id)
+      base_pos_qty <- tryCatch(
+        {base_portfolio$get_position(base_security_id)$get_qty()}
+        , error = function(e) 0
+      )
       nav_ratio <- sma_portfolio$get_nav() / base_portfolio$get_nav()
-      base_pos$get_qty() * nav_ratio
+      base_pos_qty * nav_ratio
     },
 
     calc_rebalance_qty = function(base, sma, target_sec_id = NULL) {
@@ -75,7 +76,9 @@ SMAConstructor <- R6::R6Class( #nolint
         vapply(
           all_secs_id,
           function(s) {
-            if (s %in% target_sec_id) return(self$get_scale_qty(base, sma, s))
+            if (s %in% c(target_sec_id, unique(unlist(replacements, use.names = F)))) {
+              return(self$get_scale_qty(base, sma, s))
+            } 
             if (s %in% names(sma_qty)) return(sma_qty[s])
             0
           },

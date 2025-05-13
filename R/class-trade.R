@@ -3,6 +3,7 @@
 #' R6 Class representing a trade object.
 #' 
 #' @import R6
+#' @export
 Trade <- R6::R6Class(  #nolint
   "Trade",
   private = list(
@@ -65,7 +66,13 @@ Trade <- R6::R6Class(  #nolint
       if (!exists(portfolio_short_name, envir = registries$portfolios, inherits = FALSE)) { #nolint
         stop("Specified portfolio has not been created")
       }
-      private$allocation_shares_[[portfolio_short_name]] <- quantity
+
+      existing_trade_qty <- private$allocation_shares_[[portfolio_short_name]]
+      if (is.null(existing_trade_qty)) {
+        existing_trade_qty <- 0
+      }
+
+      private$allocation_shares_[[portfolio_short_name]] <- quantity + existing_trade_qty
       private$total_qty_ <- private$total_qty_ + quantity
       self$allocate_trade()
       invisible(NULL)

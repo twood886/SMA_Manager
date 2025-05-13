@@ -136,35 +136,26 @@ SMA <- R6::R6Class(   #nolint
     #' @param security_id Security ID
     mimic_base_portfolio = function(security_id = NULL) {
       constructor <- self$get_portfolio_constructor()
-      rebal <- constructor$calc_rebalance_qty(private$base_portfolio_, self, security_id)
-      swap <- constructor$get_swap_flag_position_rules(self, names(rebal$position_qty))
-      
-      tgt_positions <- lapply(
-        seq_along(rebal$position_qty),
-        function(i) {
-          .position(
-            portfolio_name = "bemap",
-            bbid = names(rebal$position_qty)[i], 
-            qty = rebal$position_qty[[i]],
-            swap = swap[[i]]
-          )
-        }
-      )
-      for (pos in tgt_positions) {
-        self$add_target_position(pos, overwrite = TRUE)
-      }
-
-
-      for (i in seq_along(rebal$trade_qty)) {
-        if (rebal$trade_qty[[i]] != 0) {
+      rebal <- constructor$calc_rebalance_qty(self$get_base_portfolio(), self, security_id)
+      if (length(rebal$trade_qty) != 0) {
+        swap <- constructor$get_swap_flag_position_rules(self, names(rebal$trade_qty))
+        for (i in seq_along(rebal$trade_qty)) {
           t <- .trade(
             security_id = names(rebal$trade_qty)[i],
             portfolio_id = self$get_short_name(),
             qty = rebal$trade_qty[[i]],
-            swap = swap[[i]],
+            swap = swap[[names(rebal$trade_qty)[i]]],
             create = TRUE
           )
         }
+      }
+      for (i in seq_along(rebal$unfilled_qty)) {
+        warning(
+          paste0(
+            "Unfilled quantity for ", names(rebal$unfilled_qty)[i], ": ",
+            rebal$unfilled_qty[[i]]
+          )
+        )
       }
       invisible(self)
     }

@@ -19,8 +19,15 @@ ccmf <- create_portfolio_from_enfusion(
 source("smas/bemap.R")
 source("smas/fmap.R")
 
-rebalance_sma(bemap)
-rebalance_sma(fmap)
+create_trade_qty(
+  portfolio_id = "ccmf",
+  security_id = "zroz us equity",
+  trade_qty = 1000,
+  swap = FALSE
+)
+
+bemap$mimic_base_portfolio()
+fmap$mimic_base_portfolio()
 
 trades <- mget(
   ls(envir = registries$trades, all.names = TRUE),
@@ -50,7 +57,7 @@ out <- trade_df %>%
 
 write.csv(
   out,
-  file = "20250508_sma_trades.csv",
+  file = "20250509_sma_trades.csv",
   row.names = FALSE
 )
 
@@ -60,18 +67,18 @@ rules <- bemap$get_sma_rules()
 securities <- sapply(ccmf$get_position(), \(pos) pos$get_id())
 test <- get_security_position_limits(securities, rules)
 
-def <- rule$get_definition()
+base_pos <- 
+  .position(
+    short_name = "ccmf",
+    id = "AAPL US Equity",
+    qty = 1000,
+    swap = FALSE
+  )
 
-security_id <- c("AAPL US Equity", "MSFT US Equity")
-exp <- def(security_id, bemap)
+base_portfolio <- ccmf
+sma_portfolio <- bemap
+security_id <- "et us equity"
 
+base_positions <- ccmf$get_target_position()
+sma <- bemap
 
-
-    apply_rule_definition = function(rule, security_id, sma) {
-      exp <- setNames(
-        as.list(rule$get_definition(security_id, sma)),
-        security_id
-      )
-      if (length(exp) == 1) return(exp[[1]])
-      exp
-    }
