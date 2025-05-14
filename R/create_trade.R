@@ -49,12 +49,16 @@ create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty 
     swap = swap
   )
 
-  tryCatch(
-    {derived_portfolios <- get_tracking_smas(portfolio)},
+  derived_portfolios <- tryCatch(
+    {get_tracking_smas(portfolio)},
     error = function(e) {
-      return(invisible(trade))
+      NULL
     }
   )
+  if(is.null(derived_portfolios)) {
+    return(invisible(trade))
+  }
+
   if (length(derived_portfolios) > 0) {
     for (derived_portfolio in derived_portfolios) {
       derived_portfolio$mimic_base_portfolio(security_id = security_id) 
