@@ -20,7 +20,7 @@ source("smas/bemap.R")
 source("smas/fmap.R")
 
 create_trade_qty(
-  portfolio_id = "ccmf",
+  portfolio_id = "bemap",
   security_id = "zroz us equity",
   trade_qty = 1000,
   swap = FALSE

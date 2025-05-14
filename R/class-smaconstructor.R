@@ -1,5 +1,10 @@
 # SMAConstrucor
 #' @import igraph
+#' @import dplyr
+#' @import purrr
+#' @import tidyr
+#' @import tibble
+#' @importFrom magrittr %>%
 #' @importFrom R6 R6Class
 #' @include class-security.R
 #' @include class-portfolio.R
@@ -102,9 +107,9 @@ SMAConstructor <- R6::R6Class( #nolint
       derived[names(long_adj$adj)]  <- derived[names(long_adj$adj)]  + long_adj$adj
       derived[names(short_adj$adj)] <- derived[names(short_adj$adj)] + short_adj$adj
 
-      trade_qty <- derived - sma_qty[all_secs_id] %>% replace_na(0)
+      trade_qty <- derived - sma_qty[all_secs_id] %>% tidyr::replace_na(0)
       trade_qty <- trade_qty[trade_qty != 0]
-      unfilled  <- c(long_adj$leftover, short_adj$leftover) %>% keep(~ .x > 0)
+      unfilled  <- c(long_adj$leftover, short_adj$leftover) %>% purrr:::keep(~ .x > 0)
       unfilled_qty <- unfilled / prices[names(unfilled)]
 
       list(
@@ -159,7 +164,7 @@ SMAConstructor <- R6::R6Class( #nolint
       flows <- mf$flow
 
       # parse out “adj” and “leftover”
-      adj <- set_names(numeric(length(rep_secs)), rep_secs)
+      adj <- purrr::set_names(numeric(length(rep_secs)), rep_secs)
       purrr::walk2(edf$from, edf$to, ~{
         if (startsWith(.x, "o_") && startsWith(.y, "r_")) {
           sec <- sub("^r_", "", .y)
@@ -167,7 +172,7 @@ SMAConstructor <- R6::R6Class( #nolint
         }
       })
 
-      leftover <- set_names(numeric(length(secs)), secs)
+      leftover <- purrr::set_names(numeric(length(secs)), secs)
       purrr::walk2(edf$from, edf$to, ~{
         if (.x == "SRC") {
           sec <- sub("^o_", "", .y)
