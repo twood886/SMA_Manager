@@ -64,7 +64,7 @@
       pos
     }
   )
-  return(positions)
+  return(setNames(positions, NULL))
 }
 
 
