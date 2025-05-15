@@ -8,7 +8,8 @@ create_trade_qty(
   portfolio_id = NULL,
   security_id = NULL,
   trade_qty = NULL,
-  swap
+  swap,
+  assign_to_registry = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ create_trade_qty(
 \item{trade_qty}{A numeric value specifying the quantity of the trade. Default is `NULL`.}
 
 \item{swap}{A boolean indicating whether the trade involves a swap. If not provided, it is inferred from the portfolio's position.}
+
+\item{assign_to_registry}{A boolean indicating whether to assign the trade to the registry. Default is `TRUE`.}
 }
 \value{
 An invisible trade object created with the specified parameters.

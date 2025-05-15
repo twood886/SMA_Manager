@@ -7,10 +7,13 @@
 #' @param bbid A string representing the Bloomberg ID of the security. Must be a non-empty string.
 #' @param create A logical value indicating whether to create a new security object if it does not
 #'   already exist in the registry. Defaults to `TRUE`.
+#' @param assign_to_registry A logical value indicating whether to assign the security object to the
+#'  registry. Defaults to `TRUE`.
 #'
 #' @return If the security exists in the registry, it returns the corresponding security object.
 #'   If the security does not exist and `create` is `FALSE`, it returns `NULL`. If `create` is `TRUE`,
-#'   it creates a new security object, adds it to the registry, and returns it.
+#'   it creates a new security object and returns it. If `assign_to_registry` is `TRUE`, the new object is
+#'   assigned to the registry.
 #'
 #' @details The function first validates the `bbid` parameter to ensure it is a valid string. It then
 #'   checks if the security exists in the `registries$securities` environment. If the security does not
@@ -23,17 +26,19 @@
 #' security("AAPL US Equity")
 #'
 #' # Create a new security if it does not exist
-#' security("MSFT US Equity", create = TRUE)
+#' security("MSFT US Equity", create = TRUE, assign_to_registry = TRUE)
 #'
 #' # Attempt to retrieve a security without creating it
-#' security("GOOG US Equity", create = FALSE)
+#' security("GOOG US Equity", create = FALSE,  assign_to_registry = FALSE)
 #'
 #' @seealso \code{\link{Security}} for the Security class.
 #'
 #' @importFrom Rblpapi bdp
 #' @export
-.security <- function(bbid, create = TRUE) {
+.security <- function(bbid, create = TRUE, assign_to_registry = TRUE) {
   assert_string(bbid, "bbid")
+  assert_bool(create, "create")
+  assert_bool(assign_to_registry, "assign_to_registry")
   bbid <- tolower(bbid)
   env <- registries$securities
   if (exists(bbid, envir = env, inherits = FALSE)) {
@@ -44,7 +49,9 @@
     stop("Security not found in Bloomberg")
   }
   security <- Security$new(bbid)
-  assign(bbid, security, envir = env)
+  if (assign_to_registry) {
+    assign(bbid, security, envir = env)
+  }
   invisible(security)
 }
 
@@ -104,6 +111,8 @@
 #'   empty list.
 #' @param create A logical value indicating whether to create the portfolio 
 #'   if it does not exist. Defaults to `FALSE`.
+#' @param assign_to_registry A logical value indicating whether to assign the
+#'  portfolio object to the registry. Defaults to `TRUE`.
 #'
 #' @return If the portfolio exists or is successfully created, the portfolio 
 #'   object is returned. Otherwise, an error is raised.
@@ -111,8 +120,9 @@
 #' @details The function checks for the existence of a portfolio in the 
 #'   `registries$portfolios` environment using the `short_name`. If the 
 #'   portfolio exists, it is retrieved and returned. If it does not exist 
-#'   and `create` is `TRUE`, a new portfolio is created and added to the 
-#'   registry. The function performs various assertions to ensure the 
+#'   and `create` is `TRUE`, a new portfolio is created. If `assign_to_registry`
+#'   is true, the object is added to the registry. 
+#'   The function performs various assertions to ensure the 
 #'   validity of the input arguments.
 #'
 #' @examples
@@ -126,10 +136,11 @@
 #'
 #' @export
 .portfolio <- function(
-  short_name, long_name, nav = 0, positions = list(), create = FALSE
+  short_name, long_name, nav = 0, positions = list(), create = FALSE, assign_to_registry = TRUE
 ) {
   assert_string(short_name, "short_name")
   assert_bool(create, "create")
+  assert_bool(assign_to_registry, "assign_to_registry")
   env <- registries$portfolios
   if (exists(short_name, envir = env, inherits = FALSE)) {
     return(get(short_name, envir = env))
@@ -142,7 +153,9 @@
     function(position) assert_inherits(position, "Position", "positions")
   )
   portfolio <- Portfolio$new(long_name, short_name, nav, positions)
-  assign(short_name, portfolio, envir = env)
+  if (assign_to_registry) {
+    assign(short_name, portfolio, envir=env)
+  }
   invisible(portfolio)
 }
 
@@ -161,6 +174,7 @@
 #' @param positions A list of `Position` objects representing the positions in the SMA. Defaults to an empty list.
 #' @param base_portfolio A string representing the name of the base portfolio associated with the SMA.
 #' @param create A boolean indicating whether to create the SMA if it does not exist. Defaults to `FALSE`.
+#' @param assign_to_registry A boolean indicating whether to assign the SMA object to the registry. Defaults to `TRUE`.
 #'
 #' @return An SMA object.
 #' @details The function checks if the SMA with the given `short_name` exists in the 
@@ -180,7 +194,7 @@
 #'
 #' @seealso \code{\link{Portfolio}}, \code{\link{SMA}}
 #' @export
-.sma <- function(short_name, long_name, nav = 0, positions = list(), base_portfolio, create = FALSE) {
+.sma <- function(short_name, long_name, nav = 0, positions = list(), base_portfolio, create = FALSE, assign_to_registry = TRUE) {
   assert_string(short_name, "short_name")
   assert_bool(create, "create")
   env <- registries$portfolios
@@ -192,7 +206,9 @@
   assert_string(base_portfolio, "base_portfolio")
   base_ptfl <- .portfolio(base_portfolio, create = FALSE)
   sma <- SMA$new(long_name, short_name, nav, positions, base_ptfl)
-  assign(short_name, sma, envir=env)
+  if (assign_to_registry) {
+    assign(short_name, sma, envir=env)
+  }
   invisible(sma)
 }
 
@@ -274,6 +290,7 @@
 #' @param qty A numeric value representing the quantity of the trade. Must be a valid numeric value.
 #' @param swap A boolean indicating whether the trade is a swap. Must be `TRUE` or `FALSE`.
 #' @param create A boolean indicating whether to create a new trade if it does not exist. Must be `TRUE` or `FALSE`.
+#' @param assign_to_registry A boolean indicating whether to assign the trade object to the registry. Defaults to `TRUE`.
 #'
 #' @return If `create` is `FALSE`, returns a list of existing trades for the given security and swap flag.
 #'         If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's target position.
@@ -296,7 +313,7 @@
 #' @include class-trade.R
 #' @export
 .trade <- function(
-  security_id, portfolio_id, qty, swap, create
+  security_id, portfolio_id, qty, swap, create = FALSE, assign_to_registry = TRUE
 ) {
   assert_string(security_id, "security_id")
   assert_string(portfolio_id, "portfolio_id")
@@ -305,6 +322,7 @@
   assert_numeric(qty, "qty")
   assert_bool(swap, "swap")
   assert_bool(create, "create")
+  assert_bool(assign_to_registry, "assign_to_registry")
   all_trades <- mget(
     ls(envir = registries$trades, all.names = TRUE),
     envir = registries$trades,
@@ -318,7 +336,6 @@
 
   if (length(sec_trades) == 0) {
     trade <- Trade$new(security_id, swap)
-    assign(as.character(trade$get_id()), trade, envir = registries$trades)
   } else {
     trade <- sec_trades[[1]]
   }
@@ -334,5 +351,8 @@
   
   tgt_pos$set_qty(tgt_pos$get_qty() + qty)
   portfolio$add_target_position(tgt_pos, overwrite = TRUE)
+  if (assign_to_registry) {
+    assign(as.character(trade$get_id()), trade, envir = registries$trades)
+  }
   invisible(trade)
 }

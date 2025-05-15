@@ -250,13 +250,15 @@ Get Swap Flag for a given security
 \subsection{Method \code{mimic_base_portfolio()}}{
 Calculate the rebalance quantity for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(security_id = NULL, assign_to_registry = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
+
+\item{\code{assign_to_registry}}{Assign to registry (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }

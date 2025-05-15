@@ -134,10 +134,12 @@ SMA <- R6::R6Class(   #nolint
 
     #' @description Calculate the rebalance quantity for a given security
     #' @param security_id Security ID
-    mimic_base_portfolio = function(security_id = NULL) {
+    #' @param assign_to_registry Assign to registry (default: TRUE)
+    mimic_base_portfolio = function(security_id = NULL, assign_to_registry = TRUE) {
       constructor <- self$get_portfolio_constructor()
       rebal <- constructor$calc_rebalance_qty(self$get_base_portfolio(), self, security_id)
       if (length(rebal$trade_qty) != 0) {
+        trades <- list()
         swap <- constructor$get_swap_flag_position_rules(self, names(rebal$trade_qty))
         for (i in seq_along(rebal$trade_qty)) {
           t <- .trade(
@@ -145,8 +147,10 @@ SMA <- R6::R6Class(   #nolint
             portfolio_id = self$get_short_name(),
             qty = rebal$trade_qty[[i]],
             swap = swap[[names(rebal$trade_qty)[i]]],
-            create = TRUE
+            create = TRUE,
+            assign_to_registry = assign_to_registry
           )
+          trades[[t$get_id()]] <- t
         }
       }
       for (i in seq_along(rebal$unfilled_qty)) {
@@ -157,7 +161,7 @@ SMA <- R6::R6Class(   #nolint
           )
         )
       }
-      invisible(self)
+      invisible(trades)
     }
   )
 )

@@ -7,6 +7,7 @@
 #' @param security_id A string representing the ID of the security. Default is `NULL`.
 #' @param trade_qty A numeric value specifying the quantity of the trade. Default is `NULL`.
 #' @param swap A boolean indicating whether the trade involves a swap. If not provided, it is inferred from the portfolio's position.
+#' @param assign_to_registry A boolean indicating whether to assign the trade to the registry. Default is `TRUE`.
 #'
 #' @return An invisible trade object created with the specified parameters.
 #' 
@@ -29,7 +30,7 @@
 #' @include utils.R
 #' @include api-functions.R
 #' @export
-create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty = NULL, swap) {
+create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty = NULL, swap, assign_to_registry = TRUE) {
   assert_string(portfolio_id, "portfolio_id")
   assert_string(security_id, "security_id")
   security <- .security(security_id)
@@ -40,13 +41,16 @@ create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty 
     error = function(e) swap
   )
   assert_bool(swap, "swap")
-  
-  trade <- .trade(
+
+  existing_trade_ids <- ls(envir = registries$trades, all.names = TRUE)
+
+  .trade(
     security_id = security_id,
     portfolio_id = portfolio_id,
     qty = trade_qty,
     create = TRUE,
-    swap = swap
+    swap = swap,
+    assign_to_registry = assign_to_registry
   )
 
   derived_portfolios <- tryCatch(
@@ -56,14 +60,16 @@ create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty 
     }
   )
   if(is.null(derived_portfolios)) {
-    return(invisible(trade))
+    return(invisible(trades))
   }
   if (length(derived_portfolios) > 0) {
     for (derived_portfolio in derived_portfolios) {
       derived_portfolio$mimic_base_portfolio(security_id = security_id) 
     }
-  }  
-  invisible(trade)
+  }
+  new_trade_ids <- setdiff(ls(envir = registries$trades, all.names = TRUE), existing_trade_ids)
+  trades <- mget(new_trade_ids, envir = registries$trades, inherits = TRUE)
+  invisible(trades)
 }
 
 
@@ -75,6 +81,7 @@ create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty 
 #' @param security_id [character] The ID of the security. Must be a non-empty string.
 #' @param tgt_weight [numeric] The target weight for the security in the portfolio. Must be a valid number.
 #' @param swap [logical] Indicates whether the trade involves a swap. If not provided, it will be inferred from the portfolio's current position.
+#' @param assign_to_registry [logical] Indicates whether to assign the trade to the registry. Default is `TRUE`.
 #'
 #' @details
 #' The function calculates the target quantity of the security based on the portfolio's net asset value (NAV) and the security's price.
@@ -98,7 +105,7 @@ create_trade_qty <- function(portfolio_id = NULL, security_id = NULL, trade_qty 
 #' @include utils.R
 #' @include api-functions.R
 #' @export
-create_trade_tgt_weight <- function(portfolio_id = NULL, security_id = NULL, tgt_weight = NULL, swap) {
+create_trade_tgt_weight <- function(portfolio_id = NULL, security_id = NULL, tgt_weight = NULL, swap, assign_to_registry = TRUE) {
   assert_string(portfolio_id, "portfolio_id")
   assert_string(security_id, "security_id")
   security <- .security(security_id)
@@ -117,10 +124,12 @@ create_trade_tgt_weight <- function(portfolio_id = NULL, security_id = NULL, tgt
   current_qty <- current_pos$get_qty()
   trade_qty <- target_qty - current_qty
   
-  create_trade_qty(
+  trades <- create_trade_qty(
     portfolio_id = portfolio_id,
     security_id = security_id,
     trade_qty = trade_qty,
-    swap = swap
+    swap = swap,
+    assign_to_registry = assign_to_registry
   )
+  return(invisible(trades))
 }

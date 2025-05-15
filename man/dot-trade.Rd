@@ -4,7 +4,14 @@
 \alias{.trade}
 \title{Create or Retrieve a Trade Object}
 \usage{
-.trade(security_id, portfolio_id, qty, swap, create)
+.trade(
+  security_id,
+  portfolio_id,
+  qty,
+  swap,
+  create = FALSE,
+  assign_to_registry = TRUE
+)
 }
 \arguments{
 \item{security_id}{A string representing the ID of the security. Must be a valid string.}
@@ -16,6 +23,8 @@
 \item{swap}{A boolean indicating whether the trade is a swap. Must be `TRUE` or `FALSE`.}
 
 \item{create}{A boolean indicating whether to create a new trade if it does not exist. Must be `TRUE` or `FALSE`.}
+
+\item{assign_to_registry}{A boolean indicating whether to assign the trade object to the registry. Defaults to `TRUE`.}
 }
 \value{
 If `create` is `FALSE`, returns a list of existing trades for the given security and swap flag.

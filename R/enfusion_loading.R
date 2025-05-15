@@ -1,3 +1,71 @@
+#' Internal helper: create many positions from Enfusion report
+#' @param enfusion_report Data frame of Enfusion report rows
+#' @param short_name Character portfolio short name
+#' @include utils.R
+#' @include api-functions.R
+#' @import Rblpapi
+.bulk_security_positions <- function(enfusion_report, portfolio_short_name) {
+  con <- tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)
+  if (is.null(con)) con <- Rblpapi::blpConnect()
+  
+  ids <- vapply(
+    split(enfusion_report, seq_len(nrow(enfusion_report))),
+    function(x) {
+      switch(
+        x[["Instrument Type"]],
+        "Bond" = Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
+        "Listed Option" = x[["BB Yellow Key Position"]],
+        "Equity" = x[["BB Yellow Key Position"]],
+        x[["Description"]]
+      )
+    },
+    character(1)
+  )
+
+  descriptions <- Rblpapi::bdp(ids, "DX615")
+  inst_types <- Rblpapi::bdp(ids, "EX028")
+  prices <- Rblpapi::bdp(ids, "PX_LAST")
+
+  env <- registries$securities
+  
+  for (id in ids) {
+    bbid <- tolower(id)
+    if (exists(bbid, envir = env, inherits = FALSE)) next
+    security <- Security$new(
+      bbid = bbid,
+      description = descriptions[id, "DX615"],
+      instrument_type = inst_types[id, "EX028"],
+      price = prices[id, "PX_LAST"]
+    )
+    assign(bbid, security, envir = env)
+  }
+
+  positions <- lapply(
+    split(enfusion_report, seq_len(nrow(enfusion_report))),
+    function(x) {
+      instrument_type <- x[["Instrument Type"]]
+      id <- switch(
+        instrument_type,
+        "Bond" = Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
+        "Listed Option" = x[["BB Yellow Key Position"]],
+        "Equity" = x[["BB Yellow Key Position"]],
+        x[["Description"]]
+      )
+      id <- tolower(id)
+      if (instrument_type == "Listed Option") {
+        qty <- as.numeric(x[["Option Quantity"]])
+      } else {
+        qty <- as.numeric(x[["Stock Quantity"]])
+      }
+      swap <- as.logical(x[["Is Financed"]]) %||% FALSE
+      pos <- .position(portfolio_short_name, id, qty, swap = swap)
+      pos
+    }
+  )
+  return(positions)
+}
+
+
 #' Internal helper: create positions in parallel
 #'
 #' @param enfusion_report Data frame of Enfusion report rows
@@ -100,14 +168,10 @@ create_portfolio_from_enfusion <- function(
     !is.na(.data$Description) #nolint
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
-
-  positions <- .make_positions(
+  positions <- .bulk_security_positions(
     enfusion_report = enfusion_report,
-    short_name = short_name,
-    position_fn = create_position_from_enfusion
+    portfolio_short_name = short_name
   )
-
-  .register_securities(positions)
   .portfolio(short_name, long_name, nav, positions, create = TRUE)
 }
 
@@ -128,12 +192,10 @@ create_sma_from_enfusion <- function(
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
 
-  positions <- .make_positions(
+  positions <- .bulk_security_positions(
     enfusion_report = enfusion_report,
-    short_name = short_name,
-    position_fn = create_position_from_enfusion
+    portfolio_short_name = short_name
   )
-  .register_securities(positions)
   .sma(short_name, long_name, nav, positions, base_portfolio, create = TRUE)
 }
 

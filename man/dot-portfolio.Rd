@@ -4,7 +4,14 @@
 \alias{.portfolio}
 \title{Create or Retrieve a Portfolio Object}
 \usage{
-.portfolio(short_name, long_name, nav = 0, positions = list(), create = FALSE)
+.portfolio(
+  short_name,
+  long_name,
+  nav = 0,
+  positions = list(),
+  create = FALSE,
+  assign_to_registry = TRUE
+)
 }
 \arguments{
 \item{short_name}{A string representing the short name of the portfolio. 
@@ -22,6 +29,9 @@ empty list.}
 
 \item{create}{A logical value indicating whether to create the portfolio 
 if it does not exist. Defaults to `FALSE`.}
+
+\item{assign_to_registry}{A logical value indicating whether to assign the
+portfolio object to the registry. Defaults to `TRUE`.}
 }
 \value{
 If the portfolio exists or is successfully created, the portfolio 
@@ -36,8 +46,9 @@ is set to `FALSE`, an error is raised.
 The function checks for the existence of a portfolio in the 
   `registries$portfolios` environment using the `short_name`. If the 
   portfolio exists, it is retrieved and returned. If it does not exist 
-  and `create` is `TRUE`, a new portfolio is created and added to the 
-  registry. The function performs various assertions to ensure the 
+  and `create` is `TRUE`, a new portfolio is created. If `assign_to_registry`
+  is true, the object is added to the registry. 
+  The function performs various assertions to ensure the 
   validity of the input arguments.
 }
 \examples{

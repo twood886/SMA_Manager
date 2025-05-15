@@ -10,7 +10,8 @@
   nav = 0,
   positions = list(),
   base_portfolio,
-  create = FALSE
+  create = FALSE,
+  assign_to_registry = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@
 \item{base_portfolio}{A string representing the name of the base portfolio associated with the SMA.}
 
 \item{create}{A boolean indicating whether to create the SMA if it does not exist. Defaults to `FALSE`.}
+
+\item{assign_to_registry}{A boolean indicating whether to assign the SMA object to the registry. Defaults to `TRUE`.}
 }
 \value{
 An SMA object.

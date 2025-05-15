@@ -8,7 +8,8 @@ create_trade_tgt_weight(
   portfolio_id = NULL,
   security_id = NULL,
   tgt_weight = NULL,
-  swap
+  swap,
+  assign_to_registry = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ create_trade_tgt_weight(
 \item{tgt_weight}{[numeric] The target weight for the security in the portfolio. Must be a valid number.}
 
 \item{swap}{[logical] Indicates whether the trade involves a swap. If not provided, it will be inferred from the portfolio's current position.}
+
+\item{assign_to_registry}{[logical] Indicates whether to assign the trade to the registry. Default is `TRUE`.}
 }
 \value{
 Creates a trade and returns the result of the `create_trade_qty` function.

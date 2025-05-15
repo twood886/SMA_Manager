@@ -22,13 +22,37 @@ Security <- R6::R6Class( #nolint
   public = list(
     #' @description Create new Security R6 object
     #' @param bbid Character string. Security identifier (e.g., "AAPL").
-    initialize = function(bbid = NULL) {
+    #' @param description Character string. Security description.
+    #' @param instrument_type Character string. Type of instrument (e.g., "Equity").
+    #' @param price Numeric. Price of the security.
+    #' @param delta Numeric. Delta of the security.
+    initialize = function(bbid, description = NULL, instrument_type = NULL, price = NULL, delta = NULL) {
       assert_string(bbid, "bbid")
       private$bbid_ <- bbid
-      private$description_ <- Rblpapi::bdp(bbid, "DX615")$DX615
-      private$instrument_type_ <- Rblpapi::bdp(bbid, "EX028")$EX028
-      self$update_price()
-      self$update_delta()
+
+      if (!is.null(description)) {
+        private$description_ <- description
+      } else {
+        private$description_ <- Rblpapi::bdp(bbid, "DX615")$DX615
+      }
+
+      if (!is.null(instrument_type)) {
+        private$instrument_type_ <- instrument_type
+      } else {
+        private$instrument_type_ <- Rblpapi::bdp(bbid, "EX028")$EX028
+      }
+
+      if (!is.null(price)) {
+        private$price_ <- price
+      } else {
+        private$price_ <- self$update_price()
+      }
+
+      if (!is.null(delta)) {
+        private$delta_ <- delta
+      } else {
+        private$delta_ <- self$update_delta()
+      }
     },
     # Getters ------------------------------------------------------------------
     #' @description Get ID

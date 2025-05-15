@@ -27,13 +27,27 @@ R6 class for a security with time-series and non-time-series data.
 \subsection{Method \code{new()}}{
 Create new Security R6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$new(bbid = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Security$new(
+  bbid,
+  description = NULL,
+  instrument_type = NULL,
+  price = NULL,
+  delta = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{bbid}}{Character string. Security identifier (e.g., "AAPL").}
+
+\item{\code{description}}{Character string. Security description.}
+
+\item{\code{instrument_type}}{Character string. Type of instrument (e.g., "Equity").}
+
+\item{\code{price}}{Numeric. Price of the security.}
+
+\item{\code{delta}}{Numeric. Delta of the security.}
 }
 \if{html}{\out{</div>}}
 }

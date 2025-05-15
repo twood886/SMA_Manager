@@ -19,11 +19,12 @@ ccmf <- create_portfolio_from_enfusion(
 source("smas/bemap.R")
 source("smas/fmap.R")
 
-create_trade_qty(
-  portfolio_id = "bemap",
+t <- create_trade_qty(
+  portfolio_id = "ccmf",
   security_id = "zroz us equity",
   trade_qty = 1000,
-  swap = FALSE
+  swap = FALSE,
+  assign_to_registry = TRUE
 )
 
 bemap$mimic_base_portfolio()

@@ -2,9 +2,9 @@
 #' @import igraph
 #' @import dplyr
 #' @import purrr
-#' @import tidyr
 #' @import tibble
 #' @importFrom magrittr %>%
+#' @importFrom tidyr replace_na
 #' @importFrom R6 R6Class
 #' @include class-security.R
 #' @include class-portfolio.R

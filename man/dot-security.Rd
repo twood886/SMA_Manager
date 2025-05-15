@@ -4,18 +4,22 @@
 \alias{.security}
 \title{Retrieve or Create a Security Object}
 \usage{
-.security(bbid, create = TRUE)
+.security(bbid, create = TRUE, assign_to_registry = TRUE)
 }
 \arguments{
 \item{bbid}{A string representing the Bloomberg ID of the security. Must be a non-empty string.}
 
 \item{create}{A logical value indicating whether to create a new security object if it does not
 already exist in the registry. Defaults to `TRUE`.}
+
+\item{assign_to_registry}{A logical value indicating whether to assign the security object to the
+registry. Defaults to `TRUE`.}
 }
 \value{
 If the security exists in the registry, it returns the corresponding security object.
   If the security does not exist and `create` is `FALSE`, it returns `NULL`. If `create` is `TRUE`,
-  it creates a new security object, adds it to the registry, and returns it.
+  it creates a new security object and returns it. If `assign_to_registry` is `TRUE`, the new object is
+  assigned to the registry.
 }
 \description{
 This function retrieves a security object from the securities registry by its Bloomberg ID (bbid).
@@ -34,10 +38,10 @@ The function first validates the `bbid` parameter to ensure it is a valid string
 security("AAPL US Equity")
 
 # Create a new security if it does not exist
-security("MSFT US Equity", create = TRUE)
+security("MSFT US Equity", create = TRUE, assign_to_registry = TRUE)
 
 # Attempt to retrieve a security without creating it
-security("GOOG US Equity", create = FALSE)
+security("GOOG US Equity", create = FALSE,  assign_to_registry = FALSE)
 
 }
 \seealso{
