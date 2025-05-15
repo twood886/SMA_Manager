@@ -19,7 +19,8 @@
         x[["Description"]]
       )
     },
-    character(1)
+    character(1),
+    USE.NAMES = FALSE
   )
 
   descriptions <- Rblpapi::bdp(ids, "DX615")
@@ -31,11 +32,12 @@
   for (id in ids) {
     bbid <- tolower(id)
     if (exists(bbid, envir = env, inherits = FALSE)) next
+
     security <- Security$new(
       bbid = bbid,
       description = descriptions[id, "DX615"],
       instrument_type = inst_types[id, "EX028"],
-      price = prices[id, "PX_LAST"]
+      price = ifelse(inst_types[id, "EX028"] == "FixedIncome", 1, prices[id, "PX_LAST"])
     )
     assign(bbid, security, envir = env)
   }
