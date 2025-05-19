@@ -14,11 +14,20 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_nav}{\code{Portfolio$get_nav()}}
 \item \href{#method-Portfolio-get_position}{\code{Portfolio$get_position()}}
 \item \href{#method-Portfolio-get_target_position}{\code{Portfolio$get_target_position()}}
+\item \href{#method-Portfolio-get_rules}{\code{Portfolio$get_rules()}}
+\item \href{#method-Portfolio-get_trade_constructor}{\code{Portfolio$get_trade_constructor()}}
+\item \href{#method-Portfolio-get_replacement_security}{\code{Portfolio$get_replacement_security()}}
+\item \href{#method-Portfolio-get_replaced_security}{\code{Portfolio$get_replaced_security()}}
+\item \href{#method-Portfolio-check_rules_target}{\code{Portfolio$check_rules_target()}}
+\item \href{#method-Portfolio-get_security_position_limits}{\code{Portfolio$get_security_position_limits()}}
+\item \href{#method-Portfolio-get_swap_flag_position_rules}{\code{Portfolio$get_swap_flag_position_rules()}}
+\item \href{#method-Portfolio-calc_proposed_trade}{\code{Portfolio$calc_proposed_trade()}}
 \item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
 \item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
-\item \href{#method-Portfolio-get_target_trade_qty}{\code{Portfolio$get_target_trade_qty()}}
+\item \href{#method-Portfolio-add_rule}{\code{Portfolio$add_rule()}}
+\item \href{#method-Portfolio-add_replacement}{\code{Portfolio$add_replacement()}}
 \item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
 }
@@ -100,6 +109,129 @@ Get list of target positions in portfolio
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_rules"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_rules}{}}}
+\subsection{Method \code{get_rules()}}{
+Get the Rules
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_rules()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A list of rules
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_trade_constructor"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_trade_constructor}{}}}
+\subsection{Method \code{get_trade_constructor()}}{
+Get the Trade Constructor
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_trade_constructor()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The portfolio constructor object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_replacement_security"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_replacement_security}{}}}
+\subsection{Method \code{get_replacement_security()}}{
+Get replacement security for a given replaced security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_replacement_security(replaced_security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{replaced_security_id}}{Security ID of the replaced security (in base ptfl) #nolint}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_replaced_security"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_replaced_security}{}}}
+\subsection{Method \code{get_replaced_security()}}{
+Get replaced security for a given replacement security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_replaced_security(replacement_security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{replacement_security_id}}{Security ID of the replacement security (in SMA) #nolint}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-check_rules_target"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-check_rules_target}{}}}
+\subsection{Method \code{check_rules_target()}}{
+Check SMA rules against the target positions
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_target()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_security_position_limits"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_security_position_limits}{}}}
+\subsection{Method \code{get_security_position_limits()}}{
+Get Max and Min Value of the security given all SMA Rules
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_security_position_limits(security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_swap_flag_position_rules"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_swap_flag_position_rules}{}}}
+\subsection{Method \code{get_swap_flag_position_rules()}}{
+Get Swap Flag for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_swap_flag_position_rules(security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-calc_proposed_trade"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-calc_proposed_trade}{}}}
+\subsection{Method \code{calc_proposed_trade()}}{
+Calculate the trade quantity for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$calc_proposed_trade(security_id = NULL, trade_qty = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+
+\item{\code{trade_qty}}{Trade quantity (default: 0)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-add_flow"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-add_flow}{}}}
 \subsection{Method \code{add_flow()}}{
@@ -166,29 +298,50 @@ Remove existing Target Position from Portfolio
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{position_id}}{Position ID}
+\item{\code{position_id}}{Position ID
+Add Rule}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-get_target_trade_qty"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-get_target_trade_qty}{}}}
-\subsection{Method \code{get_target_trade_qty()}}{
-Get Target Trade Amount
+\if{html}{\out{<a id="method-Portfolio-add_rule"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_rule}{}}}
+\subsection{Method \code{add_rule()}}{
+Create Rule and Add to Portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_target_trade_qty(security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_rule(rule)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID}
+\item{\code{rule}}{An object of class SMARule
+Add Replacement}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-Target Trade Amount
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-add_replacement"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_replacement}{}}}
+\subsection{Method \code{add_replacement()}}{
+Add replacement securitity
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_replacement(
+  original_security = NULL,
+  replacement_security = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{original_security}}{The original Security id}
+
+\item{\code{replacement_security}}{The replacement Security id}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

@@ -15,7 +15,7 @@
 #' # assert_string(c("a", "b"), "input_name") # Throws an error
 #' # assert_string(NA, "input_name") # Throws an error
 assert_string <- function(x, name) {
-  if (!is.character(x) || length(x) != 1 || is.na(x)) {
+  if (any(!is.character(x) ,is.na(x))) {
     stop(sprintf("%s must be a non-missing single string", name), call. = FALSE)
   }
 }
@@ -62,7 +62,7 @@ assert_inherits <- function(x, class, name) {
 #' assert_numeric("a", "my_var")  # Throws an error
 #' assert_numeric(NA, "my_var")  # Throws an error
 assert_numeric <- function(x, name) {
-  if (!is.numeric(x) || length(x) != 1 || is.na(x)) {
+  if (any(!is.numeric(x) ,is.na(x))) {
     stop(sprintf("%s must be a non-missing single numeric", name), call. = FALSE)
   }
 }
@@ -89,7 +89,7 @@ assert_numeric <- function(x, name) {
 #' assert_bool(c(TRUE, FALSE), "my_var") # Throws an error
 #' }
 assert_bool <- function(x, name) {
-  if (!is.logical(x) || length(x) != 1 || is.na(x)) {
+  if (any(!is.logical(x), is.na(x))) {
     stop(sprintf("%s must be a non-missing single logical", name), call. = FALSE)
   }
 }

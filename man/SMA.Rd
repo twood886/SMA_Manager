@@ -6,7 +6,7 @@
 \description{
 R6 Class representing a seperately managed account.
  A seperately managed account is linked to a portfolio and contains
- Sma_Rules.
+ Rules.
 }
 \section{Super class}{
 \code{\link[SMAManager:Portfolio]{SMAManager::Portfolio}} -> \code{SMA}
@@ -15,17 +15,8 @@ R6 Class representing a seperately managed account.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMA-new}{\code{SMA$new()}}
-\item \href{#method-SMA-add_rule}{\code{SMA$add_rule()}}
-\item \href{#method-SMA-add_replacement}{\code{SMA$add_replacement()}}
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
-\item \href{#method-SMA-get_sma_rules}{\code{SMA$get_sma_rules()}}
-\item \href{#method-SMA-get_portfolio_constructor}{\code{SMA$get_portfolio_constructor()}}
-\item \href{#method-SMA-get_replacement_security}{\code{SMA$get_replacement_security()}}
-\item \href{#method-SMA-get_replaced_security}{\code{SMA$get_replaced_security()}}
-\item \href{#method-SMA-check_sma_rules_target}{\code{SMA$check_sma_rules_target()}}
-\item \href{#method-SMA-get_security_position_limits}{\code{SMA$get_security_position_limits()}}
-\item \href{#method-SMA-get_swap_flag_position_rules}{\code{SMA$get_swap_flag_position_rules()}}
 \item \href{#method-SMA-mimic_base_portfolio}{\code{SMA$mimic_base_portfolio()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
@@ -35,12 +26,21 @@ R6 Class representing a seperately managed account.
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_flow"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_flow'><code>SMAManager::Portfolio$add_flow()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_replacement"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_replacement'><code>SMAManager::Portfolio$add_replacement()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_rule"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_rule'><code>SMAManager::Portfolio$add_rule()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_target_position'><code>SMAManager::Portfolio$add_target_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="calc_proposed_trade"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-calc_proposed_trade'><code>SMAManager::Portfolio$calc_proposed_trade()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="check_rules_target"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-check_rules_target'><code>SMAManager::Portfolio$check_rules_target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replaced_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replaced_security'><code>SMAManager::Portfolio$get_replaced_security()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replacement_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replacement_security'><code>SMAManager::Portfolio$get_replacement_security()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_rules"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_rules'><code>SMAManager::Portfolio$get_rules()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_security_position_limits"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_security_position_limits'><code>SMAManager::Portfolio$get_security_position_limits()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_swap_flag_position_rules"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_swap_flag_position_rules'><code>SMAManager::Portfolio$get_swap_flag_position_rules()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_trade_qty"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_trade_qty'><code>SMAManager::Portfolio$get_target_trade_qty()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_trade_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_trade_constructor'><code>SMAManager::Portfolio$get_trade_constructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
 </ul>
 </details>
@@ -71,45 +71,7 @@ Create a new SMA R6 object.
 }
 \subsection{Returns}{
 A new instance of the SMA class.
-Add SMA Rule
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-add_rule"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-add_rule}{}}}
-\subsection{Method \code{add_rule()}}{
-Create SMA Rule and Add to SMA
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$add_rule(rule)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rule}}{An object of class SMARule
-Add Replacement}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-add_replacement"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-add_replacement}{}}}
-\subsection{Method \code{add_replacement()}}{
-Add replacement securitity
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$add_replacement(original_security = NULL, replacement_security = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{original_security}}{The original Security id}
-
-\item{\code{replacement_security}}{The replacement Security id
-Get Base Portfolio}
-}
-\if{html}{\out{</div>}}
+Get Base Portfolio
 }
 }
 \if{html}{\out{<hr>}}
@@ -141,114 +103,10 @@ Get a position in the Base portfolio
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_sma_rules"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_sma_rules}{}}}
-\subsection{Method \code{get_sma_rules()}}{
-Get the SMA Rules
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_sma_rules()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-A list of SMA rules
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_portfolio_constructor"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_portfolio_constructor}{}}}
-\subsection{Method \code{get_portfolio_constructor()}}{
-Get the Portfolio Constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_portfolio_constructor()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-The portfolio constructor object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_replacement_security"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_replacement_security}{}}}
-\subsection{Method \code{get_replacement_security()}}{
-Get replacement security for a given replaced security
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_replacement_security(replaced_security_id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{replaced_security_id}}{Security ID of the replaced security (in base ptfl) #nolint}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_replaced_security"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_replaced_security}{}}}
-\subsection{Method \code{get_replaced_security()}}{
-Get replaced security for a given replacement security
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_replaced_security(replacement_security_id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{replacement_security_id}}{Security ID of the replacement security (in SMA) #nolint}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-check_sma_rules_target"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-check_sma_rules_target}{}}}
-\subsection{Method \code{check_sma_rules_target()}}{
-Check SMA rules against the target positions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$check_sma_rules_target()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_security_position_limits"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_security_position_limits}{}}}
-\subsection{Method \code{get_security_position_limits()}}{
-Get Max and Min Value of the security given all SMA Rules
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_security_position_limits(security_id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-get_swap_flag_position_rules"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-get_swap_flag_position_rules}{}}}
-\subsection{Method \code{get_swap_flag_position_rules()}}{
-Get Swap Flag for a given security
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$get_swap_flag_position_rules(security_id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-mimic_base_portfolio"></a>}}
 \if{latex}{\out{\hypertarget{method-SMA-mimic_base_portfolio}{}}}
 \subsection{Method \code{mimic_base_portfolio()}}{
-Calculate the rebalance quantity for a given security
+mimic the base portfolio target position
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(security_id = NULL, assign_to_registry = TRUE)}\if{html}{\out{</div>}}
 }

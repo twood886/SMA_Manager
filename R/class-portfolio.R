@@ -6,9 +6,20 @@
 #' @importFrom dplyr filter
 #' @include api-functions.R
 #' @include utils.R
+#' @include class-tradeconstructor.R
 #' @export
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
+  private = list(
+    long_name_ = NULL,
+    short_name_ = NULL,
+    nav_ = NULL,
+    positions_ = NULL,
+    target_positions_ = NULL,
+    rules_ = list(),
+    replacements_ = list(),
+    trade_constructor = NULL
+  ),
   public = list(
     #' @description
     #' Create New Portfolio R6 object
@@ -24,6 +35,9 @@ Portfolio <- R6::R6Class( #nolint
       private$nav_ <- nav
       private$positions_ <- positions
       private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
+      private$rules_ <- list()
+      private$replacements_ <- list()
+      private$trade_constructor <- TradeConstructor$new()
     },
     # Getter Functions ---------------------------------------------------------
     #' @description Get Portfolio short name
@@ -50,6 +64,58 @@ Portfolio <- R6::R6Class( #nolint
       if (!id %in% position_ids) stop("No target position in portfolio with id")
       positions[[which(position_ids == id)]]
     },
+    #' @description Get the Rules
+    #' @return A list of rules
+    get_rules = function() {
+      private$rules_
+    },
+    #' @description Get the Trade Constructor
+    #' @return The portfolio constructor object
+    get_trade_constructor = function() {
+      private$trade_constructor
+    },
+    #' @description Get replacement security for a given replaced security
+    #' @param replaced_security_id Security ID of the replaced security (in base ptfl) #nolint
+    get_replacement_security = function(replaced_security_id = NULL) {
+      if (is.null(replaced_security_id)) return(private$replacements_)
+      if (!replaced_security_id %in% names(private$replacements_)) {
+        return(replaced_security_id)
+      }
+      private$replacements_[[replaced_security_id]]
+    },
+    #' @description Get replaced security for a given replacement security
+    #' @param replacement_security_id Security ID of the replacement security (in SMA) #nolint
+    get_replaced_security = function(replacement_security_id = NULL) {
+      if (is.null(replacement_security_id)) names(private$replacements_)
+      u <- unlist(private$replacements_, use.names = TRUE)
+      idx <- which(u == replacement_security_id)
+      if (length(idx) == 0) return(NULL)
+      names(u)[idx]
+    },
+    #' @description Check SMA rules against the target positions
+    check_rules_target = function() {
+      lapply(self$get_rules_, function(x) x$check_rule_target())
+    },
+    #' @description Get Max and Min Value of the security given all SMA Rules
+    #' @param security_id Security ID
+    get_security_position_limits = function(security_id = NULL) {
+      private$trade_constructor$get_security_position_limits(self, security_id)
+    },
+    #' @description Get Swap Flag for a given security
+    #' @param security_id Security ID
+    get_swap_flag_position_rules = function(security_id = NULL) {
+      private$trade_constructor$get_swap_flag_position_rules(self, security_id)
+    },
+    #' @description Calculate the trade quantity for a given security
+    #' @param security_id Security ID
+    #' @param trade_qty Trade quantity (default: 0)
+    calc_proposed_trade = function(security_id = NULL, trade_qty = NULL) {
+      assert_string(security_id, "security_id")
+      assert_numeric(trade_qty, "trade_qty")
+      self$get_trade_constructor()$calc_trade_qty(self, security_id, trade_qty)
+    },
+
+    # Setter Functions ---------------------------------------------------------
     #' @description
     #' Add flow to portfolio
     #' @param flow flow amount
@@ -57,7 +123,6 @@ Portfolio <- R6::R6Class( #nolint
       private$nav_ <- private$nav_ + flow
       invisible(NULL)
     },
-
     #' @description
     #' Add Position to Portfolio
     #' @param position Position S6 Object
@@ -80,7 +145,6 @@ Portfolio <- R6::R6Class( #nolint
       }
       invisible(NULL)
     },
-
     #' @description
     #' Add New Target Position to Portfolio
     #' @param position Position S6 Object
@@ -105,7 +169,6 @@ Portfolio <- R6::R6Class( #nolint
       }
       invisible(NULL)
     },
-
     #' @description
     #' Remove existing Target Position from Portfolio
     #' @param position_id Position ID
@@ -118,58 +181,30 @@ Portfolio <- R6::R6Class( #nolint
       if (position_id %in% position_ids) {
         private$target_positions_ <- private$target_positions_[position_ids != position_id] #nolint
       }
+      invisible(self)
     },
-    #' @description Get Target Trade Amount
-    #' @param security_id Security ID
-    #' @return Target Trade Amount
-    get_target_trade_qty = function(security_id = NULL) {
-      if (!is.null(security_id)) {
-        return(private$get_target_trade_qty_security_(security_id))
+    #' Add Rule
+    #' @description Create Rule and Add to Portfolio
+    #' @param rule An object of class SMARule
+    add_rule = function(rule) {
+      assert_inherits(rule, "SMARule", "rule")
+      private$rules_[[rule$get_name()]] <- rule
+      invisible(self)
+    },
+    #' Add Replacement
+    #' @description Add replacement securitity
+    #' @param original_security The original Security id
+    #' @param replacement_security The replacement Security id
+    add_replacement = function(
+      original_security = NULL, replacement_security = NULL
+    ) {
+      if (is.null(original_security) | is.null(replacement_security)) {
+        stop("Securities must be provided")
       }
-      all_sec_id <- sapply(private$target_positions_, \(x) x$get_id())
-      trade_qty <- lapply(
-        all_sec_id,
-        \(sec_id) private$get_target_trade_qty_security_(sec_id)
-      )
-      setNames(trade_qty, all_sec_id)
-    }
-  ),
-  private = list(
-    long_name_ = NULL,
-    short_name_ = NULL,
-    nav_ = NULL,
-    positions_ = NULL,
-    target_positions_ = NULL,
-    get_target_trade_qty_security_ = function(security_id = NULL) {
-      if (is.null(security_id)) stop("Security ID must be supplied")
-
-      tgt_position <- self$get_target_position(security_id)
-      if (inherits(tgt_position, "Position")) {
-        tgt_qty <- tgt_position$get_qty()
-      } else {
-        tgt_qty <- 0
-      }
-
-      cur_position <- tryCatch(
-        {
-          self$get_position(security_id)
-        },
-        error = function(e) {
-          NULL
-        }
-      )
-      if (inherits(cur_position, "Position")) {
-        cur_qty <- cur_position$get_qty()
-      } else {
-        cur_qty <- 0
-      }
-
-      list(
-        "security_id" = security_id,
-        "portfolio_id" = self$get_short_name(),
-        "amt" = tgt_qty - cur_qty, 
-        "swap" = tgt_position$get_swap()
-      )
+      original_security <- tolower(original_security)
+      replacement_security <- tolower(replacement_security)
+      private$replacements_[[original_security]] <- replacement_security
+      invisible(self)
     }
   )
 )
