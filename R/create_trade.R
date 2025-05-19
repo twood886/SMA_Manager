@@ -80,7 +80,8 @@ create_proposed_trade_qty <- function(
       "Trade Quantity" = trades_qty,
       "Swap" = swap[names(trades_qty)],
       "Unfilled" = t_$unfilled_qty[names(trades_qty)],
-      row.names = NULL
+      row.names = NULL,
+      check.names = FALSE
     )
   }
 
@@ -199,10 +200,10 @@ proposed_to_trade <- function(proposed_trade_df) {
 
   for (i in seq_len(nrow(proposed_trade_df))) {
     .trade(
-      security_id = proposed_trade_df$security_id[i],
-      portfolio_id = proposed_trade_df$portfolio_id[i],
-      qty = proposed_trade_df$trade_qty[i],
-      swap = proposed_trade_df$swap[i],
+      security_id = proposed_trade_df$Security[i],
+      portfolio_id = proposed_trade_df$Portfolio[i],
+      qty = proposed_trade_df[i, "Trade Quantity"],
+      swap = proposed_trade_df$Swap[i],
       create = TRUE
     )
   }
