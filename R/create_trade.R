@@ -193,10 +193,10 @@ create_proposed_trade_tgt_weight <- function(
 #' @export
 proposed_to_trade <- function(proposed_trade_df) {
   assert_inherits(proposed_trade_df, "data.frame", "proposed_trade_df")
-  assert_string(proposed_trade_df$portfolio_id, "portfolio_id")
-  assert_string(proposed_trade_df$security_id, "security_id")
-  assert_numeric(proposed_trade_df$trade_qty, "trade_qty")
-  assert_bool(proposed_trade_df$swap, "swap")
+  assert_string(proposed_trade_df$'Portfolio', "portfolio_id")
+  assert_string(proposed_trade_df$'Security', "security_id")
+  assert_numeric(proposed_trade_df$'Trade Quantity', "trade_qty")
+  assert_bool(proposed_trade_df$'Swap', "swap")
 
   for (i in seq_len(nrow(proposed_trade_df))) {
     .trade(
