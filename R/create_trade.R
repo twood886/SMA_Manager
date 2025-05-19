@@ -65,7 +65,8 @@ create_proposed_trade_qty <- function(
     derived_portfolios <- tryCatch(get_tracking_smas(portfolio), error = function(e) NULL)
     if (length(derived_portfolios) > 0) {
       for (derived_portfolio in derived_portfolios) {
-        t[[derived_portfolio$get_short_name()]] <- derived_portfolio$calc_proposed_trade(security_id, trade_qty)
+        scale_ratio <- derived_portfolio$get_trade_constructor()$get_scale_ratio(portfolio, derived_portfolio)
+        t[[derived_portfolio$get_short_name()]] <- derived_portfolio$calc_proposed_trade(security_id, trade_qty * scale_ratio)
       }
     }
   }
@@ -74,10 +75,11 @@ create_proposed_trade_qty <- function(
     trades_qty <- t_$trade_qty
     swap <- t_$swap
     data.frame(
-      "portfolio_id" = rep(name, length(trades_qty)),
-      "security_id" = names(trades_qty),
-      "trade_qty" = trades_qty,
-      "swap" = swap[names(trades_qty)],
+      "Portfolio" = rep(name, length(trades_qty)),
+      "Security" = names(trades_qty),
+      "Trade Quantity" = trades_qty,
+      "Swap" = swap[names(trades_qty)],
+      "Unfilled" = t_$unfilled_qty[names(trades_qty)],
       row.names = NULL
     )
   }
@@ -133,7 +135,7 @@ create_proposed_trade_tgt_weight <- function(
 ) {
   assert_string(portfolio_id, "portfolio_id")
   assert_string(security_id, "security_id")
-  assert_number(tgt_weight, "tgt_weight")
+  assert_numeric(tgt_weight, "tgt_weight")
 
   portfolio <- .portfolio(portfolio_id, create = FALSE)
   security <- .security(security_id)
@@ -143,7 +145,7 @@ create_proposed_trade_tgt_weight <- function(
   current_qty <- current_pos$get_qty()
   trade_qty <- target_qty - current_qty
   
-  proposed_trades_df <- create_proposed_trade_qty(
+  proposed_trade_df <- create_proposed_trade_qty(
     portfolio_id = portfolio_id,
     security_id = security_id,
     trade_qty = trade_qty,

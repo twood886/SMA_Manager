@@ -19,6 +19,15 @@ ccmf <- create_portfolio_from_enfusion(
 source("smas/bemap.R")
 source("smas/fmap.R")
 
+test <- create_proposed_trade_tgt_weight(
+  portfolio_id = "ccmf",
+  security_id = "zroz us equity",
+  tgt_weight = .05,
+  swap = FALSE,
+  flow_to_derived = TRUE
+)
+
+
 trades <- create_trade_qty(
   portfolio_id = "ccmf",
   security_id = "zroz us equity",
