@@ -141,8 +141,8 @@ create_proposed_trade_tgt_weight <- function(
   security <- .security(security_id)
   security_id <- security$get_id()
   target_qty <- portfolio$get_nav() * tgt_weight / security$get_price()
-  current_pos <- portfolio$get_target_position(security_id)
-  current_qty <- current_pos$get_qty()
+  
+  current_qty <- tryCatch(portfolio$get_position(security_id)$get_qty(), error = function(e) 0)
   trade_qty <- target_qty - current_qty
   
   proposed_trade_df <- create_proposed_trade_qty(
