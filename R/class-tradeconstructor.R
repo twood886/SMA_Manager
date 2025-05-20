@@ -254,7 +254,7 @@ SMAConstructor <- R6::R6Class( #nolint
         all_secs_id
       )
 
-      private$.calc_flow_from_want(portfolio, want)
+      private$.calc_flow_from_want(sma, want)
     }
   )
 )
