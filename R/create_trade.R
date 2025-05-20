@@ -66,6 +66,7 @@ create_proposed_trade_qty <- function(
     if (length(derived_portfolios) > 0) {
       for (derived_portfolio in derived_portfolios) {
         scale_ratio <- derived_portfolio$get_trade_constructor()$get_scale_ratio(portfolio, derived_portfolio)
+        scale_qty <- round(trade_qty * scale_ratio, 0)
         t[[derived_portfolio$get_short_name()]] <- derived_portfolio$calc_proposed_trade(security_id, trade_qty * scale_ratio)
       }
     }
@@ -144,7 +145,7 @@ create_proposed_trade_tgt_weight <- function(
   target_qty <- portfolio$get_nav() * tgt_weight / security$get_price()
   
   current_qty <- tryCatch(portfolio$get_position(security_id)$get_qty(), error = function(e) 0)
-  trade_qty <- target_qty - current_qty
+  trade_qty <- round(target_qty - current_qty, 0)
   
   proposed_trade_df <- create_proposed_trade_qty(
     portfolio_id = portfolio_id,

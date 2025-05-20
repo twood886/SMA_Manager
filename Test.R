@@ -19,6 +19,10 @@ ccmf <- create_portfolio_from_enfusion(
 source("smas/bemap.R")
 source("smas/fmap.R")
 
+
+test <- bemap$calc_proposed_rebalance_trade()
+
+
 test <- create_proposed_trade_tgt_weight(
   portfolio_id = "ccmf",
   security_id = "zroz us equity",

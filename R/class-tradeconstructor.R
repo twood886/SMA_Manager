@@ -128,7 +128,7 @@ TradeConstructor <- R6::R6Class( #nolint
       purrr::walk2(edf$from, edf$to, ~{
         if (startsWith(.x, "o_") && startsWith(.y, "r_")) {
           sec <- sub("^r_", "", .y)
-          adj[sec] <<- adj[sec] + flows[which(edf$from == .x & edf$to == .y)] / prices[sec]
+          adj[sec] <<- adj[sec] + round(flows[which(edf$from == .x & edf$to == .y)] / prices[sec])
         }
       })
 
@@ -169,7 +169,7 @@ TradeConstructor <- R6::R6Class( #nolint
       derived[names(short_adj$adj)] <- derived[names(short_adj$adj)] + short_adj$adj
 
       existing_qty <- private$.extract_qty(portfolio$get_target_position())
-      trade_qty <- derived - tidyr::replace_na(existing_qty[names(derived)], 0)
+      trade_qty <- round(derived - tidyr::replace_na(existing_qty[names(derived)], 0))
       trade_qty <- trade_qty[trade_qty != 0]
       unfilled  <- c(long_adj$leftover, short_adj$leftover) %>% purrr:::keep(~ .x > 0)
       unfilled_qty <- unfilled / prices[names(unfilled)]
@@ -177,10 +177,10 @@ TradeConstructor <- R6::R6Class( #nolint
       swap_flag <- unlist(self$get_swap_flag_position_rules(portfolio, names(trade_qty)))
 
       list(
-        position_qty = derived,
-        trade_qty = trade_qty,
+        position_qty = round(derived),
+        trade_qty = round(trade_qty),
         swap_flag = swap_flag,
-        unfilled_qty  = unfilled_qty
+        unfilled_qty  = round(unfilled_qty)
       )
     }
   )
