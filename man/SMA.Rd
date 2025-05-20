@@ -17,6 +17,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
+\item \href{#method-SMA-calc_proposed_rebalance_trade}{\code{SMA$calc_proposed_rebalance_trade()}}
 \item \href{#method-SMA-mimic_base_portfolio}{\code{SMA$mimic_base_portfolio()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
@@ -92,6 +93,23 @@ Get Base Portfolio Position
 Get a position in the Base portfolio
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMA$get_base_portfolio_position(security_id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-calc_proposed_rebalance_trade"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-calc_proposed_rebalance_trade}{}}}
+\subsection{Method \code{calc_proposed_rebalance_trade()}}{
+Calculate the rebalance trade quantity for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(security_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
