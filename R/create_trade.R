@@ -50,13 +50,13 @@ create_proposed_trade_qty <- function(
   security <- lapply(security_id, \(sec) .security(sec))
   security_id <- vapply(security, \(x) x$get_id(), character(1))
   portfolio <- .portfolio(portfolio_id, create = FALSE)
-  names(swap) <- security_id
   swap <- vapply(
     security_id,
     \(sec) tryCatch(portfolio$get_position(sec)$get_swap(), error = function(e) swap[[sec]]),
     logical(1)
   )
   assert_bool(swap, "swap")
+  names(swap) <- security_id
 
   t <- list()
   t[[portfolio_id]] <- portfolio$calc_proposed_trade(security_id, trade_qty)
@@ -65,9 +65,7 @@ create_proposed_trade_qty <- function(
     derived_portfolios <- tryCatch(get_tracking_smas(portfolio), error = function(e) NULL)
     if (length(derived_portfolios) > 0) {
       for (derived_portfolio in derived_portfolios) {
-        scale_ratio <- derived_portfolio$get_trade_constructor()$get_scale_ratio(portfolio, derived_portfolio)
-        scale_qty <- round(trade_qty * scale_ratio, 0)
-        t[[derived_portfolio$get_short_name()]] <- derived_portfolio$calc_proposed_trade(security_id, trade_qty * scale_ratio)
+        t[[derived_portfolio$get_short_name()]] <- derived_portfolio$calc_proposed_rebalance_trade(security_id, trade_qty)
       }
     }
   }

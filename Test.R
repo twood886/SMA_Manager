@@ -20,13 +20,10 @@ source("smas/bemap.R")
 source("smas/fmap.R")
 
 
-test <- bemap$calc_proposed_rebalance_trade()
-
-
-test <- create_proposed_trade_tgt_weight(
+test <- create_proposed_trade_qty(
   portfolio_id = "ccmf",
-  security_id = "zroz us equity",
-  tgt_weight = .05,
+  security_id = "isrg us equity",
+  trade_qty = -5000,
   swap = FALSE,
   flow_to_derived = TRUE
 )

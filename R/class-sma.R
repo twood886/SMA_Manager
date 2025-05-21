@@ -58,8 +58,9 @@ SMA <- R6::R6Class(   #nolint
 
     #' @description Calculate the rebalance trade quantity for a given security
     #' @param security_id Security ID
-    calc_proposed_rebalance_trade = function(security_id = NULL) {
-      self$get_trade_constructor()$calc_rebalance_qty(self, security_id)
+    #' @param base_trade_qty Base trade quantity (default: 0)
+    calc_proposed_rebalance_trade = function(security_id = NULL, base_trade_qty = 0) {
+      self$get_trade_constructor()$calc_rebalance_qty(self, security_id, base_trade_qty)
     },
 
     #' @description mimic the base portfolio target position

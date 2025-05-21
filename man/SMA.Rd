@@ -109,13 +109,15 @@ Get a position in the Base portfolio
 \subsection{Method \code{calc_proposed_rebalance_trade()}}{
 Calculate the rebalance trade quantity for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(security_id = NULL, base_trade_qty = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
+
+\item{\code{base_trade_qty}}{Base trade quantity (default: 0)}
 }
 \if{html}{\out{</div>}}
 }
