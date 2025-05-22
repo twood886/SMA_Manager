@@ -8,7 +8,7 @@ create_proposed_trade_qty(
   portfolio_id = NULL,
   security_id = NULL,
   trade_qty = NULL,
-  swap,
+  swap = FALSE,
   flow_to_derived = TRUE
 )
 }

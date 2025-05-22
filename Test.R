@@ -22,11 +22,13 @@ source("smas/fmap.R")
 
 test <- create_proposed_trade_qty(
   portfolio_id = "ccmf",
-  security_id = "isrg us equity",
+  security_id = "zroz us equity",
   trade_qty = -5000,
   swap = FALSE,
   flow_to_derived = TRUE
 )
+
+
 
 
 trades <- create_trade_qty(

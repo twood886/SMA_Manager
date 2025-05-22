@@ -42,7 +42,7 @@ create_proposed_trade_qty <- function(
   portfolio_id = NULL, 
   security_id = NULL, 
   trade_qty = NULL, 
-  swap,
+  swap = FALSE,
   flow_to_derived = TRUE
 ) {
   assert_string(portfolio_id, "portfolio_id")
@@ -50,13 +50,14 @@ create_proposed_trade_qty <- function(
   security <- lapply(security_id, \(sec) .security(sec))
   security_id <- vapply(security, \(x) x$get_id(), character(1))
   portfolio <- .portfolio(portfolio_id, create = FALSE)
+  names(swap) <- security_id
   swap <- vapply(
     security_id,
     \(sec) tryCatch(portfolio$get_position(sec)$get_swap(), error = function(e) swap[[sec]]),
     logical(1)
   )
   assert_bool(swap, "swap")
-  names(swap) <- security_id
+  
 
   t <- list()
   t[[portfolio_id]] <- portfolio$calc_proposed_trade(security_id, trade_qty)
