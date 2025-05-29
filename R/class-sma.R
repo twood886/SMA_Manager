@@ -6,7 +6,6 @@
 #'
 #' @import R6
 #' @import enfusion
-#' @import parallel
 #' @include class-portfolio.R
 #' @include class-position.R
 #' @include class-security.R

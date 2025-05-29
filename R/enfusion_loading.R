@@ -72,47 +72,6 @@
 }
 
 
-#' Internal helper: create positions in parallel
-#'
-#' @param enfusion_report Data frame of Enfusion report rows
-#' @param short_name Character portfolio short name
-#' @param position_fn Function(x, portfolio_short_name) that returns a Position
-#' @import parallel
-#' @include utils.R
-#'
-#' @return List of Position objects
-.make_positions <- function(enfusion_report, short_name, position_fn) {
-  ncores <- parallel::detectCores(logical = FALSE)
-  cl <- parallel::makeCluster(
-    ncores - 1,
-    type = "PSOCK",
-    rscriptArgs = c("--vanilla")
-  )
-  on.exit(parallel::stopCluster(cl), add = TRUE)
-  parallel::clusterEvalQ(cl, options(renv.verbose = FALSE))
-  parallel::clusterEvalQ(cl, {
-    suppressPackageStartupMessages(library(SMAManager))
-    suppressPackageStartupMessages(library(Rblpapi))
-    blpConnect()
-  })
-  parallel::clusterExport(
-    cl,
-    varlist = c("enfusion_report", "short_name", "registries", "position_fn"),
-    envir   = environment()
-  )
-  positions <- parallel::parLapply(
-    cl,
-    X = seq_len(nrow(enfusion_report)),
-    fun = function(i) {
-      position_fn(
-        x = enfusion_report[i, , drop = FALSE],
-        portfolio_short_name = short_name
-      )
-    }
-  )
-  positions
-}
-
 #' Create a Position from Enfusion Data
 #'
 #' @param x A list or single-row data.frame of enfusion data
