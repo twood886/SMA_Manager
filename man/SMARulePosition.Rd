@@ -16,7 +16,6 @@ R6 Class that encapsulates rule for SMAs
 \item \href{#method-SMARulePosition-check_rule_target}{\code{SMARulePosition$check_rule_target()}}
 \item \href{#method-SMARulePosition-check_swap_current}{\code{SMARulePosition$check_swap_current()}}
 \item \href{#method-SMARulePosition-check_swap_target}{\code{SMARulePosition$check_swap_target()}}
-\item \href{#method-SMARulePosition-apply_rule_definition}{\code{SMARulePosition$apply_rule_definition()}}
 \item \href{#method-SMARulePosition-get_security_limits}{\code{SMARulePosition$get_security_limits()}}
 \item \href{#method-SMARulePosition-check_swap_security}{\code{SMARulePosition$check_swap_security()}}
 \item \href{#method-SMARulePosition-clone}{\code{SMARulePosition$clone()}}
@@ -45,6 +44,9 @@ Check the rule against the current holdings
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_current()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+List of security IDs that do not comply with the rule
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePosition-check_rule_target"></a>}}
@@ -75,25 +77,6 @@ Check the swap rule against the target holdings
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_swap_target()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-apply_rule_definition"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-apply_rule_definition}{}}}
-\subsection{Method \code{apply_rule_definition()}}{
-Apply the rule definition to a security
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$apply_rule_definition(security_id, sma)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-
-\item{\code{sma}}{SMA object}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePosition-get_security_limits"></a>}}

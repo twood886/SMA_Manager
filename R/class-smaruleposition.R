@@ -11,6 +11,7 @@ SMARulePosition <- R6::R6Class( #nolint
   inherit = SMARule,
   public = list(
     #' @description Check the rule against the current holdings
+    #' @return List of security IDs that do not comply with the rule
     check_rule_current = function() {
       positions <- private$get_sma_()$get_position()
       private$check_rule_multi_position_(positions)
@@ -31,30 +32,26 @@ SMARulePosition <- R6::R6Class( #nolint
       private$check_swap_multi_position_(positions)
     },
 
-    #' @description Apply the rule definition to a security
-    #' @param security_id Security ID
-    #' @param sma SMA object
-    apply_rule_definition = function(security_id, sma) {
-      setNames(
-        as.list(private$definition_(security_id, sma)),
-        security_id
-      )
-    },
-
     #' @description Get the Max and Min Value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
     get_security_limits = function(security_id) {
-      exp <- self$apply_rule_definition(security_id, private$get_sma_())
+      exp <- private$apply_rule_definition(security_id, private$get_sma_())
       .set_ind_sec_limits <- function(exp) {
         if (is.logical(exp)) {
           if (exp) {
-            return(list(max = private$max_threshold_, min = private$min_threshold_))
+            max  <- private$max_threshold_
+            min  <- private$min_threshold_
           } else {
-            return(list(max = Inf, min = -Inf))
+            max <- +Inf
+            min <- -Inf
           }
+          return(list("max" = max, "min" = min))
+        } else {
+          max <- private$max_threshold_ / exp
+          min <- private$min_threshold_ / exp
         }
-        list(max = private$max_threshold_ / exp, min = private$min_threshold_ / exp)
+        list("max" = max, "min" = min)
       }
       lapply(exp, .set_ind_sec_limits)
     },
@@ -64,31 +61,33 @@ SMARulePosition <- R6::R6Class( #nolint
       if (!private$swap_only_) {
         return(setNames(lapply(security_id, \(x) FALSE), security_id))
       }
-      self$apply_rule_definition(security_id, private$get_sma_())
+      private$apply_rule_definition(security_id, private$get_sma_())
     }
   ),
   private = list(
     get_sma_ = function() {
       get(private$sma_name_, envir = registries$portfolios, inherits = FALSE)
     },
-    check_rule_position_ = function(position, sma) {
-      security_id <- position$get_security()$get_id()
-      qty <- position$get_qty()
-      exp <- qty * private$definition_(security_id, sma)
-      exp <= private$max_threshold_ & exp >= private$min_threshold_
-    },
     check_rule_multi_position_ = function(positions) {
       sma <- private$get_sma_()
       comply <- sapply(positions, private$check_rule_position_, sma = sma)
-      sapply(positions[which(!comply)], function(x) x$get_id())
-    },
-    check_swap_position_ = function(position) {
-      security_id <- position$get_security()$get_id()
-      self$check_swap_security_(security_id)
+      non_comply <- sapply(positions[which(!comply)], function(x) x$get_id())
+      if (length(non_comply) == 0) {
+        result <- list("pass" = TRUE)
+      } else {
+        result <- list("pass" = FALSE, "non_comply" = not_comply)
+      }
+      result
     },
     check_swap_multi_position_ = function(positions) {
       swap_only <- sapply(positions, private$check_swap_position_)
       sapply(positions[which(swap_only)], function(x) x$get_id())
+    },
+    apply_rule_definition = function(security_id, sma) {
+      setNames(
+        as.list(private$definition_(security_id, sma)),
+        security_id
+      )
     }
   )
 )

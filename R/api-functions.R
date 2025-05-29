@@ -165,7 +165,7 @@
 #' Create or Retrieve an SMA Object
 #'
 #' This function creates or retrieves an SMA (Separately Managed Account) object. 
-#' If the SMA already exists in the registry, it is returned. Otherwise, a new 
+#' If the SMA already exists in the registry, it is returned. Otherwise, a new
 #' SMA object is created if the `create` parameter is set to `TRUE`.
 #'
 #' @param short_name A string representing the short name of the SMA. Must be unique.
@@ -348,7 +348,7 @@
       .position(portfolio_id, security_id, qty = 0, swap = swap)
     }
   )
-  
+
   tgt_pos$set_qty(tgt_pos$get_qty() + qty)
   portfolio$add_target_position(tgt_pos, overwrite = TRUE)
   if (assign_to_registry) {

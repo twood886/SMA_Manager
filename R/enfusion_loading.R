@@ -7,7 +7,7 @@
 .bulk_security_positions <- function(enfusion_report, portfolio_short_name) {
   con <- tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)
   if (is.null(con)) con <- Rblpapi::blpConnect()
-  
+
   ids <- vapply(
     split(enfusion_report, seq_len(nrow(enfusion_report))),
     function(x) {
@@ -28,7 +28,7 @@
   prices <- Rblpapi::bdp(ids, "PX_LAST")
 
   env <- registries$securities
-  
+
   for (id in ids) {
     bbid <- tolower(id)
     if (exists(bbid, envir = env, inherits = FALSE)) next
@@ -37,7 +37,11 @@
       bbid = bbid,
       description = descriptions[id, "DX615"],
       instrument_type = inst_types[id, "EX028"],
-      price = ifelse(inst_types[id, "EX028"] == "FixedIncome", 1, prices[id, "PX_LAST"])
+      price = ifelse(
+        inst_types[id, "EX028"] == "FixedIncome",
+        1,
+        prices[id, "PX_LAST"]
+      )
     )
     assign(bbid, security, envir = env)
   }
@@ -64,7 +68,7 @@
       pos
     }
   )
-  return(setNames(positions, NULL))
+  setNames(positions, NULL)
 }
 
 
@@ -73,7 +77,6 @@
 #' @param enfusion_report Data frame of Enfusion report rows
 #' @param short_name Character portfolio short name
 #' @param position_fn Function(x, portfolio_short_name) that returns a Position
-#' @import furrr
 #' @import parallel
 #' @include utils.R
 #'

@@ -79,7 +79,7 @@ rules <- bemap$get_sma_rules()
 securities <- sapply(ccmf$get_position(), \(pos) pos$get_id())
 test <- get_security_position_limits(securities, rules)
 
-base_pos <- 
+base_pos <-
   .position(
     short_name = "ccmf",
     id = "AAPL US Equity",
@@ -93,4 +93,3 @@ security_id <- "et us equity"
 
 base_positions <- ccmf$get_target_position()
 sma <- bemap
-

@@ -39,9 +39,9 @@
 #' @include class-security.R
 #' @export
 create_proposed_trade_qty <- function(
-  portfolio_id = NULL, 
-  security_id = NULL, 
-  trade_qty = NULL, 
+  portfolio_id = NULL,
+  security_id = NULL,
+  trade_qty = NULL,
   swap = FALSE,
   flow_to_derived = TRUE
 ) {
@@ -57,12 +57,11 @@ create_proposed_trade_qty <- function(
     logical(1)
   )
   assert_bool(swap, "swap")
-  
 
   t <- list()
   t[[portfolio_id]] <- portfolio$calc_proposed_trade(security_id, trade_qty)
-  
-  if(flow_to_derived) {
+
+  if (flow_to_derived) {
     derived_portfolios <- tryCatch(get_tracking_smas(portfolio), error = function(e) NULL)
     if (length(derived_portfolios) > 0) {
       for (derived_portfolio in derived_portfolios) {
@@ -142,10 +141,10 @@ create_proposed_trade_tgt_weight <- function(
   security <- .security(security_id)
   security_id <- security$get_id()
   target_qty <- portfolio$get_nav() * tgt_weight / security$get_price()
-  
+
   current_qty <- tryCatch(portfolio$get_position(security_id)$get_qty(), error = function(e) 0)
   trade_qty <- round(target_qty - current_qty, 0)
-  
+
   proposed_trade_df <- create_proposed_trade_qty(
     portfolio_id = portfolio_id,
     security_id = security_id,

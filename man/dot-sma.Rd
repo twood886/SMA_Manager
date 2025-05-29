@@ -34,7 +34,7 @@ An SMA object.
 }
 \description{
 This function creates or retrieves an SMA (Separately Managed Account) object. 
-If the SMA already exists in the registry, it is returned. Otherwise, a new 
+If the SMA already exists in the registry, it is returned. Otherwise, a new
 SMA object is created if the `create` parameter is set to `TRUE`.
 }
 \details{
