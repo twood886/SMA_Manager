@@ -26,6 +26,8 @@
   descriptions <- Rblpapi::bdp(ids, "DX615")
   inst_types <- Rblpapi::bdp(ids, "EX028")
   prices <- Rblpapi::bdp(ids, "PX_LAST")
+  bics_lvl2 <- Rblpapi::bdp(ids, "BI012")
+  bics_lvl3 <- Rblpapi::bdp(ids, "BI013")
 
   env <- registries$securities
 
@@ -39,9 +41,11 @@
       instrument_type = inst_types[id, "EX028"],
       price = ifelse(
         inst_types[id, "EX028"] == "FixedIncome",
-        1,
+        prices[id, "PX_LAST"] / 100,
         prices[id, "PX_LAST"]
-      )
+      ),
+      bics_level_2 = bics_lvl2[id, "BI012"],
+      bics_level_3 = bics_lvl3[id, "BI013"]
     )
     assign(bbid, security, envir = env)
   }
@@ -112,7 +116,6 @@ create_position_from_enfusion <- function(x, portfolio_short_name) {
   if (is.na(qty)) {
     stop("Quantity is not numeric for row", call. = FALSE)
   }
-
   swap <- as.logical(x[["Is Financed"]]) %||% FALSE
   .position(portfolio_short_name, id, qty, swap = swap)
 }
@@ -198,5 +201,5 @@ create_sma_from_enfusion <- function(
       assign(sec$get_id(), sec, envir = registries$securities)
     }
   }
-  invisible(NULL) 
+  invisible(NULL)
 }

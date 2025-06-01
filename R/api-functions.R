@@ -250,7 +250,12 @@
 #' @seealso [SMARule()]
 #'
 #' @export
-.sma_rule <- function(sma_name, rule_name, scope, definition, max_threshold = Inf, min_threshold = -Inf, swap_only = FALSE) {
+.sma_rule <- function(
+  sma_name,
+  rule_name, scope, definition,
+  max_threshold = Inf, min_threshold = -Inf,
+  swap_only = FALSE, gross_exposure = FALSE
+) {
   assert_string(sma_name, "sma_name")
   sma <- .sma(sma_name, create = FALSE)
   assert_inherits(sma, "SMA", "sma")
@@ -272,7 +277,20 @@
       definition = definition,
       max_threshold = max_threshold,
       min_threshold = min_threshold,
-      swap_only = swap_only
+      swap_only = swap_only,
+      gross_exposure = gross_exposure
+    )
+  }
+  if (scope == "portfolio") {
+    smarule <- SMARulePortfolio$new(
+      sma_name = sma_name,
+      name = name,
+      scope = scope,
+      definition = definition,
+      max_threshold = max_threshold,
+      min_threshold = min_threshold,
+      swap_only = swap_only,
+      gross_exposure = gross_exposure
     )
   }
   assign(name, smarule, envir = env)

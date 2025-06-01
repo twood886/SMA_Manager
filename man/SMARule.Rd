@@ -32,7 +32,8 @@ R6 Class that encapsultes rules for SMAs.
   definition = NULL,
   max_threshold = NULL,
   min_threshold = NULL,
-  swap_only = FALSE
+  swap_only = FALSE,
+  gross_exposure = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -51,7 +52,9 @@ R6 Class that encapsultes rules for SMAs.
 
 \item{\code{min_threshold}}{numeirc}
 
-\item{\code{swap_only}}{logical
+\item{\code{swap_only}}{logical}
+
+\item{\code{gross_exposure}}{logical
 Get Id}
 }
 \if{html}{\out{</div>}}

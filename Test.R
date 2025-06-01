@@ -20,6 +20,8 @@ source("smas/bemap.R")
 source("smas/fmap.R")
 
 
+test <- bemap$get_rules()[[1]]
+
 test <- create_proposed_trade_qty(
   portfolio_id = "ccmf",
   security_id = "zroz us equity",

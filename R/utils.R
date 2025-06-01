@@ -110,3 +110,46 @@ assert_bool <- function(x, name) {
 get_registries <- function() {
   asNamespace("SMAManager")$registries
 }
+
+
+#' Update Data in all Security Object
+#' @export
+update_security_data <- function() {
+  security_ids <- ls(get_registries()$securities)
+  type <- vapply(security_ids, function(id) .security(id)$get_instrument_type(), character(1)) #nolint
+  price <- Rblpapi::bdp(security_ids, "PX_LAST")
+  price[type == "FixedIncome", "PX_LAST"] <- price[type == "FixedIncome", "PX_LAST"] / 100
+  delta <- Rblpapi::bdp(security_ids, "OP006")
+  delta[type != "Option", "OP006"] <- 1
+  lapply(
+    security_ids,
+    function(id) {
+      security <- .security(id)
+      security$set_price(price[id, "PX_LAST"])
+      security$set_delta(delta[id, "OP006"])
+      security$update_underlying_price()
+    }
+  )
+  invisible(NULL)
+}
+
+#' Check Rule Compliance
+#' @param portfolio_name Character. Name of the portfolio to check.
+#' @export
+check_rule_compliance <- function(portfolio_name) {
+  assert_string(portfolio_name, "portfolio_name")
+  portfolio <- get(portfolio_name, envir = get_registries()$portfolios, inherits = FALSE) #nolint
+  assert_inherits(portfolio, "Portfolio", "portfolio")
+
+  rules <- portfolio$get_rules()
+
+  check <- lapply(rules, \(rule) rule$check_rule_current())
+  non_comply <- which(sapply(check, function(x) !x$pass))
+  if (length(non_comply) == 0) {
+    return(list("pass" = TRUE, "message" = "All rules are compliant."))
+  } else {
+    rule_names <- names(rules)[non_comply]
+    messages <- sapply(check[non_comply], function(x) x$message)
+    return(list("pass" = FALSE, "message" = paste(rule_names, collapse = ", "), "details" = messages))
+  }
+}

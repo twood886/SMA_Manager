@@ -15,9 +15,15 @@ R6 class for a security with time-series and non-time-series data.
 \item \href{#method-Security-get_description}{\code{Security$get_description()}}
 \item \href{#method-Security-get_instrument_type}{\code{Security$get_instrument_type()}}
 \item \href{#method-Security-get_price}{\code{Security$get_price()}}
+\item \href{#method-Security-get_underlying_price}{\code{Security$get_underlying_price()}}
 \item \href{#method-Security-get_delta}{\code{Security$get_delta()}}
+\item \href{#method-Security-get_bics_level_2}{\code{Security$get_bics_level_2()}}
+\item \href{#method-Security-get_bics_level_3}{\code{Security$get_bics_level_3()}}
 \item \href{#method-Security-update_price}{\code{Security$update_price()}}
 \item \href{#method-Security-update_delta}{\code{Security$update_delta()}}
+\item \href{#method-Security-update_underlying_price}{\code{Security$update_underlying_price()}}
+\item \href{#method-Security-set_price}{\code{Security$set_price()}}
+\item \href{#method-Security-set_delta}{\code{Security$set_delta()}}
 \item \href{#method-Security-clone}{\code{Security$clone()}}
 }
 }
@@ -32,7 +38,10 @@ Create new Security R6 object
   description = NULL,
   instrument_type = NULL,
   price = NULL,
-  delta = NULL
+  underlying_price = NULL,
+  delta = NULL,
+  bics_level_2 = NULL,
+  bics_level_3 = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -43,11 +52,17 @@ Create new Security R6 object
 
 \item{\code{description}}{Character string. Security description.}
 
-\item{\code{instrument_type}}{Character string. Type of instrument (e.g., "Equity").}
+\item{\code{instrument_type}}{Character string. Type of instrument.}
 
 \item{\code{price}}{Numeric. Price of the security.}
 
+\item{\code{underlying_price}}{Numeric. Price of underlying security.}
+
 \item{\code{delta}}{Numeric. Delta of the security.}
+
+\item{\code{bics_level_2}}{Character string. BICS Level 2 classification.}
+
+\item{\code{bics_level_3}}{Character string. BICS Level 3 classification.}
 }
 \if{html}{\out{</div>}}
 }
@@ -93,12 +108,42 @@ Get Price
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_underlying_price"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_underlying_price}{}}}
+\subsection{Method \code{get_underlying_price()}}{
+Get Underlying Price
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_underlying_price()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-get_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-get_delta}{}}}
 \subsection{Method \code{get_delta()}}{
 Get Delta
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Security$get_delta()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_bics_level_2"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_bics_level_2}{}}}
+\subsection{Method \code{get_bics_level_2()}}{
+Get BICS Level 2
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_bics_level_2()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_bics_level_3"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_bics_level_3}{}}}
+\subsection{Method \code{get_bics_level_3()}}{
+Get BICS Level 3
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_bics_level_3()}\if{html}{\out{</div>}}
 }
 
 }
@@ -121,6 +166,50 @@ Update Delta
 \if{html}{\out{<div class="r">}}\preformatted{Security$update_delta()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-update_underlying_price"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-update_underlying_price}{}}}
+\subsection{Method \code{update_underlying_price()}}{
+Update Underlying Price
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$update_underlying_price()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-set_price"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-set_price}{}}}
+\subsection{Method \code{set_price()}}{
+Set Price
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$set_price(price)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{price}}{Numeric. New price of the security.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-set_delta"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-set_delta}{}}}
+\subsection{Method \code{set_delta()}}{
+Set Delta
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$set_delta(delta)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{delta}}{Numeric. New delta of the security.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-clone"></a>}}

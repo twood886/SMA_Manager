@@ -15,7 +15,8 @@ SMARule <- R6::R6Class( #nolint
     definition_ = NULL,
     max_threshold_ = NULL,
     min_threshold_ = NULL,
-    swap_only_ = NULL
+    swap_only_ = NULL,
+    gross_exposure_ = NULL
   ),
   public = list(
     #' @param sma_name Character
@@ -25,13 +26,15 @@ SMARule <- R6::R6Class( #nolint
     #' @param max_threshold numeric
     #' @param min_threshold numeirc
     #' @param swap_only logical
+    #' @param gross_exposure logical
     initialize = function(
       sma_name = NULL,
       name = NULL,
       scope = NULL,
       definition = NULL,
       max_threshold = NULL, min_threshold = NULL,
-      swap_only = FALSE
+      swap_only = FALSE,
+      gross_exposure = FALSE
     ) {
       private$sma_name_ <- sma_name
       private$name_ <- name
@@ -40,6 +43,7 @@ SMARule <- R6::R6Class( #nolint
       private$max_threshold_ <- max_threshold
       private$min_threshold_ <- min_threshold
       private$swap_only_ <- swap_only
+      private$gross_exposure_ <- gross_exposure
     },
     #' Get Id
     #' @description Get Id of SMA Rule

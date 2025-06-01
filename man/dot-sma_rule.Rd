@@ -11,7 +11,8 @@
   definition,
   max_threshold = Inf,
   min_threshold = -Inf,
-  swap_only = FALSE
+  swap_only = FALSE,
+  gross_exposure = FALSE
 )
 }
 \arguments{

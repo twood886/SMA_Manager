@@ -21,6 +21,7 @@ Collate:
     'class-smaruleposition.R'
     'class-tradeconstructor.R'
     'class-portfolio.R'
+    'class-smaruleportfolio.R'
     'create_trade.R'
     'enfusion_loading.R'
     'get_tracking_smas.R'
