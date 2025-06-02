@@ -94,7 +94,12 @@ Portfolio <- R6::R6Class( #nolint
     },
     #' @description Check SMA rules against the target positions
     check_rules_target = function() {
-      lapply(self$get_rules_, function(x) x$check_rule_target())
+      lapply(self$get_rules(), function(x) x$check_rule_target())
+    },
+
+    #' @description Check SMA rules against the current positions
+    check_rules_current = function() {
+      lapply(self$get_rules(), function(x) x$check_rules_current())
     },
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID

@@ -19,6 +19,7 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_replacement_security}{\code{Portfolio$get_replacement_security()}}
 \item \href{#method-Portfolio-get_replaced_security}{\code{Portfolio$get_replaced_security()}}
 \item \href{#method-Portfolio-check_rules_target}{\code{Portfolio$check_rules_target()}}
+\item \href{#method-Portfolio-check_rules_current}{\code{Portfolio$check_rules_current()}}
 \item \href{#method-Portfolio-get_security_position_limits}{\code{Portfolio$get_security_position_limits()}}
 \item \href{#method-Portfolio-get_swap_flag_position_rules}{\code{Portfolio$get_swap_flag_position_rules()}}
 \item \href{#method-Portfolio-calc_proposed_trade}{\code{Portfolio$calc_proposed_trade()}}
@@ -175,6 +176,16 @@ Get replaced security for a given replacement security
 Check SMA rules against the target positions
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_target()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-check_rules_current"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-check_rules_current}{}}}
+\subsection{Method \code{check_rules_current()}}{
+Check SMA rules against the current positions
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_current()}\if{html}{\out{</div>}}
 }
 
 }

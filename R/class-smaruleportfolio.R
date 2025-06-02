@@ -32,22 +32,27 @@ SMARulePortfolio <- R6::R6Class( #nolint
       v <- sum(rule_applied_pos, na.rm = TRUE)
       exp <- private$apply_rule_definition_(security_id)
 
-      remain_max <- private$max_threshold_ - v
-      remain_min <- private$min_threshold_ - v
+      remain_max <- (private$max_threshold_ - v) / length(security_id)
+      remain_min <- (private$min_threshold_ - v) / length(security_id)
 
       if (private$gross_exposure_) {
         .set_ind_sec_limits <- function(exp) {
           if (exp == 0) {
-            max <- Inf
-          } else{
+            max <- +Inf
+          } else {
             max <- max(0, remain_max) / exp
           }
           list("max" = max, "min" = -max)
         }
       } else {
         .set_ind_sec_limits <- function(exp) {
-          max <- max(0, remain_max / exp)
-          min <- min(0, remain_min / exp)
+          if (exp == 0) {
+            max <- +Inf
+            min <- -Inf
+          } else {
+            max <- max(0, remain_max / exp)
+            min <- min(0, remain_min / exp)
+          }
           list("max" = max, "min" = min)
         }
       }

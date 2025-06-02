@@ -18,6 +18,7 @@ ccmf <- create_portfolio_from_enfusion(
 
 source("smas/bemap.R")
 source("smas/fmap.R")
+source("smas/bamsf.R")
 
 
 test <- bemap$get_rules()[[1]]

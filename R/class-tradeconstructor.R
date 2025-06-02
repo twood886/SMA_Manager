@@ -18,8 +18,8 @@ TradeConstructor <- R6::R6Class( #nolint
           \(sec) {
             sec_limit <- lapply(limits, \(limit) limit[[sec]])
             if (length(sec_limit) == 0) return(list(max = Inf, min = -Inf))
-            max_limit <- min(sapply(sec_limit, \(x) x$max))
-            min_limit <- max(sapply(sec_limit, \(x) x$min))
+            max_limit <- min(sapply(sec_limit, \(x) x$max), na.rm = TRUE)
+            min_limit <- max(sapply(sec_limit, \(x) x$min), na.rm = TRUE)
             list(max = max_limit, min = min_limit)
           }
         ),
@@ -249,7 +249,7 @@ SMAConstructor <- R6::R6Class( #nolint
             if (s %in% names(sma_qty)) return(sma_qty[s])
             0
           },
-          numeric(1)  
+          numeric(1)
         ),
         all_secs_id
       )

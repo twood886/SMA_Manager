@@ -82,7 +82,7 @@ SMARulePosition <- R6::R6Class( #nolint
       if (length(non_comply) == 0) {
         result <- list("pass" = TRUE)
       } else {
-        result <- list("pass" = FALSE, "non_comply" = not_comply)
+        result <- list("pass" = FALSE, "non_comply" = non_comply)
       }
       result
     },
