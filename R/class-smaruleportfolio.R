@@ -67,6 +67,9 @@ SMARulePortfolio <- R6::R6Class( #nolint
       private$definition_(security_id, private$get_sma_())
     },
     apply_rule_definition_positions_  = function(positions) {
+      if (length(positions) == 0) {
+        return(numeric(0))
+      }
       security_ids <- sapply(positions, \(x) x$get_id())
       pos_qty <- vapply(positions, \(x) x$get_qty(), numeric(1))
       if (private$gross_exposure_) {
