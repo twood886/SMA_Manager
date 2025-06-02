@@ -57,7 +57,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
           list("max" = max, "min" = min)
         }
       }
-      setNames(lapply(exp, .set_ind_sec_limits), security_id)
+      out <- lapply(exp, .set_ind_sec_limits)
+      names(out) <- security_id
     }
   ),
   private = list(
@@ -77,7 +78,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
         pos_qty <- abs(pos_qty)
       }
       rule_applied <- pos_qty * private$apply_rule_definition_(security_ids)
-      setNames(rule_applied, security_ids)
+      names(rule_applied) <- security_ids
+      rules_applied
     },
     check_rule_position_ = function(positions) {
       rule_applied <- private$apply_rule_definition_positions_(positions)
