@@ -22,6 +22,9 @@
     character(1),
     USE.NAMES = FALSE
   )
+  if (length(ids) == 0) {
+    return(list())
+  }
 
   descriptions <- Rblpapi::bdp(ids, "DX615")
   inst_types <- Rblpapi::bdp(ids, "EX028")
@@ -158,7 +161,9 @@ create_sma_from_enfusion <- function(
     !is.na(.data$Description) #nolint
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
-
+  if (is.na(nav)) {
+    nav <- 0
+  }
   positions <- .bulk_security_positions(
     enfusion_report = enfusion_report,
     portfolio_short_name = short_name

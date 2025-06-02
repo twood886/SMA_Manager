@@ -1,11 +1,16 @@
-bamsf_url <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=shared%2FTaylor%2FSMA_Mgr_Reports%2FBEMAP+Consolidated+Position+Listing+-+Options.ppr"
-
 bamsf <- create_sma_from_enfusion(
   long_name = "Blackstone Alternative Multi-Strategy Fund",
   short_name = "bamsf",
   base_portfolio = "ccmf",
-  enfusion_url = bamsf_url
+  enfusion_url = paste0(
+    "https://webservices.enfusionsystems.com/mobile",
+    "/rest/reportservice/exportReport?",
+    "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
+    "BAMSF+Consolidated+Position+Listing+-+Options.ppr"
+  )
 )
+
+bamsf$add_flow(100000000)
 
 bamsf$add_rule(.sma_rule(
   sma_name = "bamsf",
