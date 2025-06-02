@@ -1,5 +1,6 @@
 #' @title SMA Rule for Portfolio
 #' @import R6
+#' @import stats
 #' @include class-smarule.R
 #' @export
 SMARulePortfolio <- R6::R6Class( #nolint
