@@ -79,7 +79,7 @@ SMARulePortfolio <- R6::R6Class( #nolint
       }
       rule_applied <- pos_qty * private$apply_rule_definition_(security_ids)
       names(rule_applied) <- security_ids
-      rules_applied
+      rule_applied
     },
     check_rule_position_ = function(positions) {
       rule_applied <- private$apply_rule_definition_positions_(positions)
