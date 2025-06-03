@@ -230,8 +230,7 @@ create_sma_from_enfusion <- function(
   trade_report <- dplyr::filter(
     enfusion::get_enfusion_report(trade_url),
     !is.na(.data$Description) &
-    .data$`Order Remaining Quantity` != 0 &
-    .data$`Trade Canceled`
+    .data$`Order Remaining Quantity` != 0
   )
 
   if (nrow(trade_report) == 0) {
