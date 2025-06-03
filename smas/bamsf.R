@@ -2,12 +2,19 @@ bamsf <- create_sma_from_enfusion(
   long_name = "Blackstone Alternative Multi-Strategy Fund",
   short_name = "bamsf",
   base_portfolio = "ccmf",
-  enfusion_url = paste0(
+  holdings_url = paste0(
     "https://webservices.enfusionsystems.com/mobile",
     "/rest/reportservice/exportReport?",
     "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
     "BAMSF+Consolidated+Position+Listing+-+Options.ppr"
+  ),
+  trade_url = paste0(
+    "https://webservices.enfusionsystems.com/mobile/",
+    "rest/reportservice/exportReport?",
+    "name=shared%2FTaylor%2F",
+    "SMA_Mgr_Reports%2FBAMSF_Trade_Detail.trb"
   )
+
 )
 
 bamsf$add_flow(100000000)

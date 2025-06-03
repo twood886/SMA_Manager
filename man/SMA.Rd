@@ -44,6 +44,7 @@ R6 Class representing a seperately managed account.
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_target_position'><code>SMAManager::Portfolio$get_target_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_trade_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_trade_constructor'><code>SMAManager::Portfolio$get_trade_constructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="remove_target_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-remove_target_position'><code>SMAManager::Portfolio$remove_target_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="update_enfusion"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-update_enfusion'><code>SMAManager::Portfolio$update_enfusion()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -53,7 +54,15 @@ R6 Class representing a seperately managed account.
 \subsection{Method \code{new()}}{
 Create a new SMA R6 object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$new(long_name, short_name, nav, positions = NULL, base_portfolio = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$new(
+  long_name,
+  short_name,
+  holdings_url,
+  trade_url,
+  nav,
+  positions = NULL,
+  base_portfolio = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -62,6 +71,10 @@ Create a new SMA R6 object.
 \item{\code{long_name}}{Character. SMA Long Name.}
 
 \item{\code{short_name}}{Character. SMA Short Name.}
+
+\item{\code{holdings_url}}{Character. URL to Enfusion Holdings Report.}
+
+\item{\code{trade_url}}{Character. URL to Enfusion Trade Report.}
 
 \item{\code{nav}}{Numeric. SMA Net Asset Value.}
 

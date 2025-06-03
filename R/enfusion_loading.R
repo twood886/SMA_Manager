@@ -4,6 +4,7 @@
 #' @include utils.R
 #' @include api-functions.R
 #' @import Rblpapi
+#' @export
 .bulk_security_positions <- function(enfusion_report, portfolio_short_name) {
   con <- tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)
   if (is.null(con)) con <- Rblpapi::blpConnect()
@@ -132,10 +133,10 @@ create_position_from_enfusion <- function(x, portfolio_short_name) {
 #' @return Portfolio R6 object
 #' @export
 create_portfolio_from_enfusion <- function(
-  long_name, short_name, enfusion_url
+  long_name, short_name, holdings_url, trade_url
 ) {
   enfusion_report <- dplyr::filter(
-    enfusion::get_enfusion_report(enfusion_url),
+    enfusion::get_enfusion_report(holdings_url),
     !is.na(.data$Description) #nolint
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
@@ -143,7 +144,7 @@ create_portfolio_from_enfusion <- function(
     enfusion_report = enfusion_report,
     portfolio_short_name = short_name
   )
-  .portfolio(short_name, long_name, nav, positions, create = TRUE)
+  .portfolio(short_name, long_name, holdings_url, trade_url, nav, positions, create = TRUE)
 }
 
 #' Create SMA from Enfusion
@@ -155,10 +156,10 @@ create_portfolio_from_enfusion <- function(
 #' @return SMA R6 object
 #' @export
 create_sma_from_enfusion <- function(
-  long_name, short_name, base_portfolio, enfusion_url
+  long_name, short_name, base_portfolio, holdings_url, trade_url
 ) {
   enfusion_report <- dplyr::filter(
-    enfusion::get_enfusion_report(enfusion_url),
+    enfusion::get_enfusion_report(holdings_url),
     !is.na(.data$Description) #nolint
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
@@ -169,7 +170,7 @@ create_sma_from_enfusion <- function(
     enfusion_report = enfusion_report,
     portfolio_short_name = short_name
   )
-  .sma(short_name, long_name, nav, positions, base_portfolio, create = TRUE)
+  .sma(short_name, long_name, holdings_url, trade_url, nav, positions, base_portfolio, create = TRUE)
 }
 
 
@@ -208,4 +209,47 @@ create_sma_from_enfusion <- function(
     }
   }
   invisible(NULL)
+}
+
+#' Internal helper: create many positions from Enfusion report
+#' @param enfusion_report Data frame of Enfusion report rows
+#' @param short_name Character portfolio short name
+#' @include utils.R
+#' @include api-functions.R
+#' @import Rblpapi
+#' @export
+.bulk_trade_positions <- function(trade_url, portfolio) {
+  con <- tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)
+  if (is.null(con)) con <- Rblpapi::blpConnect()
+
+  trade_report <- dplyr::filter(
+    enfusion::get_enfusion_report(trade_url),
+    !is.na(.data$Description) &
+    .data$`Order Remaining Quantity` != 0 &
+    .data$`Trade Canceled`
+  )
+
+  if (nrow(trade_report) == 0) {
+    return(invisible(NULL))
+  }
+
+  for (i in 1:nrow(trade_report)) {
+    x <- trade_report[i, ]
+    id <- switch(
+      x[["Instrument Type"]],
+      "Bond" = Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
+      "Listed Option" = x[["BB Yellow Key"]],
+      "Equity" = x[["BB Yellow Key"]],
+      x[["Description"]]
+    )
+
+    .trade(
+      security_id = id,
+      portfolio_id = portfolio$get_short_name(),
+      qty = x[["Order Remaining Quantity"]],
+      swap = x[["Is Financed"]],
+      create = TRUE,
+      assign_to_registry = TRUE
+    )
+  }
 }

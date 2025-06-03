@@ -18,7 +18,9 @@ Portfolio <- R6::R6Class( #nolint
     target_positions_ = NULL,
     rules_ = list(),
     replacements_ = list(),
-    trade_constructor = NULL
+    trade_constructor = NULL,
+    holdings_url_ = NULL,
+    trade_url_ = NULL
   ),
   public = list(
     #' @description
@@ -27,8 +29,10 @@ Portfolio <- R6::R6Class( #nolint
     #' @param short_name Portfolio Short Name
     #' @param nav NAV of portfolio
     #' @param positions list of position items
+    #' @param holdings_url URL to Enfusion Holdings Report
+    #' @param trade_url URL to Enfusion Trade Report
     initialize = function(
-      long_name, short_name, nav, positions
+      long_name, short_name, holdings_url, trade_url, nav, positions
     ) {
       private$long_name_ <- long_name
       private$short_name_ <- short_name
@@ -38,6 +42,8 @@ Portfolio <- R6::R6Class( #nolint
       private$rules_ <- list()
       private$replacements_ <- list()
       private$trade_constructor <- TradeConstructor$new()
+      private$holdings_url_ <- holdings_url
+      private$trade_url_ <- trade_url
     },
     # Getter Functions ---------------------------------------------------------
     #' @description Get Portfolio short name
@@ -210,6 +216,24 @@ Portfolio <- R6::R6Class( #nolint
       replacement_security <- tolower(replacement_security)
       private$replacements_[[original_security]] <- replacement_security
       invisible(self)
+    },
+
+    #' Updaters ----------------------------------------------------------------
+    #' @description Update Positions
+    #' @param url URL to fetch Enfusion Holdings Report
+    update_enfusion = function() {
+      enfusion_report <- dplyr::filter(
+        enfusion::get_enfusion_report(private$holdings_url_),
+        !is.na(.data$Description) #nolint
+      )
+      nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
+      positions <- .bulk_security_positions(
+        enfusion_report = enfusion_report,
+        portfolio_short_name = private$short_name_
+      )
+      private$positions_ <- positions
+      private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
+      .bulk_trade_positions(private$trade_url_, self)
     }
   )
 )

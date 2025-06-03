@@ -24,15 +24,19 @@ SMA <- R6::R6Class(   #nolint
     #' Create a new SMA R6 object.
     #' @param long_name Character. SMA Long Name.
     #' @param short_name Character. SMA Short Name.
+    #' @param holdings_url Character. URL to Enfusion Holdings Report.
+    #' @param trade_url Character. URL to Enfusion Trade Report.
     #' @param nav Numeric. SMA Net Asset Value.
     #' @param positions Optional. SMA Positions. Default is NULL.
     #' @param base_portfolio An object representing the base portfolio.
     #' @return A new instance of the SMA class.
     initialize = function(
-      long_name, short_name, nav, positions = NULL, base_portfolio = NULL
+      long_name, short_name, holdings_url, trade_url, nav, positions = NULL, base_portfolio = NULL
     ) {
       private$long_name_ <- long_name
       private$short_name_ <- short_name
+      private$holdings_url_ <- holdings_url
+      private$trade_url_ <- trade_url
       private$nav_ <- nav
       private$base_portfolio_ <- base_portfolio
       private$positions_ <- positions

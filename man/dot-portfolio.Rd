@@ -7,6 +7,8 @@
 .portfolio(
   short_name,
   long_name,
+  holdings_url,
+  trade_url,
   nav = 0,
   positions = list(),
   create = FALSE,
@@ -19,6 +21,8 @@ Must be unique within the portfolio registry.}
 
 \item{long_name}{A string representing the long name of the portfolio. 
 Required if creating a new portfolio.}
+
+\item{holdings_url}{A string representing the URL for holdings data.}
 
 \item{nav}{A numeric value representing the net asset value (NAV) of the 
 portfolio. Defaults to 0.}

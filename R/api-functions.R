@@ -104,6 +104,7 @@
 #'   Must be unique within the portfolio registry.
 #' @param long_name A string representing the long name of the portfolio. 
 #'   Required if creating a new portfolio.
+#' @param holdings_url A string representing the URL for holdings data.
 #' @param nav A numeric value representing the net asset value (NAV) of the 
 #'   portfolio. Defaults to 0.
 #' @param positions A list of positions to initialize the portfolio with. 
@@ -136,7 +137,8 @@
 #'
 #' @export
 .portfolio <- function(
-  short_name, long_name, nav = 0, positions = list(), create = FALSE, assign_to_registry = TRUE
+  short_name, long_name, holdings_url, trade_url,
+  nav = 0, positions = list(), create = FALSE, assign_to_registry = TRUE
 ) {
   assert_string(short_name, "short_name")
   assert_bool(create, "create")
@@ -152,9 +154,9 @@
     positions,
     function(position) assert_inherits(position, "Position", "positions")
   )
-  portfolio <- Portfolio$new(long_name, short_name, nav, positions)
+  portfolio <- Portfolio$new(long_name, short_name, holdings_url, trade_url, nav, positions)
   if (assign_to_registry) {
-    assign(short_name, portfolio, envir=env)
+    assign(short_name, portfolio, envir = env)
   }
   invisible(portfolio)
 }
@@ -194,7 +196,10 @@
 #'
 #' @seealso \code{\link{Portfolio}}, \code{\link{SMA}}
 #' @export
-.sma <- function(short_name, long_name, nav = 0, positions = list(), base_portfolio, create = FALSE, assign_to_registry = TRUE) {
+.sma <- function(
+  short_name, long_name, holdings_url, trade_url,
+  nav = 0, positions = list(), base_portfolio, create = FALSE, assign_to_registry = TRUE
+) {
   assert_string(short_name, "short_name")
   assert_bool(create, "create")
   env <- registries$portfolios
@@ -205,7 +210,7 @@
   lapply(positions, function(position) assert_inherits(position, "Position", "positions"))
   assert_string(base_portfolio, "base_portfolio")
   base_ptfl <- .portfolio(base_portfolio, create = FALSE)
-  sma <- SMA$new(long_name, short_name, nav, positions, base_ptfl)
+  sma <- SMA$new(long_name, short_name, holdings_url, trade_url, nav, positions, base_ptfl)
   if (assign_to_registry) {
     assign(short_name, sma, envir=env)
   }
@@ -366,8 +371,8 @@
       .position(portfolio_id, security_id, qty = 0, swap = swap)
     }
   )
-
-  tgt_pos$set_qty(tgt_pos$get_qty() + qty)
+  existing_tgt_qty <- tgt_pos$get_qty()
+  tgt_pos$set_qty(existing_tgt_qty + qty)
   portfolio$add_target_position(tgt_pos, overwrite = TRUE)
   if (assign_to_registry) {
     assign(as.character(trade$get_id()), trade, envir = registries$trades)

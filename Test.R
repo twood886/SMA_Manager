@@ -8,13 +8,21 @@ con <- blpConnect()
 ccmf <- create_portfolio_from_enfusion(
   long_name = "Callodine Capital Master Fund",
   short_name = "ccmf",
-  enfusion_url = paste0(
+  holdings_url = paste0(
     "https://webservices.enfusionsystems.com/mobile/",
     "rest/reportservice/exportReport?",
     "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
     "CCMF+Consolidated+Position+Listing+-+Options.ppr"
+  ),
+  trade_url = paste0(
+    "https://webservices.enfusionsystems.com/mobile/",
+    "rest/reportservice/exportReport?",
+    "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
+    "CCMF_Trade_Detail.trb"
   )
 )
+
+ccmf$update_enfusion()
 
 source("smas/bemap.R")
 source("smas/fmap.R")

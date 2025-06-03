@@ -4,7 +4,7 @@
 \alias{create_portfolio_from_enfusion}
 \title{Create Portfolio from Enfusion}
 \usage{
-create_portfolio_from_enfusion(long_name, short_name, enfusion_url)
+create_portfolio_from_enfusion(long_name, short_name, holdings_url, trade_url)
 }
 \arguments{
 \item{long_name}{Character long name}
