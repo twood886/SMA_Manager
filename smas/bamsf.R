@@ -17,7 +17,6 @@ bamsf <- create_sma_from_enfusion(
 
 )
 
-bamsf$add_flow(100000000)
 
 bamsf$add_rule(.sma_rule(
   sma_name = "bamsf",

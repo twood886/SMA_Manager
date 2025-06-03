@@ -137,7 +137,8 @@ create_portfolio_from_enfusion <- function(
 ) {
   enfusion_report <- dplyr::filter(
     enfusion::get_enfusion_report(holdings_url),
-    !is.na(.data$Description) #nolint
+    !is.na(.data$Description) & #nolint
+    .data$"Instrument Type" != "Cash"
   )
   nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
   positions <- .bulk_security_positions(
