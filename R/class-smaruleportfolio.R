@@ -58,6 +58,7 @@ SMARulePortfolio <- R6::R6Class( #nolint
       }
       out <- lapply(exp, .set_ind_sec_limits)
       names(out) <- security_id
+      out
     }
   ),
   private = list(

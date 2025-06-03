@@ -9,7 +9,6 @@ TradeConstructor <- R6::R6Class( #nolint
       if (is.null(security_id)) stop("Security ID must be supplied")
       rules <- portfolio$get_rules()
       non_swap_rules <- rules[!vapply(rules, \(rule) rule$get_swap_only(), logical(1))]
-
       limits <- lapply(non_swap_rules, \(rule) rule$get_security_limits(security_id))
 
       setNames(
