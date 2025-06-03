@@ -22,6 +22,7 @@
     character(1),
     USE.NAMES = FALSE
   )
+
   if (length(ids) == 0) {
     return(list())
   }
