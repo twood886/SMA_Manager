@@ -247,10 +247,16 @@ create_sma_from_enfusion <- function(
       x[["Description"]]
     )
 
+    remain <- as.numeric(x[["Order Remaining Quantity"]])
+    total <- as.numeric(x[["Notional Quantity"]])
+    if (total < 0) {
+      remain <- -remain
+    }
+
     .trade(
       security_id = id,
       portfolio_id = portfolio$get_short_name(),
-      qty = x[["Order Remaining Quantity"]],
+      qty = remain,
       swap = x[["Is Financed"]],
       create = TRUE,
       assign_to_registry = TRUE
