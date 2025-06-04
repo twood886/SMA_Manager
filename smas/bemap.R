@@ -1,11 +1,20 @@
-bemap_url <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=shared%2FTaylor%2FSMA_Mgr_Reports%2FBEMAP+Consolidated+Position+Listing+-+Options.ppr"
-
 
 bemap <- create_sma_from_enfusion(
   long_name = "Citco Bank Canada Ref BEMAP Master Fund Ltd.",
   short_name = "bemap",
   base_portfolio = "ccmf",
-  enfusion_url = bemap_url
+  holdings_url = paste0(
+    "https://webservices.enfusionsystems.com/mobile/",
+    "rest/reportservice/exportReport?",
+    "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
+    "BEMAP+Consolidated+Position+Listing+-+Options.ppr"
+  ),
+  trade_url = paste0(
+    "https://webservices.enfusionsystems.com/mobile/",
+    "rest/reportservice/exportReport?",
+    "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
+    "BEMAP_Trade_Detail.trb"
+  )
 )
 
 #bemap <- bemap$add_replacement("oci na equity", c("meoh us equity"))

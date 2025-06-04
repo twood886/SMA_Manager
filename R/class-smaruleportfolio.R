@@ -22,6 +22,12 @@ SMARulePortfolio <- R6::R6Class( #nolint
     check_swap_target = function() {
       list("pass" = TRUE)
     },
+
+    #' @description Get the swap flag for a given security
+    #' @param security_id Security ID
+    check_swap_security = function(security_id) {
+      return(setNames(sapply(security_id, \(x) FALSE), security_id))
+    },
     #' @description Get the Max and Min value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
@@ -32,8 +38,10 @@ SMARulePortfolio <- R6::R6Class( #nolint
       v <- sum(rule_applied_pos, na.rm = TRUE)
       exp <- private$apply_rule_definition_(security_id)
 
-      remain_max <- (private$max_threshold_ - v) / length(security_id)
-      remain_min <- (private$min_threshold_ - v) / length(security_id)
+      impacted <- exp[which(exp != 0)]
+
+      remain_max <- (private$max_threshold_ - v) / length(impacted)
+      remain_min <- (private$min_threshold_ - v) / length(impacted)
 
       if (private$gross_exposure_) {
         .set_ind_sec_limits <- function(exp) {

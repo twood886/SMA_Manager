@@ -52,7 +52,7 @@ TradeConstructor <- R6::R6Class( #nolint
       names(target_trade_qty) <- target_sec_id
       portfolio_qty <- private$.extract_qty(portfolio$get_target_position())
       replacements <- portfolio$get_replacement_security()
-      
+
       all_secs_id <- unique(c(target_sec_id, names(portfolio_qty), unlist(replacements, use.names = FALSE)))
       want <- setNames(
         vapply(
@@ -231,11 +231,11 @@ SMAConstructor <- R6::R6Class( #nolint
       }
 
       sma_qty <- private$.extract_qty(sma$get_target_position())
-      if(is.null(target_sec_id)) target_sec_id <- names(base_qty)
-      
+      if (is.null(target_sec_id)) target_sec_id <- names(base_qty)
+
       replacements <- sma$get_replacement_security()
       all_secs_id <- unique(c(names(base_qty), names(sma_qty), unlist(replacements, use.names = FALSE)))
-      
+
       want <- setNames(
         vapply(
           all_secs_id,

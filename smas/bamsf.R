@@ -17,6 +17,20 @@ bamsf <- create_sma_from_enfusion(
 
 )
 
+bamsf$add_rule(.sma_rule(
+  sma_name = "bamsf",
+  rule_name = "no mlps",
+  scope = "position",
+  definition = function(security_id, sma) {
+    mlp <- Rblpapi::bdp(security_id, "DS213")$DS213 == "MLP"
+    dplyr::case_when(
+      mlp ~ 1,
+      TRUE ~ 0
+    )
+  },
+  max_threshold = 0,
+  min_threshold = 0,
+))
 
 bamsf$add_rule(.sma_rule(
   sma_name = "bamsf",

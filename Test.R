@@ -29,6 +29,8 @@ source("smas/fmap.R")
 source("smas/bamsf.R")
 
 
+bamsf$mimic_base_portfolio()
+
 test <- bemap$get_rules()[[1]]
 
 test <- create_proposed_trade_qty(
@@ -104,3 +106,32 @@ security_id <- "et us equity"
 
 base_positions <- ccmf$get_target_position()
 sma <- bemap
+
+
+
+bamsftgt <- bamsf$get_target_position()
+bamsftgt_id <- sapply(bamsftgt, \(x) x$get_id())
+bamsftgt_qty <- sapply(bamsftgt, \(x) x$get_qty())
+bamsftgt_pct <- sapply(bamsftgt, \(x) x$get_delta_pct_nav())
+ccmtftgt_id <- sapply(ccmf$get_target_position(), \(x) x$get_id())
+ccmftgt_pct <- sapply(ccmf$get_target_position(), \(x) x$get_delta_pct_nav())
+
+
+bamsfdf <- data.frame(
+  security_id = bamsftgt_id,
+  target_qty = bamsftgt_qty,
+  target_pct = bamsftgt_pct
+)
+
+ccmfdf <- data.frame(
+  security_id = ccmtftgt_id,
+  ccmf_target_pct = ccmftgt_pct
+)
+
+
+full_join(
+  bamsfdf,
+  ccmfdf,
+  by = "security_id"
+)
+bamsf

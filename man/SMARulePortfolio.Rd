@@ -18,6 +18,7 @@ SMA Rule for Portfolio
 \item \href{#method-SMARulePortfolio-check_rule_target}{\code{SMARulePortfolio$check_rule_target()}}
 \item \href{#method-SMARulePortfolio-check_swap_current}{\code{SMARulePortfolio$check_swap_current()}}
 \item \href{#method-SMARulePortfolio-check_swap_target}{\code{SMARulePortfolio$check_swap_target()}}
+\item \href{#method-SMARulePortfolio-check_swap_security}{\code{SMARulePortfolio$check_swap_security()}}
 \item \href{#method-SMARulePortfolio-get_security_limits}{\code{SMARulePortfolio$get_security_limits()}}
 \item \href{#method-SMARulePortfolio-clone}{\code{SMARulePortfolio$clone()}}
 }
@@ -75,6 +76,23 @@ Check the swap rule against the target portfolio
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_swap_target()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePortfolio-check_swap_security"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_swap_security}{}}}
+\subsection{Method \code{check_swap_security()}}{
+Get the swap flag for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_swap_security(security_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePortfolio-get_security_limits"></a>}}
