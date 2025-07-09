@@ -24,12 +24,14 @@ R6 Class that encapsulates rule for SMAs
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_bbfields"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_bbfields'><code>SMAManager::SMARule$get_bbfields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_min_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_min_threshold'><code>SMAManager::SMARule$get_min_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_name'><code>SMAManager::SMARule$get_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_scope"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_scope'><code>SMAManager::SMARule$get_scope()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma_name'><code>SMAManager::SMARule$get_sma_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
 </ul>

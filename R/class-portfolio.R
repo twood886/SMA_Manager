@@ -99,30 +99,55 @@ Portfolio <- R6::R6Class( #nolint
       names(u)[idx]
     },
     #' @description Check SMA rules against the target positions
-    check_rules_target = function() {
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
+    check_rules_target = function(update_bbfields = TRUE) {
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomberg_fields()
+      }
       lapply(self$get_rules(), function(x) x$check_rule_target())
     },
 
     #' @description Check SMA rules against the current positions
-    check_rules_current = function() {
-      lapply(self$get_rules(), function(x) x$check_rules_current())
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
+    check_rules_current = function(update_bbfields = TRUE) {
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomberg_fields()
+      }
+      lapply(self$get_rules(), function(x) x$check_rule_current())
     },
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
-    get_security_position_limits = function(security_id = NULL) {
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
+    get_security_position_limits = function(security_id = NULL, update_bbfields = TRUE) { #nolint
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomberg_fields()
+      }
       private$trade_constructor$get_security_position_limits(self, security_id)
     },
     #' @description Get Swap Flag for a given security
     #' @param security_id Security ID
-    get_swap_flag_position_rules = function(security_id = NULL) {
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
+    get_swap_flag_position_rules = function(security_id = NULL, update_bbfields = TRUE) { #nolint
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomberg_fields()
+      }
       private$trade_constructor$get_swap_flag_position_rules(self, security_id)
     },
     #' @description Calculate the trade quantity for a given security
     #' @param security_id Security ID
     #' @param trade_qty Trade quantity (default: 0)
-    calc_proposed_trade = function(security_id = NULL, trade_qty = NULL) {
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
+    calc_proposed_trade = function(security_id = NULL, trade_qty = NULL, update_bbfields = TRUE) { #nolint
       assert_string(security_id, "security_id")
       assert_numeric(trade_qty, "trade_qty")
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomberg_fields()
+      }
       self$get_trade_constructor()$calc_trade_qty(self, security_id, trade_qty)
     },
 

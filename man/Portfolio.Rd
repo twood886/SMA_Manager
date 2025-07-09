@@ -180,9 +180,16 @@ Get replaced security for a given replacement security
 \subsection{Method \code{check_rules_target()}}{
 Check SMA rules against the target positions
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_target()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_target(update_bbfields = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE)}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-check_rules_current"></a>}}
@@ -190,9 +197,16 @@ Check SMA rules against the target positions
 \subsection{Method \code{check_rules_current()}}{
 Check SMA rules against the current positions
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_current()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_current(update_bbfields = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-get_security_position_limits"></a>}}
@@ -200,13 +214,18 @@ Check SMA rules against the current positions
 \subsection{Method \code{get_security_position_limits()}}{
 Get Max and Min Value of the security given all SMA Rules
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_security_position_limits(security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_security_position_limits(
+  security_id = NULL,
+  update_bbfields = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
+
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
 }
 \if{html}{\out{</div>}}
 }
@@ -217,13 +236,18 @@ Get Max and Min Value of the security given all SMA Rules
 \subsection{Method \code{get_swap_flag_position_rules()}}{
 Get Swap Flag for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_swap_flag_position_rules(security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_swap_flag_position_rules(
+  security_id = NULL,
+  update_bbfields = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
+
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
 }
 \if{html}{\out{</div>}}
 }
@@ -234,7 +258,11 @@ Get Swap Flag for a given security
 \subsection{Method \code{calc_proposed_trade()}}{
 Calculate the trade quantity for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$calc_proposed_trade(security_id = NULL, trade_qty = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$calc_proposed_trade(
+  security_id = NULL,
+  trade_qty = NULL,
+  update_bbfields = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -243,6 +271,8 @@ Calculate the trade quantity for a given security
 \item{\code{security_id}}{Security ID}
 
 \item{\code{trade_qty}}{Trade quantity (default: 0)}
+
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
 }
 \if{html}{\out{</div>}}
 }

@@ -62,7 +62,12 @@ SMA <- R6::R6Class(   #nolint
     #' @description Calculate the rebalance trade quantity for a given security
     #' @param security_id Security ID
     #' @param base_trade_qty Base trade quantity (default: 0)
-    calc_proposed_rebalance_trade = function(security_id = NULL, base_trade_qty = 0) {
+    #' @param update_bbfields Update Bloomberg fields (default: TRUE)
+    calc_proposed_rebalance_trade = function(security_id = NULL, base_trade_qty = 0, update_bbfields = TRUE) {
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomber_fields()
+      }
       constructor <- self$get_trade_constructor()
       constructor$calc_rebalance_qty(self, security_id, base_trade_qty)
     },
@@ -70,7 +75,12 @@ SMA <- R6::R6Class(   #nolint
     #' @description mimic the base portfolio target position
     #' @param security_id Security ID
     #' @param assign_to_registry Assign to registry (default: TRUE)
-    mimic_base_portfolio = function(security_id = NULL, assign_to_registry = TRUE) {
+    #' @param update_bbfields Update Bloomberg fields (default: TRUE)
+    mimic_base_portfolio = function(security_id = NULL, assign_to_registry = TRUE, update_bbfields = TRUE) {
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) {
+        update_bloomber_fields()
+      }
       constructor <- self$get_trade_constructor()
       rebal <- constructor$calc_rebalance_qty(self, security_id)
       if (length(rebal$trade_qty) != 0) {

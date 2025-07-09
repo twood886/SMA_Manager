@@ -1,25 +1,30 @@
 #' Retrieve or Create a Security Object
 #'
-#' This function retrieves a security object from the securities registry by its Bloomberg ID (bbid).
-#' If the security does not exist in the registry and `create` is set to `TRUE`, it attempts to create
-#' a new security object using Bloomberg data.
+#' This function retrieves a security object from the securities registry by its
+#'  Bloomberg ID (bbid). If the security does not exist in the registry and
+#'  `create` is set to `TRUE`, it attempts to create a new security object
+#'  using Bloomberg data.
 #'
-#' @param bbid A string representing the Bloomberg ID of the security. Must be a non-empty string.
-#' @param create A logical value indicating whether to create a new security object if it does not
-#'   already exist in the registry. Defaults to `TRUE`.
-#' @param assign_to_registry A logical value indicating whether to assign the security object to the
-#'  registry. Defaults to `TRUE`.
+#' @param bbid A string representing the Bloomberg ID of the security.
+#'  Must be a non-empty string.
+#' @param create A logical value indicating whether to create a new security
+#'  object if it does not already exist in the registry. Defaults to `TRUE`.
+#' @param assign_to_registry A logical value indicating whether to assign
+#'  the security object to the registry. Defaults to `TRUE`.
 #'
-#' @return If the security exists in the registry, it returns the corresponding security object.
-#'   If the security does not exist and `create` is `FALSE`, it returns `NULL`. If `create` is `TRUE`,
-#'   it creates a new security object and returns it. If `assign_to_registry` is `TRUE`, the new object is
-#'   assigned to the registry.
+#' @return If the security exists in the registry, it returns the corresponding
+#'  security object. If the security does not exist and `create` is `FALSE`, it
+#'  returns `NULL`. If `create` is `TRUE`, it creates a new security object and
+#'  returns it. If `assign_to_registry` is `TRUE`, the new object is assigned to
+#'  the registry.
 #'
-#' @details The function first validates the `bbid` parameter to ensure it is a valid string. It then
-#'   checks if the security exists in the `registries$securities` environment. If the security does not
-#'   exist and `create` is `TRUE`, it queries Bloomberg for the security's data using the `Rblpapi::bpd`
-#'   function. If the Bloomberg data indicates the security is not found, an error is raised. Otherwise,
-#'   a new `Security` object is created and added to the registry.
+#' @details The function first validates the `bbid` parameter to ensure it is a
+#'  valid string. It then checks if the security exists in the
+#'  `registries$securities` environment. If the security does not exist and
+#'  `create` is `TRUE`, it queries Bloomberg for the security's data using the
+#'  `Rblpapi::bpd` function. If the Bloomberg data indicates the security is not
+#'  found, an error is raised. Otherwise, a new `Security` object is created and
+#'  added to the registry.
 #'
 #' @examples
 #' # Retrieve an existing security
@@ -57,22 +62,25 @@
 
 #' Create or Update a Position in a Portfolio
 #'
-#' This function creates or updates a position in a specified portfolio. It ensures
-#' that the input parameters are valid and initializes a new position object.
+#' This function creates or updates a position in a specified portfolio.
+#'  It ensures that the input parameters are valid and initializes a new
+#'  position object.
 #'
-#' @param portfolio_name A string specifying the name of the portfolio. The portfolio
-#'   must already exist.
-#' @param bbid A string representing the Bloomberg identifier (BBID) of the security.
-#'   This will be converted to lowercase.
-#' @param qty A numeric value indicating the quantity of the position. Defaults to 0.
-#' @param swap A logical value (TRUE or FALSE) indicating whether the position is a swap.
-#'   Defaults to FALSE.
+#' @param portfolio_name A string specifying the name of the portfolio.
+#'  The portfolio must already exist.
+#' @param bbid A string representing the Bloomberg identifier (BBID) of the
+#'  security. This will be converted to lowercase.
+#' @param qty A numeric value indicating the quantity of the position.
+#'  Defaults to 0.
+#' @param swap A logical value (TRUE or FALSE) indicating whether the position
+#'  is a swap. Defaults to FALSE.
 #'
-#' @return An object of class `Position` representing the created or updated position.
+#' @return An object of class `Position` representing the created or updated
+#'  position.
 #'
-#' @details The function validates the input parameters using assertion checks. If the
-#'   security does not already exist, it will be created. The position is then initialized
-#'   using the `Position$new` method.
+#' @details The function validates the input parameters using assertion checks.
+#'  If the security does not already exist, it will be created. The position is
+#'  then initialized using the `Position$new` method.
 #'
 #' @examples
 #' # Create a position with 100 shares of a security
@@ -82,56 +90,62 @@
 #' position("MyPortfolio", "AAPL US Equity", qty = 50, swap = TRUE)
 #'
 #' @seealso \code{\link{Position}} for the Position class.
-#' 
+#'
 #' @export
 .position <- function(portfolio_name, bbid, qty = 0, swap = FALSE) {
   assert_string(portfolio_name, "portfolio_name")
   assert_string(bbid, "id")
   assert_numeric(qty, "qty")
   assert_bool(swap, "swap")
-  bbid <- tolower(bbid) 
+  bbid <- tolower(bbid)
   sec <- .security(bbid, create = TRUE)
   invisible(Position$new(portfolio_name, sec, qty, swap))
 }
 
 #' Create or Retrieve a Portfolio Object
 #'
-#' This function creates a new portfolio object or retrieves an existing one 
-#' from the portfolio registry. If the portfolio does not exist and `create` 
+#' This function creates a new portfolio object or retrieves an existing one
+#' from the portfolio registry. If the portfolio does not exist and `create`
 #' is set to `FALSE`, an error is raised.
 #'
-#' @param short_name A string representing the short name of the portfolio. 
+#' @param short_name A string representing the short name of the portfolio.
 #'   Must be unique within the portfolio registry.
-#' @param long_name A string representing the long name of the portfolio. 
+#' @param long_name A string representing the long name of the portfolio.
 #'   Required if creating a new portfolio.
 #' @param holdings_url A string representing the URL for holdings data.
-#' @param nav A numeric value representing the net asset value (NAV) of the 
+#' @param nav A numeric value representing the net asset value (NAV) of the
 #'   portfolio. Defaults to 0.
-#' @param positions A list of positions to initialize the portfolio with. 
-#'   Each position must inherit from the "Position" class. Defaults to an 
+#' @param positions A list of positions to initialize the portfolio with.
+#'   Each position must inherit from the "Position" class. Defaults to an
 #'   empty list.
-#' @param create A logical value indicating whether to create the portfolio 
+#' @param create A logical value indicating whether to create the portfolio
 #'   if it does not exist. Defaults to `FALSE`.
 #' @param assign_to_registry A logical value indicating whether to assign the
 #'  portfolio object to the registry. Defaults to `TRUE`.
 #'
-#' @return If the portfolio exists or is successfully created, the portfolio 
+#' @return If the portfolio exists or is successfully created, the portfolio
 #'   object is returned. Otherwise, an error is raised.
 #'
-#' @details The function checks for the existence of a portfolio in the 
-#'   `registries$portfolios` environment using the `short_name`. If the 
-#'   portfolio exists, it is retrieved and returned. If it does not exist 
+#' @details The function checks for the existence of a portfolio in the
+#'   `registries$portfolios` environment using the `short_name`. If the
+#'   portfolio exists, it is retrieved and returned. If it does not exist
 #'   and `create` is `TRUE`, a new portfolio is created. If `assign_to_registry`
-#'   is true, the object is added to the registry. 
-#'   The function performs various assertions to ensure the 
+#'   is true, the object is added to the registry.
+#'   The function performs various assertions to ensure the
 #'   validity of the input arguments.
 #'
 #' @examples
 #' # Retrieve an existing portfolio
-#' portfolio("short_name")
+#' .portfolio("short_name")
 #'
 #' # Create a new portfolio
-#' portfolio("short_name", "Long Name", nav = 1000, positions = list(), create = TRUE)
+#' .portfolio(
+#'  "short_name",
+#'  "Long Name",
+#'  nav = 1000,
+#'  positions = list(),
+#'  create = TRUE
+#' )
 #'
 #' @seealso \code{\link{Portfolio}} for the Portfolio class.
 #'
@@ -154,7 +168,14 @@
     positions,
     function(position) assert_inherits(position, "Position", "positions")
   )
-  portfolio <- Portfolio$new(long_name, short_name, holdings_url, trade_url, nav, positions)
+  portfolio <- Portfolio$new(
+    long_name,
+    short_name,
+    holdings_url,
+    trade_url,
+    nav,
+    positions
+  )
   if (assign_to_registry) {
     assign(short_name, portfolio, envir = env)
   }
@@ -198,21 +219,33 @@
 #' @export
 .sma <- function(
   short_name, long_name, holdings_url, trade_url,
-  nav = 0, positions = list(), base_portfolio, create = FALSE, assign_to_registry = TRUE
+  nav = 0, positions = list(),
+  base_portfolio, create = FALSE, assign_to_registry = TRUE
 ) {
   assert_string(short_name, "short_name")
   assert_bool(create, "create")
   env <- registries$portfolios
-  if (exists(short_name, envir=env)) return(get(short_name, envir=env))
+  if (exists(short_name, envir = env)) return(get(short_name, envir = env))
   if (!create) stop("SMA does not exist and create is set to FALSE")
   assert_string(long_name, "long_name")
   assert_numeric(nav, "nav")
-  lapply(positions, function(position) assert_inherits(position, "Position", "positions"))
+  lapply(
+    positions,
+    function(position) assert_inherits(position, "Position", "positions")
+  )
   assert_string(base_portfolio, "base_portfolio")
   base_ptfl <- .portfolio(base_portfolio, create = FALSE)
-  sma <- SMA$new(long_name, short_name, holdings_url, trade_url, nav, positions, base_ptfl)
+  sma <- SMA$new(
+    long_name,
+    short_name,
+    holdings_url,
+    trade_url,
+    nav,
+    positions,
+    base_ptfl
+  )
   if (assign_to_registry) {
-    assign(short_name, sma, envir=env)
+    assign(short_name, sma, envir = env)
   }
   invisible(sma)
 }
@@ -228,6 +261,7 @@
 #' @param rule_name A string representing the name of the rule. Must be unique within the SMA.
 #' @param scope A string indicating the scope of the rule. Valid values are "position", 
 #'   "portfolio", or "all".
+#' @param bbfields A character vector of Bloomberg fields to be used in the rule's logic.
 #' @param definition A function defining the rule's logic. Must be a valid function object.
 #' @param max_threshold (Optional) A numeric value specifying the maximum threshold for the rule.
 #' @param min_threshold (Optional) A numeric value specifying the minimum threshold for the rule.
@@ -257,7 +291,7 @@
 #' @export
 .sma_rule <- function(
   sma_name,
-  rule_name, scope, definition,
+  rule_name, scope, definition, bbfields,
   max_threshold = Inf, min_threshold = -Inf,
   swap_only = FALSE, gross_exposure = FALSE
 ) {
@@ -279,6 +313,7 @@
       sma_name = sma_name,
       name = name,
       scope = scope,
+      bbfields = bbfields,
       definition = definition,
       max_threshold = max_threshold,
       min_threshold = min_threshold,
@@ -291,6 +326,7 @@
       sma_name = sma_name,
       name = name,
       scope = scope,
+      bbfields = bbfields,
       definition = definition,
       max_threshold = max_threshold,
       min_threshold = min_threshold,

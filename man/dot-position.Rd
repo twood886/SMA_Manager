@@ -7,28 +7,31 @@
 .position(portfolio_name, bbid, qty = 0, swap = FALSE)
 }
 \arguments{
-\item{portfolio_name}{A string specifying the name of the portfolio. The portfolio
-must already exist.}
+\item{portfolio_name}{A string specifying the name of the portfolio.
+The portfolio must already exist.}
 
-\item{bbid}{A string representing the Bloomberg identifier (BBID) of the security.
-This will be converted to lowercase.}
+\item{bbid}{A string representing the Bloomberg identifier (BBID) of the
+security. This will be converted to lowercase.}
 
-\item{qty}{A numeric value indicating the quantity of the position. Defaults to 0.}
+\item{qty}{A numeric value indicating the quantity of the position.
+Defaults to 0.}
 
-\item{swap}{A logical value (TRUE or FALSE) indicating whether the position is a swap.
-Defaults to FALSE.}
+\item{swap}{A logical value (TRUE or FALSE) indicating whether the position
+is a swap. Defaults to FALSE.}
 }
 \value{
-An object of class `Position` representing the created or updated position.
+An object of class `Position` representing the created or updated
+ position.
 }
 \description{
-This function creates or updates a position in a specified portfolio. It ensures
-that the input parameters are valid and initializes a new position object.
+This function creates or updates a position in a specified portfolio.
+ It ensures that the input parameters are valid and initializes a new
+ position object.
 }
 \details{
-The function validates the input parameters using assertion checks. If the
-  security does not already exist, it will be created. The position is then initialized
-  using the `Position$new` method.
+The function validates the input parameters using assertion checks.
+ If the security does not already exist, it will be created. The position is
+ then initialized using the `Position$new` method.
 }
 \examples{
 # Create a position with 100 shares of a security

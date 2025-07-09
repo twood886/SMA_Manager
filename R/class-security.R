@@ -20,7 +20,8 @@ Security <- R6::R6Class( #nolint
     underlying_price_ = NULL,
     delta_ = NULL,
     bics_level_2_ = NULL,
-    bics_level_3_ = NULL
+    bics_level_3_ = NULL,
+    rule_data_ = list(NULL)
   ),
   public = list(
     #' @description Create new Security R6 object
@@ -99,7 +100,16 @@ Security <- R6::R6Class( #nolint
     get_bics_level_2 = function() private$bics_level_2_,
     #' @description Get BICS Level 3
     get_bics_level_3 = function() private$bics_level_3_,
-
+    #' @description Get Rule Data
+    #' @param bbfield Character. bbfield.
+    get_rule_data = function(bbfield) {
+      assert_string(bbfield, "bbfield")
+      if (bbfield %in% names(private$rule_data_)) {
+        private$rule_data_[[bbfield]]
+      } else {
+        stop(paste("bbfield", bbfield, "not found in security data."))
+      }
+    },
     # Update Data --------------------------------------------------
     #' @description Update Price
     update_price = function() {
@@ -145,6 +155,14 @@ Security <- R6::R6Class( #nolint
     set_delta = function(delta) {
       assert_numeric(delta, "delta")
       private$delta_ <- delta
+      invisible(TRUE)
+    },
+    #' @description Set Rule Data
+    #' @param bbfield Character. Name of the rule.
+    #' @param data value
+    set_rule_data = function(bbfield, data) {
+      assert_string(bbfield, "bbfield")
+      private$rule_data_[[bbfield]] <- data
       invisible(TRUE)
     }
   )

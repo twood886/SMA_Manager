@@ -123,7 +123,11 @@ Get a position in the Base portfolio
 \subsection{Method \code{calc_proposed_rebalance_trade()}}{
 Calculate the rebalance trade quantity for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(security_id = NULL, base_trade_qty = 0)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(
+  security_id = NULL,
+  base_trade_qty = 0,
+  update_bbfields = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -132,6 +136,8 @@ Calculate the rebalance trade quantity for a given security
 \item{\code{security_id}}{Security ID}
 
 \item{\code{base_trade_qty}}{Base trade quantity (default: 0)}
+
+\item{\code{update_bbfields}}{Update Bloomberg fields (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }
@@ -142,7 +148,11 @@ Calculate the rebalance trade quantity for a given security
 \subsection{Method \code{mimic_base_portfolio()}}{
 mimic the base portfolio target position
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(security_id = NULL, assign_to_registry = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(
+  security_id = NULL,
+  assign_to_registry = TRUE,
+  update_bbfields = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -151,6 +161,8 @@ mimic the base portfolio target position
 \item{\code{security_id}}{Security ID}
 
 \item{\code{assign_to_registry}}{Assign to registry (default: TRUE)}
+
+\item{\code{update_bbfields}}{Update Bloomberg fields (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }

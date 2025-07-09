@@ -9,6 +9,7 @@
   rule_name,
   scope,
   definition,
+  bbfields,
   max_threshold = Inf,
   min_threshold = -Inf,
   swap_only = FALSE,
@@ -24,6 +25,8 @@
 "portfolio", or "all".}
 
 \item{definition}{A function defining the rule's logic. Must be a valid function object.}
+
+\item{bbfields}{A character vector of Bloomberg fields to be used in the rule's logic.}
 
 \item{max_threshold}{(Optional) A numeric value specifying the maximum threshold for the rule.}
 

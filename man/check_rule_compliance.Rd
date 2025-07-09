@@ -4,10 +4,12 @@
 \alias{check_rule_compliance}
 \title{Check Rule Compliance}
 \usage{
-check_rule_compliance(portfolio_name)
+check_rule_compliance(portfolio_name, update_bbfields = TRUE)
 }
 \arguments{
 \item{portfolio_name}{Character. Name of the portfolio to check.}
+
+\item{update_bbfields}{Logical. Whether to update Bloomberg data before checking rules. Defaults to TRUE.}
 }
 \description{
 Check Rule Compliance

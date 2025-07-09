@@ -133,17 +133,55 @@ update_security_data <- function() {
   invisible(NULL)
 }
 
+#' Add Bloomberg Data for SMA Rules to Securities
+#' @return TRUE (invisible)
+#' @export
+#' @include api-functions.R
+#' @include class-security.R
+update_bloomberg_fields <- function() {
+  rule_names <- ls(get_registries()$smarules)
+  rules <- mget(
+    rule_names,
+    envir = get_registries()$smarules,
+    inherits = TRUE
+  )
+  rule_bbfields <- unique(
+    unlist(
+      sapply(
+        rules,
+        function(rule) rule$get_bbfields(),
+        simplify = TRUE
+      ),
+      use.names = FALSE
+    )
+  )
+  security_ids <- ls(get_registries()$securities)
+  bbdata <- Rblpapi::bdp(
+    security_ids,
+    fields = rule_bbfields
+  )
+  for (col in seq_len(ncol(bbdata))) {
+    field <- colnames(bbdata)[col]
+    for (row in seq_len(nrow(bbdata))) {
+      id <- rownames(bbdata)[row]
+      value <- bbdata[row, col]
+      .security(id, create = FALSE)$set_rule_data(field, value)
+    }
+  }
+  invisible(TRUE)
+}
+
+
 #' Check Rule Compliance
 #' @param portfolio_name Character. Name of the portfolio to check.
+#' @param update_bbfields Logical. Whether to update Bloomberg data before checking rules. Defaults to TRUE.
 #' @export
-check_rule_compliance <- function(portfolio_name) {
+check_rule_compliance <- function(portfolio_name, update_bbfields = TRUE) {
   assert_string(portfolio_name, "portfolio_name")
   portfolio <- get(portfolio_name, envir = get_registries()$portfolios, inherits = FALSE) #nolint
   assert_inherits(portfolio, "Portfolio", "portfolio")
 
-  rules <- portfolio$get_rules()
-
-  check <- lapply(rules, \(rule) rule$check_rule_current())
+  check <- portfolio$check_rules_current(update_bbfields = update_bbfields)
   non_comply <- which(sapply(check, function(x) !x$pass))
   if (length(non_comply) == 0) {
     return(list("pass" = TRUE, "message" = "All rules are compliant."))

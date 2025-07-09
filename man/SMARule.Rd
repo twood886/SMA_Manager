@@ -10,9 +10,11 @@ R6 Class that encapsultes rules for SMAs.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMARule-new}{\code{SMARule$new()}}
+\item \href{#method-SMARule-get_sma_name}{\code{SMARule$get_sma_name()}}
 \item \href{#method-SMARule-get_id}{\code{SMARule$get_id()}}
 \item \href{#method-SMARule-get_name}{\code{SMARule$get_name()}}
 \item \href{#method-SMARule-get_scope}{\code{SMARule$get_scope()}}
+\item \href{#method-SMARule-get_bbfields}{\code{SMARule$get_bbfields()}}
 \item \href{#method-SMARule-get_definition}{\code{SMARule$get_definition()}}
 \item \href{#method-SMARule-get_max_threshold}{\code{SMARule$get_max_threshold()}}
 \item \href{#method-SMARule-get_min_threshold}{\code{SMARule$get_min_threshold()}}
@@ -29,6 +31,7 @@ R6 Class that encapsultes rules for SMAs.
   sma_name = NULL,
   name = NULL,
   scope = NULL,
+  bbfields = NULL,
   definition = NULL,
   max_threshold = NULL,
   min_threshold = NULL,
@@ -46,6 +49,8 @@ R6 Class that encapsultes rules for SMAs.
 
 \item{\code{scope}}{Character}
 
+\item{\code{bbfields}}{Character vector}
+
 \item{\code{definition}}{Formula}
 
 \item{\code{max_threshold}}{numeric}
@@ -55,10 +60,21 @@ R6 Class that encapsultes rules for SMAs.
 \item{\code{swap_only}}{logical}
 
 \item{\code{gross_exposure}}{logical
-Get Id}
+Get SMA Name}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_sma_name"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_sma_name}{}}}
+\subsection{Method \code{get_sma_name()}}{
+Get the name of the SMA
+Get Id
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_sma_name()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARule-get_id"></a>}}
@@ -87,9 +103,20 @@ Get Scope
 \if{latex}{\out{\hypertarget{method-SMARule-get_scope}{}}}
 \subsection{Method \code{get_scope()}}{
 Get the scope of the SMA Rule
-Get Definition
+Get Bloomberg Fields
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARule$get_scope()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_bbfields"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_bbfields}{}}}
+\subsection{Method \code{get_bbfields()}}{
+Get the Bloomberg fields of the SMA Rule
+Get Definition
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_bbfields()}\if{html}{\out{</div>}}
 }
 
 }

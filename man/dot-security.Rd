@@ -7,31 +7,36 @@
 .security(bbid, create = TRUE, assign_to_registry = TRUE)
 }
 \arguments{
-\item{bbid}{A string representing the Bloomberg ID of the security. Must be a non-empty string.}
+\item{bbid}{A string representing the Bloomberg ID of the security.
+Must be a non-empty string.}
 
-\item{create}{A logical value indicating whether to create a new security object if it does not
-already exist in the registry. Defaults to `TRUE`.}
+\item{create}{A logical value indicating whether to create a new security
+object if it does not already exist in the registry. Defaults to `TRUE`.}
 
-\item{assign_to_registry}{A logical value indicating whether to assign the security object to the
-registry. Defaults to `TRUE`.}
+\item{assign_to_registry}{A logical value indicating whether to assign
+the security object to the registry. Defaults to `TRUE`.}
 }
 \value{
-If the security exists in the registry, it returns the corresponding security object.
-  If the security does not exist and `create` is `FALSE`, it returns `NULL`. If `create` is `TRUE`,
-  it creates a new security object and returns it. If `assign_to_registry` is `TRUE`, the new object is
-  assigned to the registry.
+If the security exists in the registry, it returns the corresponding
+ security object. If the security does not exist and `create` is `FALSE`, it
+ returns `NULL`. If `create` is `TRUE`, it creates a new security object and
+ returns it. If `assign_to_registry` is `TRUE`, the new object is assigned to
+ the registry.
 }
 \description{
-This function retrieves a security object from the securities registry by its Bloomberg ID (bbid).
-If the security does not exist in the registry and `create` is set to `TRUE`, it attempts to create
-a new security object using Bloomberg data.
+This function retrieves a security object from the securities registry by its
+ Bloomberg ID (bbid). If the security does not exist in the registry and
+ `create` is set to `TRUE`, it attempts to create a new security object
+ using Bloomberg data.
 }
 \details{
-The function first validates the `bbid` parameter to ensure it is a valid string. It then
-  checks if the security exists in the `registries$securities` environment. If the security does not
-  exist and `create` is `TRUE`, it queries Bloomberg for the security's data using the `Rblpapi::bpd`
-  function. If the Bloomberg data indicates the security is not found, an error is raised. Otherwise,
-  a new `Security` object is created and added to the registry.
+The function first validates the `bbid` parameter to ensure it is a
+ valid string. It then checks if the security exists in the
+ `registries$securities` environment. If the security does not exist and
+ `create` is `TRUE`, it queries Bloomberg for the security's data using the
+ `Rblpapi::bpd` function. If the Bloomberg data indicates the security is not
+ found, an error is raised. Otherwise, a new `Security` object is created and
+ added to the registry.
 }
 \examples{
 # Retrieve an existing security

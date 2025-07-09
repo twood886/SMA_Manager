@@ -19,11 +19,13 @@ R6 class for a security with time-series and non-time-series data.
 \item \href{#method-Security-get_delta}{\code{Security$get_delta()}}
 \item \href{#method-Security-get_bics_level_2}{\code{Security$get_bics_level_2()}}
 \item \href{#method-Security-get_bics_level_3}{\code{Security$get_bics_level_3()}}
+\item \href{#method-Security-get_rule_data}{\code{Security$get_rule_data()}}
 \item \href{#method-Security-update_price}{\code{Security$update_price()}}
 \item \href{#method-Security-update_delta}{\code{Security$update_delta()}}
 \item \href{#method-Security-update_underlying_price}{\code{Security$update_underlying_price()}}
 \item \href{#method-Security-set_price}{\code{Security$set_price()}}
 \item \href{#method-Security-set_delta}{\code{Security$set_delta()}}
+\item \href{#method-Security-set_rule_data}{\code{Security$set_rule_data()}}
 \item \href{#method-Security-clone}{\code{Security$clone()}}
 }
 }
@@ -148,6 +150,23 @@ Get BICS Level 3
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_rule_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_rule_data}{}}}
+\subsection{Method \code{get_rule_data()}}{
+Get Rule Data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_rule_data(bbfield)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bbfield}}{Character. bbfield.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-update_price"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-update_price}{}}}
 \subsection{Method \code{update_price()}}{
@@ -207,6 +226,25 @@ Set Delta
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{delta}}{Numeric. New delta of the security.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-set_rule_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-set_rule_data}{}}}
+\subsection{Method \code{set_rule_data()}}{
+Set Rule Data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$set_rule_data(bbfield, data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bbfield}}{Character. Name of the rule.}
+
+\item{\code{data}}{value}
 }
 \if{html}{\out{</div>}}
 }

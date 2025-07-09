@@ -27,7 +27,13 @@ ccmf$update_enfusion()
 source("smas/bemap.R")
 source("smas/fmap.R")
 source("smas/bamsf.R")
+load_bemap()
+load_fmap()
+load_bamsf()
 
+check_rule_compliance("bemap")
+check_rule_compliance("fmap")
+check_rule_compliance("bamsf", update_bbfields = FALSE)
 
 bamsf$mimic_base_portfolio()
 
@@ -41,6 +47,12 @@ test <- create_proposed_trade_qty(
   flow_to_derived = TRUE
 )
 
+
+for(i in 8:length(rules)) {
+  print(i)
+  rule <- rules[[i]]
+  print(rule$check_rule_current())
+}
 
 
 
