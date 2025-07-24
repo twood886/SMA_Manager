@@ -27,12 +27,16 @@ ccmf$update_enfusion()
 source("smas/bemap.R")
 source("smas/fmap.R")
 source("smas/bamsf.R")
-load_bemap()
-load_fmap()
-load_bamsf()
+bemap <- load_bemap()
+fmap <- load_fmap()
+bamsf <- load_bamsf()
+
+update_bloomberg_fields()
+rebal <- bamsf$calc_proposed_rebalance_trade()
+
 
 check_rule_compliance("bemap")
-check_rule_compliance("fmap")
+check_rule_compliance("fmap", update_bbfields = FALSE)
 check_rule_compliance("bamsf", update_bbfields = FALSE)
 
 bamsf$mimic_base_portfolio()

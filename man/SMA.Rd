@@ -126,7 +126,8 @@ Calculate the rebalance trade quantity for a given security
 \if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(
   security_id = NULL,
   base_trade_qty = 0,
-  update_bbfields = TRUE
+  update_bbfields = TRUE,
+  as.data.frame = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -138,6 +139,8 @@ Calculate the rebalance trade quantity for a given security
 \item{\code{base_trade_qty}}{Base trade quantity (default: 0)}
 
 \item{\code{update_bbfields}}{Update Bloomberg fields (default: TRUE)}
+
+\item{\code{as.data.frame}}{Return as data frame (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }
@@ -150,8 +153,8 @@ mimic the base portfolio target position
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(
   security_id = NULL,
-  assign_to_registry = TRUE,
-  update_bbfields = TRUE
+  update_bbfields = TRUE,
+  assign_to_registry = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -160,9 +163,9 @@ mimic the base portfolio target position
 \describe{
 \item{\code{security_id}}{Security ID}
 
-\item{\code{assign_to_registry}}{Assign to registry (default: TRUE)}
+\item{\code{update_bbfields}}{Update Bloomberg fields (default: FALSE)}
 
-\item{\code{update_bbfields}}{Update Bloomberg fields (default: TRUE)}
+\item{\code{assign_to_registry}}{Assign to registry (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }

@@ -28,31 +28,38 @@
     return(list())
   }
 
-  descriptions <- Rblpapi::bdp(ids, "DX615")
-  inst_types <- Rblpapi::bdp(ids, "EX028")
-  prices <- Rblpapi::bdp(ids, "PX_LAST")
-  bics_lvl2 <- Rblpapi::bdp(ids, "BI012")
-  bics_lvl3 <- Rblpapi::bdp(ids, "BI013")
-
   env <- registries$securities
+  exists <- vapply(
+    tolower(ids),
+    function(id) exists(id, envir = env, inherits = FALSE),
+    logical(1)
+  )
+  new_ids <- ids[!exists]
 
-  for (id in ids) {
-    bbid <- tolower(id)
-    if (exists(bbid, envir = env, inherits = FALSE)) next
-
-    security <- Security$new(
-      bbid = bbid,
-      description = descriptions[id, "DX615"],
-      instrument_type = inst_types[id, "EX028"],
-      price = ifelse(
-        inst_types[id, "EX028"] == "FixedIncome",
-        prices[id, "PX_LAST"] / 100,
-        prices[id, "PX_LAST"]
-      ),
-      bics_level_2 = bics_lvl2[id, "BI012"],
-      bics_level_3 = bics_lvl3[id, "BI013"]
+  if (length(new_ids) != 0) {
+    data <- Rblpapi::bdp(
+      new_ids,
+      fields = c("DX615", "EX028", "PX_LAST", "BI012", "BI013")
     )
-    assign(bbid, security, envir = env)
+
+    for (id in ids) {
+      bbid <- tolower(id)
+      if (exists(bbid, envir = env, inherits = FALSE)) next
+
+      security <- Security$new(
+        bbid = bbid,
+        description = data[id, "DX615"],
+        instrument_type = data[id, "EX028"],
+        price = ifelse(
+          data[id, "EX028"] == "FixedIncome",
+          data[id, "PX_LAST"] / 100,
+          data[id, "PX_LAST"]
+        ),
+        bics_level_2 = data[id, "BI012"],
+        bics_level_3 = data[id, "BI013"]
+      )
+      assign(bbid, security, envir = env)
+    } 
   }
 
   positions <- lapply(
@@ -81,49 +88,6 @@
 }
 
 
-#' Create a Position from Enfusion Data
-#'
-#' @param x A list or single-row data.frame of enfusion data
-#' @param portfolio_short_name Character short name of the portfolio
-#' @return Position R6 object
-#' @import Rblpapi
-#' @include api-functions.R
-#' @export
-create_position_from_enfusion <- function(x, portfolio_short_name) {
-
-  if (is.null(tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL))) #nolint
-    Rblpapi::blpConnect()
-
-  if (!is.list(x) && !is.data.frame(x)) {
-    stop("`x` must be a list or data.frame row", call. = FALSE)
-  }
-  if (length(portfolio_short_name) != 1 || !nzchar(portfolio_short_name)) {
-    stop("`portfolio_short_name` must be a non-empty string", call. = FALSE)
-  }
-
-  instrument_type <- x[["Instrument Type"]]
-  id <- switch(
-    instrument_type,
-    "Bond" = Rblpapi::bdp(x[["FIGI"]], "DX194")$DX194,
-    "Listed Option" = x[["BB Yellow Key Position"]],
-    "Equity" = x[["BB Yellow Key Position"]],
-    x[["Description"]]
-  )
-
-  id <- tolower(id)
-
-  # determine quantity
-  qty <- if (instrument_type == "Listed Option") {
-    as.numeric(x[["Option Quantity"]])
-  } else {
-    as.numeric(x[["Stock Quantity"]])
-  }
-  if (is.na(qty)) {
-    stop("Quantity is not numeric for row", call. = FALSE)
-  }
-  swap <- as.logical(x[["Is Financed"]]) %||% FALSE
-  .position(portfolio_short_name, id, qty, swap = swap)
-}
 
 #' Create Portfolio from Enfusion
 #'
@@ -135,19 +99,17 @@ create_position_from_enfusion <- function(x, portfolio_short_name) {
 create_portfolio_from_enfusion <- function(
   long_name, short_name, holdings_url, trade_url
 ) {
-  enfusion_report <- dplyr::filter(
-    enfusion::get_enfusion_report(holdings_url),
-    !is.na(.data$Description))
-  nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
-  enfusion_report <- dplyr::filter(
-    enfusion_report,
-    .data$`Instrument Type` != "Cash"
+  port <- .portfolio(
+    short_name,
+    long_name,
+    holdings_url,
+    trade_url,
+    nav = 0,
+    positions = list(),
+    create = TRUE
   )
-  positions <- .bulk_security_positions(
-    enfusion_report = enfusion_report,
-    portfolio_short_name = short_name
-  )
-  .portfolio(short_name, long_name, holdings_url, trade_url, nav, positions, create = TRUE)
+  port$update_enfusion()
+  invisible(port)
 }
 
 #' Create SMA from Enfusion
@@ -173,7 +135,16 @@ create_sma_from_enfusion <- function(
     enfusion_report = enfusion_report,
     portfolio_short_name = short_name
   )
-  .sma(short_name, long_name, holdings_url, trade_url, nav, positions, base_portfolio, create = TRUE)
+  .sma(
+    short_name,
+    long_name,
+    holdings_url,
+    trade_url,
+    nav,
+    positions,
+    base_portfolio,
+    create = TRUE
+  )
 }
 
 

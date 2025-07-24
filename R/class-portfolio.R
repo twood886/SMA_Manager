@@ -249,9 +249,13 @@ Portfolio <- R6::R6Class( #nolint
     update_enfusion = function() {
       enfusion_report <- dplyr::filter(
         enfusion::get_enfusion_report(private$holdings_url_),
-        !is.na(.data$Description) #nolint
+        !is.na(.data$Description) & .data$`Instrument Type` != "Cash"
       )
       nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
+      if (is.na(nav)) {
+        nav <- 0
+      }
+      private$nav_ <- nav
       positions <- .bulk_security_positions(
         enfusion_report = enfusion_report,
         portfolio_short_name = private$short_name_
