@@ -17,7 +17,10 @@ SMARule <- R6::R6Class( #nolint
     max_threshold_ = NULL,
     min_threshold_ = NULL,
     swap_only_ = NULL,
-    gross_exposure_ = NULL
+    gross_exposure_ = NULL,
+    get_portfolio = function() {
+      get(private$sma_name_, envir = registries$portfolios, inherits = FALSE)
+    }
   ),
   public = list(
     #' @param sma_name Character
@@ -83,6 +86,26 @@ SMARule <- R6::R6Class( #nolint
 
     #' Get Swap Only Flag
     #' @description Get the swap only flag of the SMA Rule
-    get_swap_only = function() private$swap_only_
+    get_swap_only = function() private$swap_only_,
+
+    #' Get Gross Exposure Flag
+    #' @description Get the gross exposure flag of the SMA Rule
+    get_gross_exposure = function() private$gross_exposure_,
+
+    #'Get the SMA Object
+    #' @description Get the SMA Object that this rule belongs to
+    get_sma = function() {
+      get(private$sma_name_, envir = registries$portfolios, inherits = TRUE)
+    },
+
+    #' Apply the Rule Definition
+    #' @description Apply the rule definition to a set of security IDs
+    #' @param security_id Security ID
+    apply_rule_definition = function(security_id) {
+      setNames(
+        private$definition_(security_id, private$get_portfolio()),
+        security_id
+      )
+    }
   )
 )

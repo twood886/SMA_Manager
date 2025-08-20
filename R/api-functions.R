@@ -400,14 +400,13 @@
   }
 
   trade$add_trade_qty(portfolio_id, qty)
-
   tgt_pos <- tryCatch(
     {portfolio$get_target_position(security_id)},
     error = function(e) {
       .position(portfolio_id, security_id, qty = 0, swap = swap)
     }
   )
-  existing_tgt_qty <- tgt_pos$get_qty()
+  existing_tgt_qty <- as.numeric(tgt_pos$get_qty())
   tgt_pos$set_qty(existing_tgt_qty + qty)
   portfolio$add_target_position(tgt_pos, overwrite = TRUE)
   if (assign_to_registry) {

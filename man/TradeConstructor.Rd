@@ -2,18 +2,18 @@
 % Please edit documentation in R/class-tradeconstructor.R
 \name{TradeConstructor}
 \alias{TradeConstructor}
-\title{Portfolio Constructor}
+\title{Trade Constructor Parent Class}
 \description{
-Portfolio Constructor
+Trade Constructor Parent Class
 
-Portfolio Constructor
+Trade Constructor Parent Class
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TradeConstructor-get_security_position_limits}{\code{TradeConstructor$get_security_position_limits()}}
 \item \href{#method-TradeConstructor-get_swap_flag_position_rules}{\code{TradeConstructor$get_swap_flag_position_rules()}}
-\item \href{#method-TradeConstructor-calc_trade_qty}{\code{TradeConstructor$calc_trade_qty()}}
+\item \href{#method-TradeConstructor-optimize_sma}{\code{TradeConstructor$optimize_sma()}}
 \item \href{#method-TradeConstructor-clone}{\code{TradeConstructor$clone()}}
 }
 }
@@ -22,7 +22,11 @@ Portfolio Constructor
 \if{latex}{\out{\hypertarget{method-TradeConstructor-get_security_position_limits}{}}}
 \subsection{Method \code{get_security_position_limits()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$get_security_position_limits(portfolio, security_id = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$get_security_position_limits(
+  portfolio,
+  security_id = NULL,
+  position_only = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -31,6 +35,8 @@ Portfolio Constructor
 \item{\code{portfolio}}{An object of class Portfolio}
 
 \item{\code{security_id}}{A character vector of security IDs}
+
+\item{\code{position_only}}{Logical, if TRUE only consider position rules}
 }
 \if{html}{\out{</div>}}
 }
@@ -48,31 +54,44 @@ Portfolio Constructor
 \describe{
 \item{\code{portfolio}}{An object of class Portfolio}
 
-\item{\code{security_id}}{A character vector of security IDs}
+\item{\code{security_id}}{A character vector of security IDs
+Main optimization using CVXR}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TradeConstructor-calc_trade_qty"></a>}}
-\if{latex}{\out{\hypertarget{method-TradeConstructor-calc_trade_qty}{}}}
-\subsection{Method \code{calc_trade_qty()}}{
+\if{html}{\out{<a id="method-TradeConstructor-optimize_sma"></a>}}
+\if{latex}{\out{\hypertarget{method-TradeConstructor-optimize_sma}{}}}
+\subsection{Method \code{optimize_sma()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$calc_trade_qty(
-  portfolio,
-  target_sec_id = NULL,
-  target_trade_qty = 0
+\if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$optimize_sma(
+  sma,
+  lambda_alpha = 10,
+  tau_rel = 0.001,
+  beta_free = 5,
+  alpha_min = 0.8,
+  alpha_max = 5,
+  verbose = TRUE
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{portfolio}}{An object of class Portfolio}
+\item{\code{sma}}{SMA object}
 
-\item{\code{target_sec_id}}{A character vector of target security IDs}
+\item{\code{lambda_alpha}}{Regularization parameter for alpha}
 
-\item{\code{target_trade_qty}}{A numeric vector of target trade quantities}
+\item{\code{tau_rel}}{Small denominator to stabilize relative error}
+
+\item{\code{beta_free}}{Extra weight for "unaffected" names}
+
+\item{\code{alpha_min}}{Minimum value for alpha}
+
+\item{\code{alpha_max}}{Maximum value for alpha}
+
+\item{\code{verbose}}{Print progress}
 }
 \if{html}{\out{</div>}}
 }

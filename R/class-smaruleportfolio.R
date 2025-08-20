@@ -8,86 +8,86 @@ SMARulePortfolio <- R6::R6Class( #nolint
   public = list(
     #' @description Check the rule against the current portfolio
     check_rule_current = function() {
-      private$check_rule_position_(private$get_sma_()$get_position())
+      private$check_rule_position_(self$get_sma()$get_position())
     },
     #' @description Check the rule against the target portfolio
     check_rule_target = function() {
-      private$check_rule_position_(private$get_sma_()$get_target_position())
+      private$check_rule_position_(self$get_sma()$get_target_position())
     },
     #' @description Check the swap rule against the current portfolio
-    check_swap_current = function() {
-      list("pass" = TRUE)
-    },
+    check_swap_current = function() list("pass" = TRUE),
     #' @description Check the swap rule against the target portfolio
-    check_swap_target = function() {
-      list("pass" = TRUE)
-    },
+    check_swap_target = function() list("pass" = TRUE),
 
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
-      return(setNames(sapply(security_id, \(x) FALSE), security_id))
+      setNames(sapply(security_id, \(x) FALSE), security_id)
     },
     #' @description Get the Max and Min value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
     get_security_limits = function(security_id) {
-      positions <- private$get_sma_()$get_position()
-      rule_applied_pos <- private$apply_rule_definition_positions_(positions)
-      rule_applied_pos[security_id] <- 0
-      v <- sum(rule_applied_pos, na.rm = TRUE)
-      exp <- private$apply_rule_definition_(security_id)
+      positions <- self$get_sma()$get_position()
+      applied_pos <- private$apply_rule_definition_positions_(positions)
+      applied_pos[security_id] <- 0
+      current_group_exp <- sum(applied_pos, na.rm = TRUE)
 
-      impacted <- exp[which(exp != 0)]
+      exp_factors <- replace_na(self$apply_rule_definition(security_id), 0)
 
-      remain_max <- (private$max_threshold_ - v) / length(impacted)
-      remain_min <- (private$min_threshold_ - v) / length(impacted)
+      remain_max_total <- private$max_threshold_ - current_group_exp
+      remain_min_total <- private$min_threshold_ - current_group_exp
 
+      limits <- lapply(exp_factors, function(e) {
+        if (e == 0) return(list(max = Inf, min = -Inf))
+        if (private$gross_exposure_) {
+          cap <- max(0, remain_max_total) / e
+          list(max = cap, min = -cap)
+        } else {
+          max_q <- max(0, remain_max_total / e)
+          min_q <- min(0, remain_min_total / e)
+          list(max = max_q, min = min_q)
+        }
+      })
+      setNames(limits, security_id)
+    },
+
+    #' Check if a position set would violate this rule
+    #' @param shares Named vector of shares
+    #' @param tolerance Numerical tolerance for constraint checking
+    check_violations = function(shares, tolerance = 1e-6) {
+      factors <- self$apply_rule_definition(names(shares))
+      factors[is.na(factors)] <- 0
+
+      value <- sum(factors * shares)
       if (private$gross_exposure_) {
-        .set_ind_sec_limits <- function(exp) {
-          if (exp == 0) {
-            max <- +Inf
-          } else {
-            max <- max(0, remain_max) / exp
-          }
-          list("max" = max, "min" = -max)
-        }
-      } else {
-        .set_ind_sec_limits <- function(exp) {
-          if (exp == 0) {
-            max <- +Inf
-            min <- -Inf
-          } else {
-            max <- max(0, remain_max / exp)
-            min <- min(0, remain_min / exp)
-          }
-          list("max" = max, "min" = min)
-        }
+        value <- sum(factors * abs(shares))
       }
-      out <- lapply(exp, .set_ind_sec_limits)
-      names(out) <- security_id
-      out
+      max_t <- private$max_threshold_
+      min_t <- private$min_threshold_
+
+      list(
+        rule_name = private$name_,
+        scope = private$scope_,
+        value = value,
+        min_threshold = min_t,
+        max_threshold = max_t,
+        violates_max = is.finite(max_t) && value > max_t + tolerance,
+        violates_min = is.finite(min_t) && value < min_t - tolerance,
+        slack_to_max = if(is.finite(max_t)) max_t - value else Inf,
+        slack_to_min = if(is.finite(min_t)) value - min_t else Inf,
+        is_gross = private$gross_exposure_
+      )
     }
   ),
   private = list(
-    get_sma_ = function() {
-      get(private$sma_name_, envir = registries$portfolios, inherits = TRUE)
-    },
-    apply_rule_definition_ = function(security_id) {
-      private$definition_(security_id, private$get_sma_())
-    },
     apply_rule_definition_positions_  = function(positions) {
-      if (length(positions) == 0) {
-        return(numeric(0))
-      }
+      if (length(positions) == 0) return(numeric(0))
       security_ids <- sapply(positions, \(x) x$get_id())
       pos_qty <- vapply(positions, \(x) x$get_qty(), numeric(1))
-      if (private$gross_exposure_) {
-        pos_qty <- abs(pos_qty)
-      }
-      rule_applied <- pos_qty * private$apply_rule_definition_(security_ids)
-      names(rule_applied) <- security_ids
-      rule_applied
+      if (private$gross_exposure_) pos_qty <- abs(pos_qty)
+      rule_applied <- pos_qty * self$apply_rule_definition(security_ids)
+      setNames(rule_applied, security_ids)
     },
     check_rule_position_ = function(positions) {
       rule_applied <- private$apply_rule_definition_positions_(positions)

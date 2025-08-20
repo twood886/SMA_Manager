@@ -20,19 +20,26 @@ SMA Rule for Portfolio
 \item \href{#method-SMARulePortfolio-check_swap_target}{\code{SMARulePortfolio$check_swap_target()}}
 \item \href{#method-SMARulePortfolio-check_swap_security}{\code{SMARulePortfolio$check_swap_security()}}
 \item \href{#method-SMARulePortfolio-get_security_limits}{\code{SMARulePortfolio$get_security_limits()}}
+\item \href{#method-SMARulePortfolio-build_constraint_matrix}{\code{SMARulePortfolio$build_constraint_matrix()}}
+\item \href{#method-SMARulePortfolio-check_violation}{\code{SMARulePortfolio$check_violation()}}
+\item \href{#method-SMARulePortfolio-build_objective_penalty}{\code{SMARulePortfolio$build_objective_penalty()}}
+\item \href{#method-SMARulePortfolio-compute_lambda}{\code{SMARulePortfolio$compute_lambda()}}
 \item \href{#method-SMARulePortfolio-clone}{\code{SMARulePortfolio$clone()}}
 }
 }
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="apply_rule_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-apply_rule_definition'><code>SMAManager::SMARule$apply_rule_definition()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_bbfields"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_bbfields'><code>SMAManager::SMARule$get_bbfields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_gross_exposure"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_gross_exposure'><code>SMAManager::SMARule$get_gross_exposure()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_min_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_min_threshold'><code>SMAManager::SMARule$get_min_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_name'><code>SMAManager::SMARule$get_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_scope"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_scope'><code>SMAManager::SMARule$get_scope()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma'><code>SMAManager::SMARule$get_sma()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma_name'><code>SMAManager::SMARule$get_sma_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
@@ -114,6 +121,90 @@ Get the Max and Min value of the security based on the rule
 }
 \subsection{Returns}{
 List of Max and Min Value
+Build constraint matrix for portfolio rule
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePortfolio-build_constraint_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-build_constraint_matrix}{}}}
+\subsection{Method \code{build_constraint_matrix()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_constraint_matrix(securities, expected_signs = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{securities}}{Vector of security IDs}
+
+\item{\code{expected_signs}}{Expected signs of positions for gross exposure
+Check if a position set would violate this rule}
+
+\item{\code{prices}}{Named vector of security prices}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePortfolio-check_violation"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_violation}{}}}
+\subsection{Method \code{check_violation()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_violation(shares, tolerance = 1e-06)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{shares}}{Named vector of shares}
+
+\item{\code{tolerance}}{Numerical tolerance for constraint checking
+Get the contribution to the objective function for soft constraints}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePortfolio-build_objective_penalty"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-build_objective_penalty}{}}}
+\subsection{Method \code{build_objective_penalty()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_objective_penalty(
+  securities,
+  target_positions,
+  lambda_soft = 0.1
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{securities}}{Vector of security IDs}
+
+\item{\code{target_positions}}{Target positions for these securities}
+
+\item{\code{lambda_soft}}{Penalty weight for soft constraints}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePortfolio-compute_lambda"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-compute_lambda}{}}}
+\subsection{Method \code{compute_lambda()}}{
+Heuristic auto-scale of lambda
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$compute_lambda(want, tol_frac = 0.01)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{want}}{named numeric vector of target shares}
+
+\item{\code{tol_frac}}{tolerance fraction for auto-scaling lambda (default 0.01)}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

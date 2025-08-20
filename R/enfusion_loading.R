@@ -206,7 +206,7 @@ create_sma_from_enfusion <- function(
     return(invisible(NULL))
   }
 
-  for (i in 1:nrow(trade_report)) {
+  for (i in seq_len(nrow(trade_report))) {
     x <- trade_report[i, ]
     id <- switch(
       x[["Instrument Type"]],
@@ -215,6 +215,7 @@ create_sma_from_enfusion <- function(
       "Equity" = x[["BB Yellow Key"]],
       x[["Description"]]
     )
+    id <- tolower(id)
 
     remain <- as.numeric(x[["Order Remaining Quantity"]])
     total <- as.numeric(x[["Notional Quantity"]])

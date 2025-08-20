@@ -19,6 +19,9 @@ R6 Class that encapsultes rules for SMAs.
 \item \href{#method-SMARule-get_max_threshold}{\code{SMARule$get_max_threshold()}}
 \item \href{#method-SMARule-get_min_threshold}{\code{SMARule$get_min_threshold()}}
 \item \href{#method-SMARule-get_swap_only}{\code{SMARule$get_swap_only()}}
+\item \href{#method-SMARule-get_gross_exposure}{\code{SMARule$get_gross_exposure()}}
+\item \href{#method-SMARule-get_sma}{\code{SMARule$get_sma()}}
+\item \href{#method-SMARule-apply_rule_definition}{\code{SMARule$apply_rule_definition()}}
 \item \href{#method-SMARule-clone}{\code{SMARule$clone()}}
 }
 }
@@ -158,10 +161,50 @@ Get Swap Only Flag
 \if{latex}{\out{\hypertarget{method-SMARule-get_swap_only}{}}}
 \subsection{Method \code{get_swap_only()}}{
 Get the swap only flag of the SMA Rule
+Get Gross Exposure Flag
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARule$get_swap_only()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_gross_exposure"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_gross_exposure}{}}}
+\subsection{Method \code{get_gross_exposure()}}{
+Get the gross exposure flag of the SMA Rule
+Get the SMA Object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_gross_exposure()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_sma"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_sma}{}}}
+\subsection{Method \code{get_sma()}}{
+Get the SMA Object that this rule belongs to
+Apply the Rule Definition
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_sma()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-apply_rule_definition"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-apply_rule_definition}{}}}
+\subsection{Method \code{apply_rule_definition()}}{
+Apply the rule definition to a set of security IDs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$apply_rule_definition(security_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARule-clone"></a>}}

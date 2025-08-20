@@ -239,6 +239,7 @@ Portfolio <- R6::R6Class( #nolint
       }
       original_security <- tolower(original_security)
       replacement_security <- tolower(replacement_security)
+      .security(replacement_security)
       private$replacements_[[original_security]] <- replacement_security
       invisible(self)
     },
