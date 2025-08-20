@@ -120,7 +120,10 @@ Portfolio <- R6::R6Class( #nolint
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
     #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
-    get_security_position_limits = function(security_id = NULL, update_bbfields = TRUE) { #nolint
+    get_security_position_limits = function(
+      security_id = NULL,
+      update_bbfields = TRUE
+    ) {
       assert_bool(update_bbfields, "update_bbfields")
       if (update_bbfields) {
         update_bloomberg_fields()
@@ -130,27 +133,16 @@ Portfolio <- R6::R6Class( #nolint
     #' @description Get Swap Flag for a given security
     #' @param security_id Security ID
     #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
-    get_swap_flag_position_rules = function(security_id = NULL, update_bbfields = TRUE) { #nolint
+    get_swap_flag_position_rules = function(
+      security_id = NULL,
+      update_bbfields = TRUE
+    ) {
       assert_bool(update_bbfields, "update_bbfields")
       if (update_bbfields) {
         update_bloomberg_fields()
       }
       private$trade_constructor$get_swap_flag_position_rules(self, security_id)
     },
-    #' @description Calculate the trade quantity for a given security
-    #' @param security_id Security ID
-    #' @param trade_qty Trade quantity (default: 0)
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
-    calc_proposed_trade = function(security_id = NULL, trade_qty = NULL, update_bbfields = TRUE) { #nolint
-      assert_string(security_id, "security_id")
-      assert_numeric(trade_qty, "trade_qty")
-      assert_bool(update_bbfields, "update_bbfields")
-      if (update_bbfields) {
-        update_bloomberg_fields()
-      }
-      self$get_trade_constructor()$calc_trade_qty(self, security_id, trade_qty)
-    },
-
     # Setter Functions ---------------------------------------------------------
     #' @description
     #' Add flow to portfolio
@@ -197,7 +189,7 @@ Portfolio <- R6::R6Class( #nolint
       )
       if (!is.null(existing_pos)) {
         if (overwrite) {
-          self$remove_target_position(position$get_id())
+          self$remove_target_position(existing_pos$get_id())
           private$target_positions_ <- c(private$target_positions_, position)
         }
       } else {
@@ -209,15 +201,16 @@ Portfolio <- R6::R6Class( #nolint
     #' Remove existing Target Position from Portfolio
     #' @param position_id Position ID
     remove_target_position = function(position_id = NULL) {
-      if(is.null(position_id)) {
+      if (is.null(position_id)) {
         private$target_positions_ <- list()
         return(invisible(NULL))
       }
-      position_ids <- sapply(private$target_positions_, \(x) x$get_id())
+      position_ids <- sapply(self$get_target_position(), \(x) x$get_id())
       if (position_id %in% position_ids) {
-        private$target_positions_ <- private$target_positions_[position_ids != position_id] #nolint
+        pos_idx <- which(position_ids != position_id)
+        private$target_positions_ <- private$target_positions_[pos_idx]
       }
-      invisible(self)
+      invisible(NULL)
     },
     #' Add Rule
     #' @description Create Rule and Add to Portfolio
@@ -225,7 +218,7 @@ Portfolio <- R6::R6Class( #nolint
     add_rule = function(rule) {
       assert_inherits(rule, "SMARule", "rule")
       private$rules_[[rule$get_name()]] <- rule
-      invisible(self)
+      invisible(rule)
     },
     #' Add Replacement
     #' @description Add replacement securitity
@@ -241,10 +234,10 @@ Portfolio <- R6::R6Class( #nolint
       replacement_security <- tolower(replacement_security)
       .security(replacement_security)
       private$replacements_[[original_security]] <- replacement_security
-      invisible(self)
+      invisible(NULL)
     },
-
-    #' Updaters ----------------------------------------------------------------
+    # Updaters -----------------------------------------------------------------
+    #' Update Enfusion Data
     #' @description Update Positions
     #' @param url URL to fetch Enfusion Holdings Report
     update_enfusion = function() {
@@ -253,9 +246,7 @@ Portfolio <- R6::R6Class( #nolint
         !is.na(.data$Description) & .data$`Instrument Type` != "Cash"
       )
       nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
-      if (is.na(nav)) {
-        nav <- 0
-      }
+      if (is.na(nav)) nav <- 0
       private$nav_ <- nav
       positions <- .bulk_security_positions(
         enfusion_report = enfusion_report,
@@ -264,6 +255,37 @@ Portfolio <- R6::R6Class( #nolint
       private$positions_ <- positions
       private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
       .bulk_trade_positions(private$trade_url_, self)
+      invisible(self)
+    },
+    # Calculators --------------------------------------------------------------
+    #' Rebalance Portfolio
+    #' @description Calculate the trade quantity for a given security
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
+    #' @param as.df Logical. Return as data frame (default: TRUE)
+    rebalance = function(update_bbfields = TRUE, as.df = TRUE) {
+      assert_bool(update_bbfields, "update_bbfields")
+      if (update_bbfields) update_bloomberg_fields()
+      rebal <- self$get_trade_constructor()$optimize_sma(self, verbose = FALSE)
+      current_shares <- sapply(
+        self$get_target_position(),
+        \(pos) setNames(pos$get_qty(), pos$get_id())
+      )
+      sec_ids <- unique(c(
+        names(rebal$target_weights),
+        names(current_shares)
+      ))
+
+      if (!as.df) return(rebal)
+      data.frame(
+        security_id   = sec_ids,
+        target_weights = tidyr::replace_na(rebal$target_weights[sec_ids], 0),
+        final_weights = tidyr::replace_na(rebal_list$weights[sec_ids], 0),
+        final_shares  = tidyr::replace_na(rebal_list$shares[sec_ids], 0),
+        trade = tidyr::replace_na(rebal_list$shares[sec_ids], 0) -
+          tidyr::replace_na(current_shares[sec_ids], 0),
+        stringsAsFactors = FALSE,
+        row.names = NULL
+      )
     }
   )
 )

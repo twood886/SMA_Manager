@@ -59,7 +59,7 @@
         bics_level_3 = data[id, "BI013"]
       )
       assign(bbid, security, envir = env)
-    } 
+    }
   }
 
   positions <- lapply(
@@ -198,8 +198,7 @@ create_sma_from_enfusion <- function(
 
   trade_report <- dplyr::filter(
     enfusion::get_enfusion_report(trade_url),
-    !is.na(.data$Description) &
-    .data$`Order Remaining Quantity` != 0
+    !is.na(.data$Description) & .data$`Order Remaining Quantity` != 0
   )
 
   if (nrow(trade_report) == 0) {
@@ -219,9 +218,7 @@ create_sma_from_enfusion <- function(
 
     remain <- as.numeric(x[["Order Remaining Quantity"]])
     total <- as.numeric(x[["Notional Quantity"]])
-    if (total < 0) {
-      remain <- -remain
-    }
+    if (total < 0) remain <- -remain
 
     .trade(
       security_id = id,

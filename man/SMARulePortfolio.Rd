@@ -20,10 +20,7 @@ SMA Rule for Portfolio
 \item \href{#method-SMARulePortfolio-check_swap_target}{\code{SMARulePortfolio$check_swap_target()}}
 \item \href{#method-SMARulePortfolio-check_swap_security}{\code{SMARulePortfolio$check_swap_security()}}
 \item \href{#method-SMARulePortfolio-get_security_limits}{\code{SMARulePortfolio$get_security_limits()}}
-\item \href{#method-SMARulePortfolio-build_constraint_matrix}{\code{SMARulePortfolio$build_constraint_matrix()}}
-\item \href{#method-SMARulePortfolio-check_violation}{\code{SMARulePortfolio$check_violation()}}
-\item \href{#method-SMARulePortfolio-build_objective_penalty}{\code{SMARulePortfolio$build_objective_penalty()}}
-\item \href{#method-SMARulePortfolio-compute_lambda}{\code{SMARulePortfolio$compute_lambda()}}
+\item \href{#method-SMARulePortfolio-check_violations}{\code{SMARulePortfolio$check_violations()}}
 \item \href{#method-SMARulePortfolio-clone}{\code{SMARulePortfolio$clone()}}
 }
 }
@@ -121,36 +118,15 @@ Get the Max and Min value of the security based on the rule
 }
 \subsection{Returns}{
 List of Max and Min Value
-Build constraint matrix for portfolio rule
+Check if a position set would violate this rule
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-build_constraint_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-build_constraint_matrix}{}}}
-\subsection{Method \code{build_constraint_matrix()}}{
+\if{html}{\out{<a id="method-SMARulePortfolio-check_violations"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_violations}{}}}
+\subsection{Method \code{check_violations()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_constraint_matrix(securities, expected_signs = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{securities}}{Vector of security IDs}
-
-\item{\code{expected_signs}}{Expected signs of positions for gross exposure
-Check if a position set would violate this rule}
-
-\item{\code{prices}}{Named vector of security prices}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-check_violation"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_violation}{}}}
-\subsection{Method \code{check_violation()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_violation(shares, tolerance = 1e-06)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_violations(shares, tolerance = 1e-06)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -158,51 +134,7 @@ Check if a position set would violate this rule}
 \describe{
 \item{\code{shares}}{Named vector of shares}
 
-\item{\code{tolerance}}{Numerical tolerance for constraint checking
-Get the contribution to the objective function for soft constraints}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-build_objective_penalty"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-build_objective_penalty}{}}}
-\subsection{Method \code{build_objective_penalty()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_objective_penalty(
-  securities,
-  target_positions,
-  lambda_soft = 0.1
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{securities}}{Vector of security IDs}
-
-\item{\code{target_positions}}{Target positions for these securities}
-
-\item{\code{lambda_soft}}{Penalty weight for soft constraints}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-compute_lambda"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-compute_lambda}{}}}
-\subsection{Method \code{compute_lambda()}}{
-Heuristic auto-scale of lambda
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$compute_lambda(want, tol_frac = 0.01)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{want}}{named numeric vector of target shares}
-
-\item{\code{tol_frac}}{tolerance fraction for auto-scaling lambda (default 0.01)}
+\item{\code{tolerance}}{Numerical tolerance for constraint checking}
 }
 \if{html}{\out{</div>}}
 }

@@ -387,8 +387,8 @@
     envir = registries$trades,
     inherits = TRUE
   )
-  all_trades_ids <- vapply(all_trades, function(x) x$get_security_id(), character(1)) #nolint
-  all_trades_swap_flag <- vapply(all_trades, function(x) x$get_swap_flag(), logical(1)) #nolint
+  all_trades_ids <- vapply(all_trades, \(x) x$get_security_id(), character(1))
+  all_trades_swap_flag <- vapply(all_trades, \(x) x$get_swap_flag(), logical(1))
   sec_trades <- all_trades[all_trades_ids == security_id & all_trades_swap_flag == swap] #nolint
 
   if (!create) return(sec_trades)

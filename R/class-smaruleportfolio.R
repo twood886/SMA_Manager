@@ -74,8 +74,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
         max_threshold = max_t,
         violates_max = is.finite(max_t) && value > max_t + tolerance,
         violates_min = is.finite(min_t) && value < min_t - tolerance,
-        slack_to_max = if(is.finite(max_t)) max_t - value else Inf,
-        slack_to_min = if(is.finite(min_t)) value - min_t else Inf,
+        slack_to_max = if (is.finite(max_t)) max_t - value else Inf,
+        slack_to_min = if (is.finite(min_t)) value - min_t else Inf,
         is_gross = private$gross_exposure_
       )
     }

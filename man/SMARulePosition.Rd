@@ -18,7 +18,6 @@ R6 Class that encapsulates rule for SMAs
 \item \href{#method-SMARulePosition-check_swap_target}{\code{SMARulePosition$check_swap_target()}}
 \item \href{#method-SMARulePosition-get_security_limits}{\code{SMARulePosition$get_security_limits()}}
 \item \href{#method-SMARulePosition-check_swap_security}{\code{SMARulePosition$check_swap_security()}}
-\item \href{#method-SMARulePosition-build_constraint_matrix}{\code{SMARulePosition$build_constraint_matrix()}}
 \item \href{#method-SMARulePosition-check_violations}{\code{SMARulePosition$check_violations()}}
 \item \href{#method-SMARulePosition-clone}{\code{SMARulePosition$clone()}}
 }
@@ -118,23 +117,6 @@ Get the swap flag for a given security
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID
-Build constraint matrix for position rule}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-build_constraint_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-build_constraint_matrix}{}}}
-\subsection{Method \code{build_constraint_matrix()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$build_constraint_matrix(securities)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{securities}}{Vector of security IDs
 Check violations for specific securities}
 }
 \if{html}{\out{</div>}}

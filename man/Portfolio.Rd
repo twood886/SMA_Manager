@@ -22,7 +22,6 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-check_rules_current}{\code{Portfolio$check_rules_current()}}
 \item \href{#method-Portfolio-get_security_position_limits}{\code{Portfolio$get_security_position_limits()}}
 \item \href{#method-Portfolio-get_swap_flag_position_rules}{\code{Portfolio$get_swap_flag_position_rules()}}
-\item \href{#method-Portfolio-calc_proposed_trade}{\code{Portfolio$calc_proposed_trade()}}
 \item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
@@ -30,6 +29,7 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-add_rule}{\code{Portfolio$add_rule()}}
 \item \href{#method-Portfolio-add_replacement}{\code{Portfolio$add_replacement()}}
 \item \href{#method-Portfolio-update_enfusion}{\code{Portfolio$update_enfusion()}}
+\item \href{#method-Portfolio-rebalance}{\code{Portfolio$rebalance()}}
 \item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
 }
@@ -253,31 +253,6 @@ Get Swap Flag for a given security
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-calc_proposed_trade"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-calc_proposed_trade}{}}}
-\subsection{Method \code{calc_proposed_trade()}}{
-Calculate the trade quantity for a given security
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$calc_proposed_trade(
-  security_id = NULL,
-  trade_qty = NULL,
-  update_bbfields = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-
-\item{\code{trade_qty}}{Trade quantity (default: 0)}
-
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-add_flow"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-add_flow}{}}}
 \subsection{Method \code{add_flow()}}{
@@ -386,7 +361,7 @@ Add replacement securitity
 \item{\code{original_security}}{The original Security id}
 
 \item{\code{replacement_security}}{The replacement Security id
-Updaters ----------------------------------------------------------------}
+Update Enfusion Data}
 }
 \if{html}{\out{</div>}}
 }
@@ -403,7 +378,27 @@ Update Positions
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{url}}{URL to fetch Enfusion Holdings Report}
+\item{\code{url}}{URL to fetch Enfusion Holdings Report
+Rebalance Portfolio}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-rebalance"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-rebalance}{}}}
+\subsection{Method \code{rebalance()}}{
+Calculate the trade quantity for a given security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$rebalance(update_bbfields = TRUE, as.df = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE)}
+
+\item{\code{as.df}}{Logical. Return as data frame (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }

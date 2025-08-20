@@ -20,11 +20,11 @@ TradeConstructor <- R6::R6Class( #nolint
     ) {
       if (is.null(security_id)) stop("Security ID must be supplied")
       rules <- Filter(\(r) !r$get_swap_only(), portfolio$get_rules())
-      
+
       if (position_only) {
         rules <- Filter(\(r) r$get_scope() == "position", rules)
       }
-      
+
       limits <- lapply(rules, \(r) r$get_security_limits(security_id))
 
       setNames(
@@ -110,8 +110,8 @@ TradeConstructor <- R6::R6Class( #nolint
       sgn <- sign(t_w)
 
       # share limits -> weight limits
-      w_min <- rep(-Inf, n); names(w_min) <- all_securities
-      w_max <- rep( Inf, n); names(w_max) <- all_securities
+      w_min <- setNames(rep(-Inf, n), all_securities)
+      w_max <- setNames(rep(Inf, n), all_securities)
       for (i in seq_len(n)) {
         sec  <- all_securities[i]
         lims <- self$get_security_position_limits(sma, sec, TRUE)
@@ -134,8 +134,8 @@ TradeConstructor <- R6::R6Class( #nolint
       # zero-target names that are not overflow targets -> clamp to 0
       S_ids <- names(replacements)
       T_ids <- if (length(replacements)) {
-        unique(unlist(replacements, use.names = FALSE)) 
-      } else{
+        unique(unlist(replacements, use.names = FALSE))
+      } else {
         character()
       }
       zero_idx <- which(abs(t_w) < 1e-12)
@@ -182,7 +182,8 @@ TradeConstructor <- R6::R6Class( #nolint
       for (rule in Filter(\(r) !isTRUE(r$get_gross_exposure()), rules_ptfl)) {
         f_raw <- rule$apply_rule_definition(all_securities)
         gamma <- .gamma_from_f(f_raw, all_securities, nav, price_vec)
-        max_t <- rule$get_max_threshold(); min_t <- rule$get_min_threshold()
+        max_t <- rule$get_max_threshold()
+        min_t <- rule$get_min_threshold()
         port_val <- CVXR::sum_entries(gamma * w)
         if (is.finite(max_t)) cons <- c(cons, list(port_val <= max_t))
         if (is.finite(min_t)) cons <- c(cons, list(port_val >= min_t))
@@ -195,7 +196,7 @@ TradeConstructor <- R6::R6Class( #nolint
           tgt_ids <- as.character(replacements[[src]])
           tgt_idx <- match(tgt_ids, all_securities)
           tgt_idx <- tgt_idx[!is.na(tgt_idx)]
-          if (is.na(src_idx) || length(tgt_idx)==0) next
+          if (is.na(src_idx) || length(tgt_idx) == 0) next
 
           if (t_w[src_idx] >= 0) {
             cons <- c(cons, list(w[src_idx] <= alpha * t_w[src_idx]))
@@ -211,7 +212,10 @@ TradeConstructor <- R6::R6Class( #nolint
           }
           cons <- c(
             cons,
-            list((alpha * t_w[src_idx] - w[src_idx]) == CVXR::sum_entries(w[tgt_idx] - alpha * t_w[tgt_idx]))
+            list((
+                  alpha * t_w[src_idx] - w[src_idx]) ==
+              CVXR::sum_entries(w[tgt_idx] - alpha * t_w[tgt_idx]
+              ))
           )
         }
       }
@@ -221,7 +225,10 @@ TradeConstructor <- R6::R6Class( #nolint
       base_err <- (w - alpha * t_w) / denom
 
       # "unaffected" = not in overflow sets and not in any subset gross rule
-      affected <- (names(all_securities) %in% S_ids) | (names(all_securities) %in% T_ids) | subset_union
+      affected <-
+        (names(all_securities) %in% S_ids) |
+        (names(all_securities) %in% T_ids) |
+        subset_union
       free_idx <- which(!affected)
 
       term_base <- CVXR::sum_squares(base_err)
@@ -234,8 +241,8 @@ TradeConstructor <- R6::R6Class( #nolint
 
       objective <- CVXR::Minimize(
         term_base + term_free +
-        lambda_alpha * CVXR::square(alpha - 1) +
-        10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)   # soft net anchor
+          lambda_alpha * CVXR::square(alpha - 1) +
+          10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)   # soft net anchor
       )
 
       prob <- CVXR::Problem(objective, cons)
@@ -243,7 +250,7 @@ TradeConstructor <- R6::R6Class( #nolint
       # solve
       res <- tryCatch({
         CVXR::solve(
-          prob, 
+          prob,
           solver = "OSQP",
           verbose = FALSE,
           eps_abs = 1e-8,
@@ -257,13 +264,13 @@ TradeConstructor <- R6::R6Class( #nolint
           prob,
           solver = "ECOS",
           verbose = FALSE,
-          abstol = 1e-8, 
+          abstol = 1e-8,
           reltol = 1e-8,
           feastol = 1e-8
         )
       })
 
-      if (!(res$status %in% c("optimal","optimal_inaccurate","solved")))
+      if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved")))
         stop(sprintf("Optimization failed with status: %s", res$status))
 
       w_hat     <- setNames(as.numeric(res$getValue(w)), all_securities)
@@ -292,15 +299,12 @@ TradeConstructor <- R6::R6Class( #nolint
   private = list(
     .extract_qty = function(positions) {
       if (length(positions) == 0) return(numeric(0))
-      
       ids <- vapply(positions, function(x) x$get_id(), character(1))
       qty <- vapply(positions, function(x) x$get_qty(), numeric(1))
-      
       # Clean up non-finite values
       if (any(!is.finite(qty))) {
         qty[!is.finite(qty)] <- 0
       }
-      
       setNames(qty, ids)
     }
   )
@@ -393,18 +397,14 @@ SMAConstructor <- R6::R6Class( #nolint
     calc_target_quantities = function(sma) {
       base <- sma$get_base_portfolio()
       scale_ratio <- self$get_scale_ratio(base, sma)
-
       # Get base positions
       base_positions <- private$.extract_qty(base$get_target_position())
-      
       # Scale all base positions by NAV ratio
       target_quantities <- base_positions * scale_ratio
-      
       # Clean up non-finite values
       if (any(!is.finite(target_quantities))) {
         target_quantities[!is.finite(target_quantities)] <- 0
       }
-
       # Include replacement securities
       replacements <- sma$get_replacement_security()
       replacement_secs <- unlist(replacements, use.names = FALSE)
@@ -413,7 +413,6 @@ SMAConstructor <- R6::R6Class( #nolint
           target_quantities[sec] <- 0
         }
       }
-      
       target_quantities
     }
   )
