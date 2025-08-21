@@ -17,8 +17,6 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
-\item \href{#method-SMA-calc_proposed_rebalance_trade}{\code{SMA$calc_proposed_rebalance_trade()}}
-\item \href{#method-SMA-mimic_base_portfolio}{\code{SMA$mimic_base_portfolio()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -113,59 +111,6 @@ Get a position in the Base portfolio
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-calc_proposed_rebalance_trade"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-calc_proposed_rebalance_trade}{}}}
-\subsection{Method \code{calc_proposed_rebalance_trade()}}{
-Calculate the rebalance trade quantity for a given security
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$calc_proposed_rebalance_trade(
-  security_id = NULL,
-  base_trade_qty = 0,
-  update_bbfields = TRUE,
-  as.data.frame = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-
-\item{\code{base_trade_qty}}{Base trade quantity (default: 0)}
-
-\item{\code{update_bbfields}}{Update Bloomberg fields (default: TRUE)}
-
-\item{\code{as.data.frame}}{Return as data frame (default: TRUE)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-mimic_base_portfolio"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-mimic_base_portfolio}{}}}
-\subsection{Method \code{mimic_base_portfolio()}}{
-mimic the base portfolio target position
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$mimic_base_portfolio(
-  security_id = NULL,
-  update_bbfields = TRUE,
-  assign_to_registry = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-
-\item{\code{update_bbfields}}{Update Bloomberg fields (default: FALSE)}
-
-\item{\code{assign_to_registry}}{Assign to registry (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }

@@ -279,9 +279,9 @@ Portfolio <- R6::R6Class( #nolint
       data.frame(
         security_id   = sec_ids,
         target_weights = tidyr::replace_na(rebal$target_weights[sec_ids], 0),
-        final_weights = tidyr::replace_na(rebal_list$weights[sec_ids], 0),
-        final_shares  = tidyr::replace_na(rebal_list$shares[sec_ids], 0),
-        trade = tidyr::replace_na(rebal_list$shares[sec_ids], 0) -
+        final_weights = tidyr::replace_na(rebal$weights[sec_ids], 0),
+        final_shares  = tidyr::replace_na(rebal$shares[sec_ids], 0),
+        trade = tidyr::replace_na(rebal$shares[sec_ids], 0) -
           tidyr::replace_na(current_shares[sec_ids], 0),
         stringsAsFactors = FALSE,
         row.names = NULL
