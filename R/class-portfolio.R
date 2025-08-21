@@ -241,20 +241,31 @@ Portfolio <- R6::R6Class( #nolint
     #' @description Update Positions
     #' @param url URL to fetch Enfusion Holdings Report
     update_enfusion = function() {
+      t1 <- Sys.time()
       enfusion_report <- dplyr::filter(
         enfusion::get_enfusion_report(private$holdings_url_),
         !is.na(.data$Description) & .data$`Instrument Type` != "Cash"
       )
+      t2 <- Sys.time()
+      message("Enfusion report fetched in ", round(difftime(t2, t1, units = "secs"), 2), " seconds") #nolint
       nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
       if (is.na(nav)) nav <- 0
       private$nav_ <- nav
+      t3 <- Sys.time()
+      message("NAV extracted in ", round(difftime(t3, t2, units = "secs"), 2), " seconds") #nolint
       positions <- .bulk_security_positions(
         enfusion_report = enfusion_report,
         portfolio_short_name = private$short_name_
       )
+      t4 <- Sys.time()
+      message("Positions extracted in ", round(difftime(t4, t3, units = "secs"), 2), " seconds") #nolint
       private$positions_ <- positions
       private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
+      t5 <- Sys.time()
+      message("Target positions updated in ", round(difftime(t5, t4, units = "secs"), 2), " seconds") #nolint
       .bulk_trade_positions(private$trade_url_, self)
+      t6 <- Sys.time()
+      message("Trade positions updated in ", round(difftime(t6, t5, units = "secs"), 2), " seconds") #nolint
       invisible(self)
     },
     # Calculators --------------------------------------------------------------
