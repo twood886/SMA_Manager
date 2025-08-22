@@ -65,6 +65,7 @@ TradeConstructor <- R6::R6Class( #nolint
     #' @param alpha_min Minimum value for alpha
     #' @param alpha_max Maximum value for alpha
     #' @param verbose Print progress
+    #' @importFrom stats setNames
     optimize_sma = function(
       sma,
       lambda_alpha   = 10,
@@ -78,7 +79,9 @@ TradeConstructor <- R6::R6Class( #nolint
         cat("\n=== SMA Optimization (relative-L2 in weight space) ===\n\n")
       }
 
-      `%||%` <- function(x, y) if (is.null(x)) y else x
+      `%||%` <- function(x, y) {
+        if (is.null(x) || length(x) == 0 || (length(x) == 1 && is.na(x))) y else x #nolint
+      }
 
       # --- Data
       target_quantities <- self$calc_target_quantities(sma)
@@ -252,7 +255,7 @@ TradeConstructor <- R6::R6Class( #nolint
         CVXR::solve(
           prob,
           solver = "OSQP",
-          verbose = FALSE,
+          verbose = verbose,
           eps_abs = 1e-8,
           eps_rel = 1e-8,
           max_iter = 200000,
@@ -263,7 +266,7 @@ TradeConstructor <- R6::R6Class( #nolint
         CVXR::solve(
           prob,
           solver = "ECOS",
-          verbose = FALSE,
+          verbose = verbose,
           abstol = 1e-8,
           reltol = 1e-8,
           feastol = 1e-8
