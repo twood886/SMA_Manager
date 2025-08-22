@@ -5,13 +5,13 @@
 #'  Rules.
 #'
 #' @import R6
-#' @import enfusion
 #' @include class-portfolio.R
 #' @include class-position.R
 #' @include class-security.R
 #' @include utils.R
 #' @include api-functions.R
 #' @include class-tradeconstructor.R
+#' @include enfusion_loading.R
 #' @export
 SMA <- R6::R6Class(   #nolint
   "SMA",
@@ -31,7 +31,13 @@ SMA <- R6::R6Class(   #nolint
     #' @param base_portfolio An object representing the base portfolio.
     #' @return A new instance of the SMA class.
     initialize = function(
-      long_name, short_name, holdings_url, trade_url, nav, positions = NULL, base_portfolio = NULL
+      long_name,
+      short_name,
+      holdings_url,
+      trade_url,
+      nav,
+      positions = NULL,
+      base_portfolio = NULL
     ) {
       private$long_name_ <- long_name
       private$short_name_ <- short_name
@@ -45,13 +51,10 @@ SMA <- R6::R6Class(   #nolint
       private$replacements_ <- list()
       private$trade_constructor <- SMAConstructor$new()
     },
-
-
     # Getters ------------------------------------------------------------------
     #' Get Base Portfolio
     #' @description Get the tagret portfolio
     get_base_portfolio = function() private$base_portfolio_,
-
     #' Get Base Portfolio Position
     #' @description Get a position in the Base portfolio
     #' @param security_id Security ID

@@ -1,3 +1,59 @@
+#' @title Check connection to Enfusion
+#' @description Checks connection to Enfusion based on whether a users is logged
+#'  into Enfusion or not. Returns TRUE if logged in, FALSE if not.
+#' @importFrom httr GET
+#' @returns Bool
+#' @export
+check_enfusion_connection <- function() {
+  tryCatch(
+    {
+      httr::GET("http://127.0.0.1:18443/exportReport")
+      TRUE
+    },
+    error = function(cond) {
+      FALSE
+    }
+  )
+}
+
+#' @title Download Enfusion Report Using API from Excel Add-In
+#' @description This function downloads Enfusion reports using the same API as
+#'  the Enfusion Excel Add-In. This cicumvents the need to use the REST API
+#'  which is an additional cost the Enfusion License. It requires logging into
+#'  the enfusion application which can be accomplished using the launch
+#'  enfusion function.
+#' @param reportWebServiceURL The Enfusion Report URL.
+#'  Same as the one used when downloading reports in Excel.
+#' @importFrom httr GET
+#' @importFrom readr read_csv
+#' @importFrom dplyr if_all
+#' @importFrom dplyr everything
+#' @examples
+#' library(enfusion)
+#' enfusion_process <- launch_enfusion("username", "password")
+#' reportWebServiceURL <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=test.trb" #nolint
+#' get_enfusion_report(reportWebServiceURL, enfusion_process)
+#' @export
+get_enfusion_report <- function(reportWebServiceURL) { #nolint
+  if (!check_enfusion_connection()) {
+    stop("Enfusion is not Running")
+  }
+  # Change Web Service URL from rest API to app
+  report_url <- gsub(
+    "https://webservices.enfusionsystems.com/mobile/rest/reportservice/",
+    "http://127.0.0.1:18443/",
+    reportWebServiceURL
+  )
+  tryCatch({
+    suppressMessages(
+      raw_data <- readr::read_csv(report_url, show_col_types = FALSE)
+    )
+  }, error = function(e) {
+    stop("No Response from Enfusion")
+  })
+  raw_data[rowSums(is.na(raw_data)) != ncol(raw_data), ]
+}
+
 #' Internal helper: create many positions from Enfusion report
 #' @param enfusion_report Data frame of Enfusion report rows
 #' @param short_name Character portfolio short name
@@ -125,28 +181,18 @@ create_portfolio_from_enfusion <- function(
 create_sma_from_enfusion <- function(
   long_name, short_name, base_portfolio, holdings_url, trade_url
 ) {
-  enfusion_report <- dplyr::filter(
-    enfusion::get_enfusion_report(holdings_url),
-    !is.na(.data$Description) #nolint
-  )
-  nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
-  if (is.na(nav)) {
-    nav <- 0
-  }
-  positions <- .bulk_security_positions(
-    enfusion_report = enfusion_report,
-    portfolio_short_name = short_name
-  )
-  .sma(
+  sma <- .sma(
     short_name,
     long_name,
     holdings_url,
     trade_url,
-    nav,
-    positions,
+    nav = 0,
+    positions = list(),
     base_portfolio,
     create = TRUE
   )
+  sma$update_enfusion()
+  invisible(sma)
 }
 
 
@@ -200,7 +246,7 @@ create_sma_from_enfusion <- function(
   if (is.null(con)) Rblpapi::blpConnect()
 
   # Pull report + keep only rows we need
-  trade_report <- enfusion::get_enfusion_report(trade_url)
+  trade_report <- get_enfusion_report(trade_url)
   if (is.null(trade_report) || !nrow(trade_report)) return(invisible(NULL))
 
   keep <- !is.na(trade_report[["Description"]]) &

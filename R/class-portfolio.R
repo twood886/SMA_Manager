@@ -2,11 +2,11 @@
 #' @description
 #' R6 Class representing a portfolio object.
 #' @import R6
-#' @import enfusion
 #' @importFrom dplyr filter
 #' @include api-functions.R
 #' @include utils.R
 #' @include class-tradeconstructor.R
+#' @include enfusion_loading.R
 #' @export
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
@@ -242,7 +242,7 @@ Portfolio <- R6::R6Class( #nolint
     #' @param url URL to fetch Enfusion Holdings Report
     update_enfusion = function() {
       enfusion_report <- dplyr::filter(
-        enfusion::get_enfusion_report(private$holdings_url_),
+        get_enfusion_report(private$holdings_url_),
         !is.na(.data$Description) & .data$`Instrument Type` != "Cash"
       )
       nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
