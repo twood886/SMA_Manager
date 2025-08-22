@@ -75,6 +75,7 @@ TradeConstructor <- R6::R6Class( #nolint
       alpha_max      = 5.0,
       verbose        = TRUE
     ) {
+      t1 <- Sys.time()
       if (verbose) {
         cat("\n=== SMA Optimization (relative-L2 in weight space) ===\n\n")
       }
@@ -249,7 +250,13 @@ TradeConstructor <- R6::R6Class( #nolint
       )
 
       prob <- CVXR::Problem(objective, cons)
-
+      t2 <- Sys.time()
+      message(
+        sprintf(
+          "Problem setup time: %.2f seconds",
+          as.numeric(difftime(t2, t1, units = "secs"))
+        )
+      )
       # solve
       res <- tryCatch({
         CVXR::solve(
@@ -272,7 +279,13 @@ TradeConstructor <- R6::R6Class( #nolint
           feastol = 1e-8
         )
       })
-
+      t3 <- Sys.time()
+      message(
+        sprintf(
+          "Problem solve time: %.2f seconds",
+          as.numeric(difftime(t3, t2, units = "secs"))
+        )
+      )
       if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved")))
         stop(sprintf("Optimization failed with status: %s", res$status))
 

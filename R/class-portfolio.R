@@ -270,10 +270,7 @@ Portfolio <- R6::R6Class( #nolint
         self$get_target_position(),
         \(pos) setNames(pos$get_qty(), pos$get_id())
       )
-      sec_ids <- unique(c(
-        names(rebal$target_weights),
-        names(current_shares)
-      ))
+      sec_ids <- unique(c(names(rebal$target_weights), names(current_shares)))
 
       if (!as.df) return(rebal)
       data.frame(
@@ -281,6 +278,7 @@ Portfolio <- R6::R6Class( #nolint
         target_weights = tidyr::replace_na(rebal$target_weights[sec_ids], 0),
         final_weights = tidyr::replace_na(rebal$weights[sec_ids], 0),
         final_shares  = tidyr::replace_na(rebal$shares[sec_ids], 0),
+        current_shares = tidyr::replace_na(current_shares[sec_ids], 0),
         trade = tidyr::replace_na(rebal$shares[sec_ids], 0) -
           tidyr::replace_na(current_shares[sec_ids], 0),
         stringsAsFactors = FALSE,
