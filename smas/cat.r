@@ -8,7 +8,6 @@
   #    organized and traded in the United States, including exchange-traded funds
   #    (“ETFs”) of United States issuers;
 
-
   # 1.4(b) publicly traded equity and convertible securities of issuers
   #    organized in countries other than the United States are permitted only if
   #    both of the following conditions are met: 
@@ -29,7 +28,6 @@
 
   # 1.4(d) futures instruments and options on futures (including commodities and
   #    commodity ETFs) (collectively, “Futures”).  
-
 
   # 3.5	Notwithstanding anything herein to the contrary:
   # 3.5(a) If Investment Manager plans to engage in any activity that would be
@@ -105,14 +103,15 @@ load_caty <- function() {
     bbfields = NULL,
     definition = function(security_id, portfolio) {
       security <- lapply(security_id, function(id) .security(id))
-      price <- vapply(security, function(x) x$get_price(), numeric(1))
-      und_p <- vapply(security, function(x) x$get_underlying_price(), numeric(1))
+      price <- vapply(security, \(x) x$get_price(), numeric(1))
+      und_p <- vapply(security, \(x) x$get_underlying_price(), numeric(1))
       type <- vapply(security, \(x) x$get_instrument_type(), character(1))
       price[type == "Option"] <- und_p[type == "Option"]
       delta <- vapply(security, function(x) x$get_delta(), numeric(1))
       nav <- portfolio$get_nav()
       exp <- (delta * price) / nav
-      setNames(exp, security_id)
+      names(exp) <- security_id
+      exp
     },
     swap_only = FALSE,
     max_threshold = 2.5,
@@ -126,15 +125,16 @@ load_caty <- function() {
     scope = "portfolio",
     bbfields = NULL,
     definition = function(security_id, portfolio) {
-      security <- lapply(security_id, function(id) .security(id))
-      price <- vapply(security, function(x) x$get_price(), numeric(1))
-      und_p <- vapply(security, function(x) x$get_underlying_price(), numeric(1))
+      security <- lapply(security_id, \(id) .security(id))
+      price <- vapply(security, \(x) x$get_price(), numeric(1))
+      und_p <- vapply(security, \(x) x$get_underlying_price(), numeric(1))
       type <- vapply(security, \(x) x$get_instrument_type(), character(1))
       price[type == "Option"] <- und_p[type == "Option"]
       delta <- vapply(security, function(x) x$get_delta(), numeric(1))
       nav <- portfolio$get_nav()
       exp <- (delta * price) / nav
-      setNames(exp, security_id)
+      names(exp) <- security_id
+      exp
     },
     swap_only = FALSE,
     max_threshold = 0.5,
@@ -142,7 +142,7 @@ load_caty <- function() {
     gross_exposure = FALSE
   ))
 
-  caty$add_rule(.sma_rule(
+  caty$add_rule(SMAManager::.sma_rule(
     sma_name = "caty",
     rule_name = "Gross Position under 12% of NAV",
     scope = "position",
@@ -190,6 +190,28 @@ load_caty <- function() {
 
   caty$add_rule(.sma_rule(
     sma_name = "caty",
+    rule_name = "Market Cap over $500MM",
+    scope = "position",
+    bbfields = c("RR902"),
+    definition = function(security_id, sma) {
+      except <- c("www us equity")
+      mktcap <- vapply(
+        security_id,
+        \(id) .security(id)$get_rule_data("RR902"),
+        numeric(1)
+      )
+      dplyr::case_when(
+        mktcap < 500e6 & !tolower(security_id) %in% except ~ 1,
+        TRUE ~ 0
+      )
+    },
+    max_threshold = 0,
+    min_threshold = 0,
+    swap_only = FALSE
+  ))
+
+  caty$add_rule(.sma_rule(
+    sma_name = "caty",
     rule_name = "Non-US Equity on Swap Only",
     scope = "position",
     bbfields = "DS290",
@@ -224,6 +246,5 @@ load_caty <- function() {
     },
     swap_only = TRUE
   ))
-
   invisible(caty)
 }

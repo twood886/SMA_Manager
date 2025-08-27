@@ -58,7 +58,7 @@ SMARule <- R6::R6Class( #nolint
 
     #' Get Id
     #' @description Get Id of SMA Rule
-    get_id = function() private$id_,
+    get_id = function() paste0(private$sma_name_, "::", private$name_),
 
     #' Get Name
     #' @description Get name of SMA Rule

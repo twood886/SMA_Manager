@@ -1,3 +1,12 @@
+#' Null/empty coalescing
+#' Returns y if x is NULL, length 0, or NA; otherwise returns x.
+#' @param x An object to check.
+#' @param y A fallback value to return if x is NULL, length 0, or NA.
+#' @export
+`%||%` <- function(x, y) {
+  if (is.null(x) || length(x) == 0 || (length(x) == 1 && is.na(x))) y else x
+}
+
 #' Assert that an input is a single non-missing string
 #'
 #' This function checks whether the input `x` is a character vector of length 1

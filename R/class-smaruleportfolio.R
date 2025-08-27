@@ -33,7 +33,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
       applied_pos[security_id] <- 0
       current_group_exp <- sum(applied_pos, na.rm = TRUE)
 
-      exp_factors <- replace_na(self$apply_rule_definition(security_id), 0)
+      exp_factors <- self$apply_rule_definition(security_id)
+      exp_factors[is.na(exp_factors)] <- 0
 
       remain_max_total <- private$max_threshold_ - current_group_exp
       remain_min_total <- private$min_threshold_ - current_group_exp
