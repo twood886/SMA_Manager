@@ -60,7 +60,87 @@
   invisible(security)
 }
 
-#' Create or Update a Position in a Portfolio
+#' Create or Retrieve a Holding Object
+#'
+#' This function creates or retrieves a holding object associated with a
+#' specific portfolio and security. If the holding already exists, it is
+#' returned. If not, a new holding is created and added to the corresponding
+#' position in the portfolio.
+#'
+#' @param portfolio_name A string representing the name of the portfolio.
+#' Must be a valid portfolio name.
+#' @param sec_id A string representing the security ID (ticker).
+#' Must be a valid security ID.
+#' @param qty A numeric value representing the quantity of the holding.
+#' Must be a valid numeric value.
+#' @param swap A logical value indicating whether the holding is a swap.
+#' Defaults to `FALSE`.
+#' @param custodian (Optional) A string representing the custodian name.
+#' @param broker_custodian (Optional) A string representing the broker custodian name. #nolint
+#' @param custodian_acct_id (Optional) A string representing the custodian account ID. #nolint
+#' @param custodian_acct (Optional) A string representing the custodian account name. #nolint
+#' @param trs_custodian_id (Optional) A string representing the TRS custodian ID. #nolint
+#' @param trs_custodian_name (Optional) A string representing the TRS custodian name. #nolint
+#' @param assign_to_portfolio A logical value indicating whether to add the holding. #nolint
+#'
+#' @return An object of class `Holding` representing the created or retrieved holding. #nolint
+#'
+#' @details The function first validates the input parameters to ensure they are
+#' of the correct type. It then constructs a unique ID for the holding based on
+#' the security ID and custodian account ID. The function checks if the holding
+#' already exists in the position associated with the portfolio. If it exists,
+#' the existing holding is returned. If not, a new `Holding` object is created
+#' and added to the position.
+#'
+#' @seealso \code{\link{Holding}} for the Holding class.
+#' @export
+.holding <- function(
+  portfolio_name, sec_id, qty, swap = FALSE,
+  custodian = NULL, broker_custodian = NULL,
+  custodian_acct_id = NULL, custodian_acct = NULL,
+  trs_custodian_id = NULL, trs_custodian_name = NULL,
+  create = FALSE, assign_to_portfolio = TRUE
+) {
+  checkmate::assert_character(sec_id)
+  sec_id <- tolower(sec_id)
+  checkmate::assert_numeric(qty)
+  checkmate::assert_flag(swap)
+  checkmate::assert_character(custodian, null.ok = TRUE)
+  checkmate::assert_character(broker_custodian, null.ok = TRUE)
+  checkmate::assert_character(custodian_acct_id, null.ok = TRUE)
+  checkmate::assert_character(custodian_acct, null.ok = TRUE)
+  checkmate::assert_character(trs_custodian_id, null.ok = TRUE)
+  checkmate::assert_character(trs_custodian_name, null.ok = TRUE)
+  id <- paste(sec_id, custodian_acct_id, sep = "|")
+
+  portfolio <- .portfolio(portfolio_name, create = FALSE)
+  position <- .position(portfolio_name, sec_id, TRUE, assign_to_portfolio)
+  holdings <- position$get_holdings()
+  holdings_id <- vapply(holdings, \(x) x$get_id(), character(1))
+
+  holding <- tryCatch(
+    holdings[[which(holdings_id == id)]],
+    error = function(e) NULL
+  )
+  if (!is.null(holding) && create) holding$set_qty(qty)
+  if (!is.null(holding)) return(invisible(holding))
+  if (!create) stop("Holding does not exist and create is set to FALSE")
+
+  holding <- Holding$new(
+    portfolio_name, sec_id, qty, swap,
+    custodian, broker_custodian,
+    custodian_acct_id, custodian_acct,
+    trs_custodian_id, trs_custodian_name
+  )
+  position$add_holding(holding)
+
+  if (assign_to_portfolio) {
+    portfolio$add_position(position, overwrite = TRUE)
+  }
+  return(invisible(holding))
+}
+
+#' Create or Retrieve a Position Object
 #'
 #' This function creates or updates a position in a specified portfolio.
 #'  It ensures that the input parameters are valid and initializes a new
@@ -70,10 +150,9 @@
 #'  The portfolio must already exist.
 #' @param bbid A string representing the Bloomberg identifier (BBID) of the
 #'  security. This will be converted to lowercase.
-#' @param qty A numeric value indicating the quantity of the position.
-#'  Defaults to 0.
-#' @param swap A logical value (TRUE or FALSE) indicating whether the position
-#'  is a swap. Defaults to FALSE.
+#' @param create A logical value indicating whether to create the position
+#' @param assign_to_portfolio A logical value indicating whether to add the 
+#' position to the portfolio. Defaults to `TRUE`.
 #'
 #' @return An object of class `Position` representing the created or updated
 #'  position.
@@ -84,22 +163,35 @@
 #'
 #' @examples
 #' # Create a position with 100 shares of a security
-#' position("MyPortfolio", "AAPL US Equity", qty = 100)
-#'
-#' # Create a swap position
-#' position("MyPortfolio", "AAPL US Equity", qty = 50, swap = TRUE)
+#' .position("MyPortfolio", "AAPL US Equity")
 #'
 #' @seealso \code{\link{Position}} for the Position class.
 #'
 #' @export
-.position <- function(portfolio_name, bbid, qty = 0, swap = FALSE) {
-  assert_string(portfolio_name, "portfolio_name")
-  assert_string(bbid, "id")
-  assert_numeric(qty, "qty")
-  assert_bool(swap, "swap")
+.position <- function(
+  portfolio_name,
+  bbid,
+  create = FALSE, assign_to_portfolio = FALSE
+) {
+  checkmate::assert_character(portfolio_name)
+  checkmate::assert_string(bbid)
+  checkmate::assert_flag(create)
+  checkmate::assert_flag(assign_to_portfolio)
   bbid <- tolower(bbid)
+  portfolio <- .portfolio(portfolio_name, create = FALSE)
+  position <- tryCatch(
+    portfolio$get_position(bbid),
+    error = function(e) NULL
+  )
+  if (!is.null(position)) return(invisible(position))
+  if (!create) stop("Position does not exist and create is set to FALSE")
+
   sec <- .security(bbid, create = TRUE)
-  invisible(Position$new(portfolio_name, sec, qty, swap))
+  pos <- Position$new(portfolio_name, sec)
+  if (assign_to_portfolio) {
+    portfolio$add_position(pos)
+  }
+  return(invisible(pos))
 }
 
 #' Create or Retrieve a Portfolio Object
@@ -154,20 +246,19 @@
   short_name, long_name, holdings_url, trade_url,
   nav = 0, positions = list(), create = FALSE, assign_to_registry = TRUE
 ) {
-  assert_string(short_name, "short_name")
-  assert_bool(create, "create")
-  assert_bool(assign_to_registry, "assign_to_registry")
+  checkmate::assert_character(short_name)
+
   env <- registries$portfolios
   if (exists(short_name, envir = env, inherits = FALSE)) {
     return(get(short_name, envir = env))
   }
+  checkmate::assert_flag(create)
+  checkmate::assert_flag(assign_to_registry)
+  checkmate::assert_character(long_name)
+  checkmate::assert_numeric(nav)
+
   if (!create) stop("Portfolio does not exist and create is set to FALSE")
-  assert_string(long_name, "long_name")
-  assert_numeric(nav, "nav")
-  lapply(
-    positions,
-    function(position) assert_inherits(position, "Position", "positions")
-  )
+  lapply(positions, \(p) checkmate::assert_r6(p, "Position"))
   portfolio <- Portfolio$new(
     long_name,
     short_name,
@@ -176,18 +267,13 @@
     nav,
     positions
   )
-  if (assign_to_registry) {
-    assign(short_name, portfolio, envir = env)
-  }
+  if (assign_to_registry) assign(short_name, portfolio, envir = env)
   invisible(portfolio)
 }
 
-
-
-
 #' Create or Retrieve an SMA Object
 #'
-#' This function creates or retrieves an SMA (Separately Managed Account) object. 
+#' This function creates or retrieves an SMA (Separately Managed Account) object
 #' If the SMA already exists in the registry, it is returned. Otherwise, a new
 #' SMA object is created if the `create` parameter is set to `TRUE`.
 #'
@@ -249,8 +335,6 @@
   }
   invisible(sma)
 }
-
-
 #' Create or Retrieve an SMA Rule
 #'
 #' This function creates or retrieves an SMA (Simple Moving Average) rule object 
@@ -342,7 +426,7 @@
 #' Create or Retrieve a Trade Object
 #'
 #' This function manages trades for a given security and portfolio. It retrieves or creates a trade object,
-#' updates the trade quantity, and adjusts the target position in the portfolio accordingly.
+#' updates the trade quantity, and adjusts the position in the portfolio accordingly.
 #'
 #' @param security_id A string representing the ID of the security. Must be a valid string.
 #' @param portfolio_id A string representing the ID of the portfolio. Must be a valid string.
@@ -352,13 +436,13 @@
 #' @param assign_to_registry A boolean indicating whether to assign the trade object to the registry. Defaults to `TRUE`.
 #'
 #' @return If `create` is `FALSE`, returns a list of existing trades for the given security and swap flag.
-#'         If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's target position.
+#'         If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's position.
 #'
 #' @details
 #' The function first validates the input parameters. It retrieves all existing trades from the `registries$trades`
 #' environment and filters them based on the `security_id` and `swap` flag. If `create` is `FALSE`, it returns the
 #' filtered trades. If `create` is `TRUE`, it creates a new trade if none exists, updates the trade quantity, and
-#' adjusts the target position in the portfolio.
+#' adjusts the position in the portfolio.
 #'
 #' @examples
 #' # Example usage:
@@ -401,14 +485,14 @@
 
   trade$add_trade_qty(portfolio_id, qty)
   tgt_pos <- tryCatch(
-    {portfolio$get_target_position(security_id)},
+    {portfolio$get_position(security_id)},
     error = function(e) {
       .position(portfolio_id, security_id, qty = 0, swap = swap)
     }
   )
   existing_tgt_qty <- as.numeric(tgt_pos$get_qty())
   tgt_pos$set_qty(existing_tgt_qty + qty)
-  portfolio$add_target_position(tgt_pos, overwrite = TRUE)
+  portfolio$add_position(tgt_pos, overwrite = TRUE)
   if (assign_to_registry) {
     assign(as.character(trade$get_id()), trade, envir = registries$trades)
   }

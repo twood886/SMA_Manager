@@ -13,6 +13,7 @@ Collate:
     'SMAManager-package.R'
     'class-trade.R'
     'api-functions.R'
+    'class-holding.R'
     'class-security.R'
     'utils.R'
     'enfusion_loading.R'

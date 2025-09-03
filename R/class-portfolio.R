@@ -15,7 +15,6 @@ Portfolio <- R6::R6Class( #nolint
     short_name_ = NULL,
     nav_ = NULL,
     positions_ = NULL,
-    target_positions_ = NULL,
     rules_ = list(),
     replacements_ = list(),
     trade_constructor = NULL,
@@ -38,7 +37,6 @@ Portfolio <- R6::R6Class( #nolint
       private$short_name_ <- short_name
       private$nav_ <- nav
       private$positions_ <- positions
-      private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
       private$rules_ <- list()
       private$replacements_ <- list()
       private$trade_constructor <- TradeConstructor$new()
@@ -60,26 +58,12 @@ Portfolio <- R6::R6Class( #nolint
       if (!id %in% position_ids) stop("No position in portfolio with id")
       positions[[which(position_ids == id)]]
     },
-    #' @description
-    #' Get list of target positions in portfolio
-    #' @param id Ticker
-    get_target_position = function(id = NULL) {
-      positions <- private$target_positions_
-      if (is.null(id)) return(positions)
-      position_ids <- sapply(positions, \(x) x$get_id())
-      if (!id %in% position_ids) stop("No target position in portfolio with id")
-      positions[[which(position_ids == id)]]
-    },
     #' @description Get the Rules
     #' @return A list of rules
-    get_rules = function() {
-      private$rules_
-    },
+    get_rules = function() private$rules_,
     #' @description Get the Trade Constructor
     #' @return The portfolio constructor object
-    get_trade_constructor = function() {
-      private$trade_constructor
-    },
+    get_trade_constructor = function() private$trade_constructor,
     #' @description Get replacement security for a given replaced security
     #' @param replaced_security_id Security ID of the replaced security (in base ptfl) #nolint
     get_replacement_security = function(replaced_security_id = NULL) {
@@ -98,16 +82,6 @@ Portfolio <- R6::R6Class( #nolint
       if (length(idx) == 0) return(NULL)
       names(u)[idx]
     },
-    #' @description Check SMA rules against the target positions
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
-    check_rules_target = function(update_bbfields = TRUE) {
-      assert_bool(update_bbfields, "update_bbfields")
-      if (update_bbfields) {
-        update_bloomberg_fields()
-      }
-      lapply(self$get_rules(), function(x) x$check_rule_target())
-    },
-
     #' @description Check SMA rules against the current positions
     #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
     check_rules_current = function(update_bbfields = TRUE) {
@@ -156,59 +130,18 @@ Portfolio <- R6::R6Class( #nolint
     #' @param position Position S6 Object
     #' @param overwrite Logical. Overwrite existing position if TRUE
     add_position = function(position, overwrite = FALSE) {
-      assert_inherits(position, "Position", "position")
-      existing_pos <- tryCatch(
-        self$get_position(position$get_id()),
-        error = function(e) {
-          NULL
-        }
-      )
+      checkmate::assert_r6(position, "Position")
+      position_ids <- sapply(self$get_position(), \(x) x$get_id())
+      existing_pos <- position$get_id() %in% position_ids
       if (!is.null(existing_pos)) {
         if (overwrite) {
-          self$remove_position(position$get_id())
-          private$positions_ <- c(private$positions_, position)
+          other_positions <- self$get_position()[
+            which(position_ids != position$get_id())
+          ]
+          private$positions_ <- c(other_positions, position)
         }
       } else {
         private$positions_ <- c(private$positions_, position)
-      }
-      invisible(NULL)
-    },
-    #' @description
-    #' Add New Target Position to Portfolio
-    #' @param position Position S6 Object
-    #' @param overwrite Logical. Overwrite existing position if TRUE
-    add_target_position = function(position, overwrite = FALSE) {
-      if (!inherits(position, "Position")) {
-        stop("position must be a Position object")
-      }
-      existing_pos <- tryCatch(
-        self$get_target_position(position$get_id()),
-        error = function(e) {
-          NULL
-        }
-      )
-      if (!is.null(existing_pos)) {
-        if (overwrite) {
-          self$remove_target_position(existing_pos$get_id())
-          private$target_positions_ <- c(private$target_positions_, position)
-        }
-      } else {
-        private$target_positions_ <- c(private$target_positions_, position)
-      }
-      invisible(NULL)
-    },
-    #' @description
-    #' Remove existing Target Position from Portfolio
-    #' @param position_id Position ID
-    remove_target_position = function(position_id = NULL) {
-      if (is.null(position_id)) {
-        private$target_positions_ <- list()
-        return(invisible(NULL))
-      }
-      position_ids <- sapply(self$get_target_position(), \(x) x$get_id())
-      if (position_id %in% position_ids) {
-        pos_idx <- which(position_ids != position_id)
-        private$target_positions_ <- private$target_positions_[pos_idx]
       }
       invisible(NULL)
     },
@@ -239,7 +172,6 @@ Portfolio <- R6::R6Class( #nolint
     # Updaters -----------------------------------------------------------------
     #' Update Enfusion Data
     #' @description Update Positions
-    #' @param url URL to fetch Enfusion Holdings Report
     update_enfusion = function() {
       enfusion_report <- dplyr::filter(
         get_enfusion_report(private$holdings_url_),
@@ -248,13 +180,8 @@ Portfolio <- R6::R6Class( #nolint
       nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
       if (is.na(nav)) nav <- 0
       private$nav_ <- nav
-      positions <- .bulk_security_positions(
-        enfusion_report = enfusion_report,
-        portfolio_short_name = private$short_name_
-      )
-      private$positions_ <- positions
-      private$target_positions_ <- lapply(positions, \(x) x$clone(deep = TRUE))
-      .bulk_trade_positions(private$trade_url_, self)
+      .bulk_holding_positions(enfusion_report, private$short_name_)
+      # .bulk_trade_positions(private$trade_url_, self)
       invisible(self)
     },
     # Calculators --------------------------------------------------------------
@@ -267,7 +194,7 @@ Portfolio <- R6::R6Class( #nolint
       if (update_bbfields) update_bloomberg_fields()
       rebal <- self$get_trade_constructor()$optimize_sma(self, verbose = FALSE)
       current_shares <- sapply(
-        self$get_target_position(),
+        self$get_position(),
         \(pos) setNames(pos$get_qty(), pos$get_id())
       )
       sec_ids <- unique(c(names(rebal$target_weights), names(current_shares)))

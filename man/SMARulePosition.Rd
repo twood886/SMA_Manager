@@ -13,9 +13,7 @@ R6 Class that encapsulates rule for SMAs
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMARulePosition-check_rule_current}{\code{SMARulePosition$check_rule_current()}}
-\item \href{#method-SMARulePosition-check_rule_target}{\code{SMARulePosition$check_rule_target()}}
 \item \href{#method-SMARulePosition-check_swap_current}{\code{SMARulePosition$check_swap_current()}}
-\item \href{#method-SMARulePosition-check_swap_target}{\code{SMARulePosition$check_swap_target()}}
 \item \href{#method-SMARulePosition-get_security_limits}{\code{SMARulePosition$get_security_limits()}}
 \item \href{#method-SMARulePosition-check_swap_security}{\code{SMARulePosition$check_swap_security()}}
 \item \href{#method-SMARulePosition-check_violations}{\code{SMARulePosition$check_violations()}}
@@ -55,32 +53,12 @@ List of security IDs that do not comply with the rule
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-check_rule_target"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-check_rule_target}{}}}
-\subsection{Method \code{check_rule_target()}}{
-Check the rule against the target holdings
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_target()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePosition-check_swap_current"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARulePosition-check_swap_current}{}}}
 \subsection{Method \code{check_swap_current()}}{
 Check the swap rule against the current holdings
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_swap_current()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-check_swap_target"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-check_swap_target}{}}}
-\subsection{Method \code{check_swap_target()}}{
-Check the swap rule against the target holdings
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_swap_target()}\if{html}{\out{</div>}}
 }
 
 }

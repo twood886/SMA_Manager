@@ -15,9 +15,7 @@ SMA Rule for Portfolio
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMARulePortfolio-check_rule_current}{\code{SMARulePortfolio$check_rule_current()}}
-\item \href{#method-SMARulePortfolio-check_rule_target}{\code{SMARulePortfolio$check_rule_target()}}
 \item \href{#method-SMARulePortfolio-check_swap_current}{\code{SMARulePortfolio$check_swap_current()}}
-\item \href{#method-SMARulePortfolio-check_swap_target}{\code{SMARulePortfolio$check_swap_target()}}
 \item \href{#method-SMARulePortfolio-check_swap_security}{\code{SMARulePortfolio$check_swap_security()}}
 \item \href{#method-SMARulePortfolio-get_security_limits}{\code{SMARulePortfolio$get_security_limits()}}
 \item \href{#method-SMARulePortfolio-check_violations}{\code{SMARulePortfolio$check_violations()}}
@@ -54,32 +52,12 @@ Check the rule against the current portfolio
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-check_rule_target"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_rule_target}{}}}
-\subsection{Method \code{check_rule_target()}}{
-Check the rule against the target portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_rule_target()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePortfolio-check_swap_current"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_swap_current}{}}}
 \subsection{Method \code{check_swap_current()}}{
 Check the swap rule against the current portfolio
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_swap_current()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-check_swap_target"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_swap_target}{}}}
-\subsection{Method \code{check_swap_target()}}{
-Check the swap rule against the target portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_swap_target()}\if{html}{\out{</div>}}
 }
 
 }

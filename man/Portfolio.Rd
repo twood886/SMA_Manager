@@ -13,19 +13,15 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_short_name}{\code{Portfolio$get_short_name()}}
 \item \href{#method-Portfolio-get_nav}{\code{Portfolio$get_nav()}}
 \item \href{#method-Portfolio-get_position}{\code{Portfolio$get_position()}}
-\item \href{#method-Portfolio-get_target_position}{\code{Portfolio$get_target_position()}}
 \item \href{#method-Portfolio-get_rules}{\code{Portfolio$get_rules()}}
 \item \href{#method-Portfolio-get_trade_constructor}{\code{Portfolio$get_trade_constructor()}}
 \item \href{#method-Portfolio-get_replacement_security}{\code{Portfolio$get_replacement_security()}}
 \item \href{#method-Portfolio-get_replaced_security}{\code{Portfolio$get_replaced_security()}}
-\item \href{#method-Portfolio-check_rules_target}{\code{Portfolio$check_rules_target()}}
 \item \href{#method-Portfolio-check_rules_current}{\code{Portfolio$check_rules_current()}}
 \item \href{#method-Portfolio-get_security_position_limits}{\code{Portfolio$get_security_position_limits()}}
 \item \href{#method-Portfolio-get_swap_flag_position_rules}{\code{Portfolio$get_swap_flag_position_rules()}}
 \item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
-\item \href{#method-Portfolio-add_target_position}{\code{Portfolio$add_target_position()}}
-\item \href{#method-Portfolio-remove_target_position}{\code{Portfolio$remove_target_position()}}
 \item \href{#method-Portfolio-add_rule}{\code{Portfolio$add_rule()}}
 \item \href{#method-Portfolio-add_replacement}{\code{Portfolio$add_replacement()}}
 \item \href{#method-Portfolio-update_enfusion}{\code{Portfolio$update_enfusion()}}
@@ -98,23 +94,6 @@ Get list of positions in portfolio
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-get_target_position"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-get_target_position}{}}}
-\subsection{Method \code{get_target_position()}}{
-Get list of target positions in portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_target_position(id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{id}}{Ticker}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-get_rules"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-get_rules}{}}}
 \subsection{Method \code{get_rules()}}{
@@ -170,23 +149,6 @@ Get replaced security for a given replacement security
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{replacement_security_id}}{Security ID of the replacement security (in SMA) #nolint}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-check_rules_target"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-check_rules_target}{}}}
-\subsection{Method \code{check_rules_target()}}{
-Check SMA rules against the target positions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_target(update_bbfields = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE)}
 }
 \if{html}{\out{</div>}}
 }
@@ -283,43 +245,7 @@ Add Position to Portfolio
 \describe{
 \item{\code{position}}{Position S6 Object}
 
-\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-add_target_position"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-add_target_position}{}}}
-\subsection{Method \code{add_target_position()}}{
-Add New Target Position to Portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_target_position(position, overwrite = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{position}}{Position S6 Object}
-
-\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-remove_target_position"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-remove_target_position}{}}}
-\subsection{Method \code{remove_target_position()}}{
-Remove existing Target Position from Portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$remove_target_position(position_id = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{position_id}}{Position ID
+\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE
 Add Rule}
 }
 \if{html}{\out{</div>}}

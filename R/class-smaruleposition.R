@@ -15,17 +15,9 @@ SMARulePosition <- R6::R6Class( #nolint
     check_rule_current = function() {
       private$check_rule_multi_position_(self$get_sma()$get_position())
     },
-    #' @description Check the rule against the target holdings
-    check_rule_target = function() {
-      private$check_rule_multi_position_(self$get_sma()$get_target_position())
-    },
     #' @description Check the swap rule against the current holdings
     check_swap_current = function() {
       private$check_swap_multi_position_(self$get_sma()$get_position())
-    },
-    #' @description Check the swap rule against the target holdings
-    check_swap_target = function() {
-      private$check_swap_multi_position_(self$get_sma()$get_target_position())
     },
     #' @description Get the Max and Min Value of the security based on the rule
     #' @param security_id Security ID

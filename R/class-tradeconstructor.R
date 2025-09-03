@@ -86,7 +86,7 @@ TradeConstructor <- R6::R6Class( #nolint
 
       # --- Data
       target_quantities <- self$calc_target_quantities(sma)
-      current_positions <- private$.extract_qty(sma$get_target_position())
+      current_positions <- private$.extract_qty(sma$get_position())
       replacements <- sma$get_replacement_security()
 
       all_securities <- unique(c(

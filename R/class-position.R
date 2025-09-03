@@ -8,59 +8,64 @@
 #' @include utils.R
 #' @include api-functions.R
 #' @include class-security.R
+#' @include class-holding.R
 #' @export
 Position <- R6::R6Class(  #nolint
   "Position",
   private = list(
     portfolio_short_name_ = NULL,
     id_ = NULL,
-    qty_ = NULL,
     security_ = NULL,
-    swap_ = NULL
+    holdings_ = list()
   ),
   public = list(
     #' @description
     #' Create New PositionR6 object
     #' @param portfolio_short_name Portfolio_Short_name
-    #' @param qty Stock Quantity
     #' @param security Security
-    #' @param swap Swap Flag
-    initialize = function(portfolio_short_name, security, qty, swap = FALSE) {
-      assert_inherits(security, "Security", "security")
-      assert_numeric(qty, "qty")
-      assert_bool(swap, "swap")
+    initialize = function(portfolio_short_name, security) {
+      checkmate::assert_character(portfolio_short_name)
+      checkmate::assert_r6(security, "Security")
       private$portfolio_short_name_ <- portfolio_short_name
       private$security_ <- security
       private$id_ <- security$get_id()
-      private$qty_ <- qty
-      private$swap_ <- swap
     },
-
     # Getter Functions ---------------------------------------------------------
     #' @description Get position ticker
     get_id = function() private$id_,
     #' @description Get position security
     get_security = function() private$security_,
     #' @description Get position Quantity
-    get_qty = function() private$qty_,
+    get_qty = function() {
+      sum(vapply(private$holdings_, function(x) x$get_qty(), numeric(1)))
+    },
     #' @description Get Swap flag
-    get_swap = function() private$swap_,
+    get_swap = function() {
+      any(vapply(private$holdings_, function(x) x$get_swap(), logical(1)))
+    },
     #' @description Get position Delta Quantity
-    get_delta_qty = function() private$qty_ * private$security_$get_delta(),
+    get_delta_qty = function() {
+      self$get_qty() * self$get_security()$get_delta()
+    },
     #' @description Get position Market Value
-    get_mkt_val = function() private$qty_ * private$security_$get_price(),
+    get_mkt_val = function() {
+      self$get_qty() * self$get_security()$get_price()
+    },
     #' @description Get position Delta Value
-    get_delta_val = function() self$get_delta_qty() * private$security_$get_price(),
+    get_delta_val = function() {
+      self$get_delta_qty() * self$get_security()$get_price()
+    },
     #' @description Get position Stock Percent of NAV
     #' @param nav Portfolio NAV
     get_mkt_pct_nav = function(nav = NULL) {
       tryCatch(
         {
-          assert_numeric(nav, "nav")
+          checkmate::assert_numeric(nav)
           self$get_mkt_val() / nav
         },
         error = function(e) {
-          nav <- .portfolio(private$portfolio_short_name_, create = FALSE)$get_nav()
+          port <- 
+          nav <- port$get_nav()
           self$get_mkt_val() / nav
         }
       )
@@ -70,21 +75,27 @@ Position <- R6::R6Class(  #nolint
     get_delta_pct_nav = function(nav = NULL) {
       tryCatch(
         {
-          assert_numeric(nav, "nav")
+          checkmate::assert_numeric(nav)
           self$get_delta_val() / nav
         },
         error = function(e) {
-          nav <- .portfolio(private$portfolio_short_name_, create = FALSE)$get_nav()
+          port <- .portfolio(private$portfolio_short_name_, create = FALSE)
+          nav <- .port$get_nav()
           self$get_delta_val() / nav
         }
       )
     },
+    #' @description Get all holdings associated with position
+    get_holdings = function() private$holdings_,
     # Setter Functions ---------------------------------------------------------
-    #' @description Set Qty
-    #' @param qty New Quantity
-    set_qty = function(qty) {
-      assert_numeric(qty, "qty")
-      private$qty_ <- qty
+    #' @description Add Holding to Position
+    #' @param holding Holding R6 object
+    add_holding = function(holding) {
+      checkmate::assert_r6(holding, "Holding")
+      if (holding$get_security_id() != self$get_id()) {
+        stop("Holding ID does not match Position ID")
+      }
+      private$holdings_[[length(private$holdings_) + 1]] <- holding
     }
   )
 )

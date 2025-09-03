@@ -10,9 +10,7 @@ check_enfusion_connection <- function() {
       httr::GET("http://127.0.0.1:18443/exportReport")
       TRUE
     },
-    error = function(cond) {
-      FALSE
-    }
+    error = function(cond) FALSE
   )
 }
 
@@ -51,17 +49,17 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
   }, error = function(e) {
     stop("No Response from Enfusion")
   })
-  raw_data[rowSums(is.na(raw_data)) != ncol(raw_data), ]
+  raw_data[!is.na(raw_data$Description), ]
 }
 
-#' Internal helper: create many positions from Enfusion report
+#' Internal helper: create many holdings from Enfusion report
 #' @param enfusion_report Data frame of Enfusion report rows
 #' @param short_name Character portfolio short name
 #' @include utils.R
 #' @include api-functions.R
 #' @import Rblpapi
 #' @export
-.bulk_security_positions <- function(enfusion_report, portfolio_short_name) {
+.bulk_holding_positions <- function(enfusion_report, portfolio_short_name) {
   con <- tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)
   if (is.null(con)) Rblpapi::blpConnect()
 
@@ -71,7 +69,7 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
   # ----- Vectorized ID derivation -----
   types <- enfusion_report[["Instrument Type"]]
   ids   <- enfusion_report[["Description"]]
-  yk    <- enfusion_report[["BB Yellow Key Position"]]
+  yk    <- enfusion_report[["BB Yellow Key"]]
 
   is_eqopt <- types %in% c("Equity", "Listed Option")
   ids[is_eqopt] <- yk[is_eqopt]
@@ -90,6 +88,8 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
   }
 
   ids <- tolower(ids)
+  enfusion_report <- enfusion_report[!is.na(ids) & ids != "", , drop = FALSE]
+  ids <- ids[!is.na(ids) & ids != ""]
 
   # ----- Register missing Security objects (single bdp) -----
   env       <- registries$securities
@@ -98,8 +98,8 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
   new_ids   <- uniq_ids[!have_mask]
 
   if (length(new_ids)) {
-    fields <- c("DX615", "EX028", "PX_LAST", "BI012", "BI013")
-    data   <- Rblpapi::bdp(new_ids, fields)
+    fields  <- c("DX615", "EX028", "PX_LAST", "BI012", "BI013")
+    data    <- Rblpapi::bdp(new_ids, fields)
     data_key <- if ("security" %in% names(data)) {
       data[["security"]]
     } else {
@@ -128,24 +128,36 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
       )
     }
   }
-
-  # ----- Build positions (no splits, no per-row bdp) -----
-  qty <- ifelse(
-    types == "Listed Option",
-    as.double(enfusion_report[["Option Quantity"]]),
-    as.double(enfusion_report[["Stock Quantity"]])
+  # ----- Build holdings (no splits, no per-row bdp) -----
+  types <- enfusion_report[["Instrument Type"]]
+  qtys <- dplyr::case_when(
+    types == "Listed Option" ~ as.double(enfusion_report[["Option Quantity"]]),
+    TRUE                     ~ as.double(enfusion_report[["Stock Quantity"]])
   )
-  swap_raw <- as.logical(enfusion_report[["Is Financed"]])
-  swap     <- ifelse(is.na(swap_raw), FALSE, swap_raw)
 
-  positions <- Map(
-    \(id, q, s) .position(portfolio_short_name, id, q, swap = s), ids, qty, swap
-  )
-  positions <- unname(positions)
-  positions
+  swap_raw  <- as.logical(enfusion_report[["Is Financed"]])
+  swaps     <- ifelse(is.na(swap_raw), FALSE, swap_raw)
+
+  custodians         <- as.character(enfusion_report[["Custodian"]])
+  broker_custodians  <- as.character(enfusion_report[["Broker Custodian Name"]])
+  custodian_acct_ids <- as.character(enfusion_report[["Custodian Acct Id"]])
+  custodian_accts    <- as.character(enfusion_report[["Custodian Acct"]])
+  trs_custodian_ids  <- as.character(enfusion_report[["TRS Custodian ID"]])
+  trs_custodian_names <- as.character(enfusion_report[["TRS Custodian Name"]])
+
+  for (i in seq_along(ids)) {
+    .holding(
+      portfolio_short_name,
+      ids[i], qtys[i], swaps[i],
+      custodians[i], broker_custodians[i],
+      custodian_acct_ids[i], custodian_accts[i],
+      trs_custodian_ids[i], trs_custodian_names[i],
+      create = TRUE, assign_to_portfolio = TRUE
+    )
+  }
+
+  invisible(NULL)
 }
-
-
 
 #' Create Portfolio from Enfusion
 #'

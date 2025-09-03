@@ -28,17 +28,17 @@
 }
 \value{
 If `create` is `FALSE`, returns a list of existing trades for the given security and swap flag.
-        If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's target position.
+        If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's position.
 }
 \description{
 This function manages trades for a given security and portfolio. It retrieves or creates a trade object,
-updates the trade quantity, and adjusts the target position in the portfolio accordingly.
+updates the trade quantity, and adjusts the position in the portfolio accordingly.
 }
 \details{
 The function first validates the input parameters. It retrieves all existing trades from the `registries$trades`
 environment and filters them based on the `security_id` and `swap` flag. If `create` is `FALSE`, it returns the
 filtered trades. If `create` is `TRUE`, it creates a new trade if none exists, updates the trade quantity, and
-adjusts the target position in the portfolio.
+adjusts the position in the portfolio.
 }
 \examples{
 # Example usage:

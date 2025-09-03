@@ -2,9 +2,9 @@
 % Please edit documentation in R/api-functions.R
 \name{.position}
 \alias{.position}
-\title{Create or Update a Position in a Portfolio}
+\title{Create or Retrieve a Position Object}
 \usage{
-.position(portfolio_name, bbid, qty = 0, swap = FALSE)
+.position(portfolio_name, bbid, create = FALSE, assign_to_portfolio = FALSE)
 }
 \arguments{
 \item{portfolio_name}{A string specifying the name of the portfolio.
@@ -13,11 +13,10 @@ The portfolio must already exist.}
 \item{bbid}{A string representing the Bloomberg identifier (BBID) of the
 security. This will be converted to lowercase.}
 
-\item{qty}{A numeric value indicating the quantity of the position.
-Defaults to 0.}
+\item{create}{A logical value indicating whether to create the position}
 
-\item{swap}{A logical value (TRUE or FALSE) indicating whether the position
-is a swap. Defaults to FALSE.}
+\item{assign_to_portfolio}{A logical value indicating whether to add the 
+position to the portfolio. Defaults to `TRUE`.}
 }
 \value{
 An object of class `Position` representing the created or updated
@@ -35,10 +34,7 @@ The function validates the input parameters using assertion checks.
 }
 \examples{
 # Create a position with 100 shares of a security
-position("MyPortfolio", "AAPL US Equity", qty = 100)
-
-# Create a swap position
-position("MyPortfolio", "AAPL US Equity", qty = 50, swap = TRUE)
+.position("MyPortfolio", "AAPL US Equity")
 
 }
 \seealso{

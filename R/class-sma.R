@@ -46,7 +46,6 @@ SMA <- R6::R6Class(   #nolint
       private$nav_ <- nav
       private$base_portfolio_ <- base_portfolio
       private$positions_ <- positions
-      private$target_positions_ <- positions
       private$rules_ <- list()
       private$replacements_ <- list()
       private$trade_constructor <- SMAConstructor$new()

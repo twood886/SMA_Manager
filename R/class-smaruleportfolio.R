@@ -10,15 +10,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
     check_rule_current = function() {
       private$check_rule_position_(self$get_sma()$get_position())
     },
-    #' @description Check the rule against the target portfolio
-    check_rule_target = function() {
-      private$check_rule_position_(self$get_sma()$get_target_position())
-    },
     #' @description Check the swap rule against the current portfolio
     check_swap_current = function() list("pass" = TRUE),
-    #' @description Check the swap rule against the target portfolio
-    check_swap_target = function() list("pass" = TRUE),
-
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {

@@ -22,7 +22,8 @@ A position object contains information about the size of the
 \item \href{#method-Position-get_delta_val}{\code{Position$get_delta_val()}}
 \item \href{#method-Position-get_mkt_pct_nav}{\code{Position$get_mkt_pct_nav()}}
 \item \href{#method-Position-get_delta_pct_nav}{\code{Position$get_delta_pct_nav()}}
-\item \href{#method-Position-set_qty}{\code{Position$set_qty()}}
+\item \href{#method-Position-get_holdings}{\code{Position$get_holdings()}}
+\item \href{#method-Position-add_holding}{\code{Position$add_holding()}}
 \item \href{#method-Position-clone}{\code{Position$clone()}}
 }
 }
@@ -32,7 +33,7 @@ A position object contains information about the size of the
 \subsection{Method \code{new()}}{
 Create New PositionR6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Position$new(portfolio_short_name, security, qty, swap = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Position$new(portfolio_short_name, security)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -41,10 +42,6 @@ Create New PositionR6 object
 \item{\code{portfolio_short_name}}{Portfolio_Short_name}
 
 \item{\code{security}}{Security}
-
-\item{\code{qty}}{Stock Quantity}
-
-\item{\code{swap}}{Swap Flag}
 }
 \if{html}{\out{</div>}}
 }
@@ -154,18 +151,28 @@ Get position Delta Percent of NAV
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Position-set_qty"></a>}}
-\if{latex}{\out{\hypertarget{method-Position-set_qty}{}}}
-\subsection{Method \code{set_qty()}}{
-Set Qty
+\if{html}{\out{<a id="method-Position-get_holdings"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-get_holdings}{}}}
+\subsection{Method \code{get_holdings()}}{
+Get all holdings associated with position
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Position$set_qty(qty)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Position$get_holdings()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Position-add_holding"></a>}}
+\if{latex}{\out{\hypertarget{method-Position-add_holding}{}}}
+\subsection{Method \code{add_holding()}}{
+Add Holding to Position
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Position$add_holding(holding)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{qty}}{New Quantity}
+\item{\code{holding}}{Holding R6 object}
 }
 \if{html}{\out{</div>}}
 }
