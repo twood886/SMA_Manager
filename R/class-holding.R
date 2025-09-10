@@ -85,7 +85,7 @@ Holding <- R6::R6Class(
     #' @description Set Qty
     #' @param qty New Quantity
     set_qty = function(qty) {
-      assert_numeric(qty, "qty")
+      checkmate::assert_numeric(qty)
       private$qty_ <- qty
       invisible(NULL)
     }

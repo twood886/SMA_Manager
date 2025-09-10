@@ -8,16 +8,9 @@ load_bamsf <- function() {
       "https://webservices.enfusionsystems.com/mobile",
       "/rest/reportservice/exportReport?",
       "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "BAMSF+Consolidated+Position+Listing+-+Options.ppr"
-    ),
-    trade_url = paste0(
-      "https://webservices.enfusionsystems.com/mobile/",
-      "rest/reportservice/exportReport?",
-      "name=shared%2FTaylor%2F",
-      "SMA_Mgr_Reports%2FBAMSF_Trade_Detail.trb"
+      "BAMSF+-+Positions.ppr"
     )
   )
-
 
   bamsf$add_rule(.sma_rule(
     sma_name = "bamsf",

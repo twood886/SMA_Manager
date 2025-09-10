@@ -16,7 +16,6 @@ SMA Trade Constructor Class
 \itemize{
 \item \href{#method-SMAConstructor-get_scale_qty}{\code{SMAConstructor$get_scale_qty()}}
 \item \href{#method-SMAConstructor-get_scale_ratio}{\code{SMAConstructor$get_scale_ratio()}}
-\item \href{#method-SMAConstructor-calc_want_qty}{\code{SMAConstructor$calc_want_qty()}}
 \item \href{#method-SMAConstructor-calc_target_quantities}{\code{SMAConstructor$calc_target_quantities()}}
 \item \href{#method-SMAConstructor-clone}{\code{SMAConstructor$clone()}}
 }
@@ -66,27 +65,6 @@ Get the scale ratio for the SMA
 \item{\code{base_portfolio}}{Base portfolio object}
 
 \item{\code{sma_portfolio}}{SMA portfolio object
-Calculate the target quantity for the SMA based on the base portfolio}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMAConstructor-calc_want_qty"></a>}}
-\if{latex}{\out{\hypertarget{method-SMAConstructor-calc_want_qty}{}}}
-\subsection{Method \code{calc_want_qty()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$calc_want_qty(sma, target_sec_id = NULL, base_trade_qty = 0)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{sma}}{SMA object}
-
-\item{\code{target_sec_id}}{Security ID to calculate for}
-
-\item{\code{base_trade_qty}}{Base trade quantity to adjust
 Calculate target quantities for the SMA based on scaled base portfolio}
 }
 \if{html}{\out{</div>}}

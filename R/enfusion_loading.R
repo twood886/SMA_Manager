@@ -87,6 +87,38 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
     ids[bond_idx] <- bond_tab$DX194[match(figi, key_vec)]
   }
 
+  # Unfound Ids: Find by CUSIP (one bdp call for all CUSIPs)
+  unfound_idx <- which(is.na(ids) | ids == "")
+  if (length(unfound_idx) > 0) {
+    cusip_vec <- enfusion_report[["CUSIP"]][unfound_idx]
+
+    for (i in seq_along(unfound_idx)) {
+      cusip_i <- cusip_vec[i]
+      if (!is.na(cusip_i) && nzchar(cusip_i)) {
+        lookup_ids <- tryCatch(
+          Rblpapi::lookupSecurity(cusip_i)$security,
+          error = function(e) NULL
+        )
+        if (is.null(lookup_ids) || length(lookup_ids) == 0) next
+
+        bb_ids <- bbid_to_security_id(lookup_ids)
+        if (length(bb_ids) == 0) next
+        cusip_check <- tryCatch(
+          Rblpapi::bdp(bb_ids, c("ID032", "DX194")),
+          error = function(e) NULL
+        )
+        if (is.null(cusip_check) || nrow(cusip_check) == 0) next
+        hit <- which(cusip_check$ID032 == cusip_i)[1]
+        if (!is.na(hit)) {
+          id <- cusip_check$DX194[hit]
+          if (!is.na(id) && nzchar(id)) {
+            ids[unfound_idx[i]] <- id
+          }
+        }
+      }
+    }
+  }
+
   ids <- tolower(ids)
   enfusion_report <- enfusion_report[!is.na(ids) & ids != "", , drop = FALSE]
   ids <- ids[!is.na(ids) & ids != ""]
@@ -163,17 +195,16 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
 #'
 #' @param long_name Character long name
 #' @param short_name Character short name
-#' @param enfusion_url URL to fetch Enfusion report
+#' @param holdings_url URL to fetch Enfusion report
 #' @return Portfolio R6 object
 #' @export
 create_portfolio_from_enfusion <- function(
-  long_name, short_name, holdings_url, trade_url
+  long_name, short_name, holdings_url
 ) {
   port <- .portfolio(
     short_name,
     long_name,
     holdings_url,
-    trade_url,
     nav = 0,
     positions = list(),
     create = TRUE
@@ -187,17 +218,16 @@ create_portfolio_from_enfusion <- function(
 #' @param long_name Character long name
 #' @param short_name Character short name
 #' @param base_portfolio Portfolio object
-#' @param enfusion_url URL to fetch Enfusion report
+#' @param holdings_url URL to fetch Enfusion report
 #' @return SMA R6 object
 #' @export
 create_sma_from_enfusion <- function(
-  long_name, short_name, base_portfolio, holdings_url, trade_url
+  long_name, short_name, base_portfolio, holdings_url
 ) {
   sma <- .sma(
     short_name,
     long_name,
     holdings_url,
-    trade_url,
     nav = 0,
     positions = list(),
     base_portfolio,
@@ -222,21 +252,23 @@ create_sma_from_enfusion <- function(
 #' @return Returns `NULL` invisibly.
 #'
 #' @details The function ensures that each `Position` object in the input list
-#'  is of the correct class by calling `SMAManager:::assert_inherits`. If the
+#'  is of the correct class by calling `checkmate::assert_r6`. If the
 #'  associated `Security` object is not already registered in the
 #'  `registries$securities` environment, it is added using its unique
 #'  identifier as the key.
 #'
 #' @note This function relies on the `registries$securities` environment being
-#'  pre-defined and accessible. It also assumes that the `SMAManager` package
-#'  provides the `assert_inherits` function for type validation.
+#'  pre-defined and accessible.
 #'
 #' @examples
 #' # Assuming `positions` is a list of Position objects:
 #' .register_securities(positions)
+#' @include utils.R
+#' @include class-position.R
+#' @import checkmate
 .register_securities <- function(positions) {
   for (pos in positions) {
-    SMAManager:::assert_inherits(pos, "Position", "pos")
+    checkmate::assert_r6(pos, "Position")
     sec <- pos$get_security()
     if (!exists(sec$get_id(), envir = registries$securities)) {
       assign(sec$get_id(), sec, envir = registries$securities)

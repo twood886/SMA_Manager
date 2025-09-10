@@ -11,13 +11,31 @@ SMARulePosition <- R6::R6Class( #nolint
   inherit = SMARule,
   public = list(
     #' @description Check the rule against the current holdings
+    #' @param positions List of Position objects
     #' @return List of security IDs that do not comply with the rule
-    check_rule_current = function() {
-      private$check_rule_multi_position_(self$get_sma()$get_position())
-    },
-    #' @description Check the swap rule against the current holdings
-    check_swap_current = function() {
-      private$check_swap_multi_position_(self$get_sma()$get_position())
+    check_compliance = function(positions) {
+      # Get the security ids from the positions
+      security_ids <- vapply(
+        positions, 
+        \(x) x$get_security()$get_id(), character(1)
+      )
+      # Find non-compliant securities
+      if (private$swap_only_) {
+        need_swap <- self$check_swap_security(security_ids)
+        is_swap <- vapply(positions, \(x) x$get_swap(), logical(1))
+        non_comply <- security_ids[which(need_swap & !is_swap)]
+      } else {
+        qtys <- vapply(positions, \(x) x$get_qty(), numeric(1))
+        exp <- qtys * self$get_definition()(security_ids, portfolio)
+        comply <- exp <= self$get_max_threshold() & exp >= self$get_min_threshold()
+        non_comply <- sapply(positions[which(!comply)], function(x) x$get_id())
+      }
+      # Return results
+      if (length(non_comply) == 0) {
+        list("pass" = TRUE)
+      } else {
+        list("pass" = FALSE, "non_comply" = non_comply)
+      }
     },
     #' @description Get the Max and Min Value of the security based on the rule
     #' @param security_id Security ID
@@ -64,8 +82,8 @@ SMARulePosition <- R6::R6Class( #nolint
     #' @param tolerance Numerical tolerance
     check_violations = function(shares, tolerance = 1e-6) {
       factors <- self$apply_rule_definition(names(shares))
-      max_t <- private$max_threshold_
-      min_t <- private$min_threshold_
+      max_t <- self$get_max_threshold()
+      min_t <- self$get_min_threshold()
       violations <- list()
       for (i in seq_along(shares)) {
         sec <- names(shares)[i]
@@ -93,32 +111,6 @@ SMARulePosition <- R6::R6Class( #nolint
         attr(violations, "scope") <- "position"
       }
       violations
-    }
-  ),
-  private = list(
-    check_rule_multi_position_ = function(positions) {
-      portfolio <- self$get_sma()
-      security_ids <- vapply(positions, \(x) x$get_security()$get_id(), character(1)) #nolint
-      qtys <- vapply(positions, \(x) x$get_qty(), numeric(1))
-      exp <- qtys * private$definition_(security_ids, portfolio)
-      comply <- exp <= private$max_threshold_ & exp >= private$min_threshold_
-      non_comply <- sapply(positions[which(!comply)], function(x) x$get_id())
-      if (length(non_comply) == 0) {
-        list("pass" = TRUE)
-      } else {
-        list("pass" = FALSE, "non_comply" = non_comply)
-      }
-    },
-    check_swap_multi_position_ = function(positions) {
-      security_ids <- vapply(positions, \(x) x$get_security()$get_id(), character(1)) #nolint
-      swap_rule <- self$check_swap_security(security_ids)
-      is_swap <- vapply(positions, \(x) x$get_swap(), logical(1))
-      non_comply <- security_ids[which(swap_rule & !is_swap)]
-      if (length(non_comply) == 0) {
-        list("pass" = TRUE)
-      } else {
-        list("pass" = FALSE, "non_comply" = non_comply)
-      }
     }
   )
 )

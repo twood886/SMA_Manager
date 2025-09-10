@@ -86,16 +86,10 @@ load_caty <- function() {
       "https://webservices.enfusionsystems.com/mobile/",
       "rest/reportservice/exportReport?",
       "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "CAT+Consolidated+Position+Listing+-+Options.ppr"
-    ),
-    trade_url = paste0(
-      "https://webservices.enfusionsystems.com/mobile/",
-      "rest/reportservice/exportReport?",
-      "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "CAT_Trade_Detail.trb"
+      "CAT+-+Positions.ppr"
     )
   )
-
+  
   caty$add_rule(.sma_rule(
     sma_name = "caty",
     rule_name = "Gross Exposure Under 250% of NAV",

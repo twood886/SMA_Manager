@@ -5,7 +5,7 @@
 #'  `create` is set to `TRUE`, it attempts to create a new security object
 #'  using Bloomberg data.
 #'
-#' @param bbid A string representing the Bloomberg ID of the security.
+#' @param sec_id A string representing the Bloomberg ID of the security.
 #'  Must be a non-empty string.
 #' @param create A logical value indicating whether to create a new security
 #'  object if it does not already exist in the registry. Defaults to `TRUE`.
@@ -39,23 +39,24 @@
 #' @seealso \code{\link{Security}} for the Security class.
 #'
 #' @importFrom Rblpapi bdp
+#' @import checkmate
 #' @export
-.security <- function(bbid, create = TRUE, assign_to_registry = TRUE) {
-  assert_string(bbid, "bbid")
-  assert_bool(create, "create")
-  assert_bool(assign_to_registry, "assign_to_registry")
-  bbid <- tolower(bbid)
+.security <- function(sec_id, create = TRUE, assign_to_registry = TRUE) {
+  checkmate::assert_character(sec_id)
+  checkmate::assert_logical(create)
+  checkmate::assert_logical(assign_to_registry)
+  sec_id <- tolower(sec_id)
   env <- registries$securities
-  if (exists(bbid, envir = env, inherits = FALSE)) {
-    return(get(bbid, envir = env))
+  if (exists(sec_id, envir = env, inherits = FALSE)) {
+    return(get(sec_id, envir = env))
   }
   if (!create) return(NULL)
-  if (Rblpapi::bdp(bbid, "DX194")$DX194 == "") {
+  if (Rblpapi::bdp(sec_id, "DX194")$DX194 == "") {
     stop("Security not found in Bloomberg")
   }
-  security <- Security$new(bbid)
+  security <- Security$new(sec_id)
   if (assign_to_registry) {
-    assign(bbid, security, envir = env)
+    assign(sec_id, security, envir = env)
   }
   invisible(security)
 }
@@ -93,6 +94,7 @@
 #' and added to the position.
 #'
 #' @seealso \code{\link{Holding}} for the Holding class.
+#' @import checkmate
 #' @export
 .holding <- function(
   portfolio_name, sec_id, qty, swap = FALSE,
@@ -148,11 +150,11 @@
 #'
 #' @param portfolio_name A string specifying the name of the portfolio.
 #'  The portfolio must already exist.
-#' @param bbid A string representing the Bloomberg identifier (BBID) of the
+#' @param sec_id A string representing the Bloomberg identifier (BBID) of the
 #'  security. This will be converted to lowercase.
 #' @param create A logical value indicating whether to create the position
-#' @param assign_to_portfolio A logical value indicating whether to add the 
-#' position to the portfolio. Defaults to `TRUE`.
+#' @param assign_to_portfolio A logical value indicating whether to add the
+#'  position to the portfolio. Defaults to `TRUE`.
 #'
 #' @return An object of class `Position` representing the created or updated
 #'  position.
@@ -166,32 +168,31 @@
 #' .position("MyPortfolio", "AAPL US Equity")
 #'
 #' @seealso \code{\link{Position}} for the Position class.
+#' @import checkmate
 #'
 #' @export
 .position <- function(
-  portfolio_name,
-  bbid,
-  create = FALSE, assign_to_portfolio = FALSE
+  portfolio_name, sec_id, create = FALSE, assign_to_portfolio = FALSE
 ) {
   checkmate::assert_character(portfolio_name)
-  checkmate::assert_string(bbid)
+  checkmate::assert_string(sec_id)
   checkmate::assert_flag(create)
   checkmate::assert_flag(assign_to_portfolio)
-  bbid <- tolower(bbid)
+  sec_id <- tolower(sec_id)
   portfolio <- .portfolio(portfolio_name, create = FALSE)
   position <- tryCatch(
-    portfolio$get_position(bbid),
+    portfolio$get_position(sec_id),
     error = function(e) NULL
   )
   if (!is.null(position)) return(invisible(position))
   if (!create) stop("Position does not exist and create is set to FALSE")
 
-  sec <- .security(bbid, create = TRUE)
-  pos <- Position$new(portfolio_name, sec)
+  sec <- .security(sec_id, create = TRUE)
+  position <- Position$new(portfolio_name, sec)
   if (assign_to_portfolio) {
-    portfolio$add_position(pos)
+    portfolio$add_position(position, overwrite = TRUE)
   }
-  return(invisible(pos))
+  return(invisible(position))
 }
 
 #' Create or Retrieve a Portfolio Object
@@ -240,10 +241,11 @@
 #' )
 #'
 #' @seealso \code{\link{Portfolio}} for the Portfolio class.
+#' @import checkmate
 #'
 #' @export
 .portfolio <- function(
-  short_name, long_name, holdings_url, trade_url,
+  short_name, long_name, holdings_url,
   nav = 0, positions = list(), create = FALSE, assign_to_registry = TRUE
 ) {
   checkmate::assert_character(short_name)
@@ -263,7 +265,6 @@
     long_name,
     short_name,
     holdings_url,
-    trade_url,
     nav,
     positions
   )
@@ -279,6 +280,7 @@
 #'
 #' @param short_name A string representing the short name of the SMA. Must be unique.
 #' @param long_name A string representing the long name of the SMA.
+#' @param holdings_url A string representing the URL for holdings data.
 #' @param nav A numeric value representing the net asset value (NAV) of the SMA. Defaults to 0.
 #' @param positions A list of `Position` objects representing the positions in the SMA. Defaults to an empty list.
 #' @param base_portfolio A string representing the name of the base portfolio associated with the SMA.
@@ -302,30 +304,30 @@
 #'                 base_portfolio = "base_portfolio", create = TRUE)
 #'
 #' @seealso \code{\link{Portfolio}}, \code{\link{SMA}}
+#' @import checkmate
 #' @export
 .sma <- function(
-  short_name, long_name, holdings_url, trade_url,
+  short_name, long_name, holdings_url,
   nav = 0, positions = list(),
   base_portfolio, create = FALSE, assign_to_registry = TRUE
 ) {
-  assert_string(short_name, "short_name")
-  assert_bool(create, "create")
+  checkmate::assert_character(short_name)
+  checkmate::assert_logical(create)
   env <- registries$portfolios
   if (exists(short_name, envir = env)) return(get(short_name, envir = env))
   if (!create) stop("SMA does not exist and create is set to FALSE")
-  assert_string(long_name, "long_name")
-  assert_numeric(nav, "nav")
+  checkmate::assert_character(long_name)
+  checkmate::assert_numeric(nav)
   lapply(
     positions,
-    function(position) assert_inherits(position, "Position", "positions")
+    function(position) checkmate::assert_r6(position, "Position")
   )
-  assert_string(base_portfolio, "base_portfolio")
+  checkmate::assert_character(base_portfolio)
   base_ptfl <- .portfolio(base_portfolio, create = FALSE)
   sma <- SMA$new(
     long_name,
     short_name,
     holdings_url,
-    trade_url,
     nav,
     positions,
     base_ptfl
@@ -372,6 +374,7 @@
 #'
 #' @seealso [SMARule()]
 #'
+#' @import checkmate
 #' @export
 .sma_rule <- function(
   sma_name,
@@ -379,17 +382,17 @@
   max_threshold = Inf, min_threshold = -Inf,
   swap_only = FALSE, gross_exposure = FALSE
 ) {
-  assert_string(sma_name, "sma_name")
+  checkmate::assert_character(sma_name)
   sma <- .sma(sma_name, create = FALSE)
-  assert_inherits(sma, "SMA", "sma")
-  assert_string(rule_name, "name")
+  checkmate::assert_r6(sma, "SMA")
+  checkmate::assert_character(rule_name)
   name <- paste(sma_name, rule_name)
   env <- registries$smarules
   if (exists(name, envir = env)) return(get(name, envir = env))
-  assert_string(scope, "scope")
-  assert_inherits(definition, "function", "definition")
-  assert_numeric(max_threshold, "max_threshold")
-  assert_numeric(min_threshold, "min_threshold")
+  checkmate::assert_character(scope)
+  checkmate::assert_function(definition)
+  checkmate::assert_numeric(max_threshold)
+  checkmate::assert_numeric(min_threshold)
 
   if (!scope %in% c("position", "portfolio", "all")) stop("scope not valid")
   if (scope == "position") {
@@ -428,7 +431,7 @@
 #' This function manages trades for a given security and portfolio. It retrieves or creates a trade object,
 #' updates the trade quantity, and adjusts the position in the portfolio accordingly.
 #'
-#' @param security_id A string representing the ID of the security. Must be a valid string.
+#' @param sec_id A string representing the ID of the security. Must be a valid string.
 #' @param portfolio_id A string representing the ID of the portfolio. Must be a valid string.
 #' @param qty A numeric value representing the quantity of the trade. Must be a valid numeric value.
 #' @param swap A boolean indicating whether the trade is a swap. Must be `TRUE` or `FALSE`.
@@ -454,18 +457,21 @@
 #'
 #' @seealso \code{\link{Trade}}, \code{\link{Portfolio}}
 #' @include class-trade.R
+#' @import checkmate
 #' @export
 .trade <- function(
-  security_id, portfolio_id, qty, swap, create = FALSE, assign_to_registry = TRUE
+  sec_id, portfolio_id, qty, swap, create = FALSE, assign_to_registry = TRUE
 ) {
-  assert_string(security_id, "security_id")
-  assert_string(portfolio_id, "portfolio_id")
+  checkmate::assert_character(sec_id)
+  security_id <- tolower(sec_id)
+  checkmate::assert_character(portfolio_id)
   portfolio <- .portfolio(portfolio_id, create = FALSE)
-  assert_inherits(portfolio, "Portfolio", "portfolio")
-  assert_numeric(qty, "qty")
-  assert_bool(swap, "swap")
-  assert_bool(create, "create")
-  assert_bool(assign_to_registry, "assign_to_registry")
+  checkmate::assert_r6(portfolio, "Portfolio")
+  checkmate::assert_numeric(qty)
+  checkmate::assert_flag(swap)
+  checkmate::assert_flag(create)
+  checkmate::assert_flag(assign_to_registry)
+
   all_trades <- mget(
     ls(envir = registries$trades, all.names = TRUE),
     envir = registries$trades,

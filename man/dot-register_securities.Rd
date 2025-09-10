@@ -22,15 +22,14 @@ This function iterates over a list of `Position` objects, validates their
 }
 \details{
 The function ensures that each `Position` object in the input list
- is of the correct class by calling `SMAManager:::assert_inherits`. If the
+ is of the correct class by calling `checkmate::assert_r6`. If the
  associated `Security` object is not already registered in the
  `registries$securities` environment, it is added using its unique
  identifier as the key.
 }
 \note{
 This function relies on the `registries$securities` environment being
- pre-defined and accessible. It also assumes that the `SMAManager` package
- provides the `assert_inherits` function for type validation.
+ pre-defined and accessible.
 }
 \examples{
 # Assuming `positions` is a list of Position objects:

@@ -17,6 +17,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-new}{\code{SMA$new()}}
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
+\item \href{#method-SMA-check_rule_compliance}{\code{SMA$check_rule_compliance()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -27,7 +28,6 @@ R6 Class representing a seperately managed account.
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_replacement"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_replacement'><code>SMAManager::Portfolio$add_replacement()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_rule"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_rule'><code>SMAManager::Portfolio$add_rule()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="check_rules_current"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-check_rules_current'><code>SMAManager::Portfolio$check_rules_current()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replaced_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replaced_security'><code>SMAManager::Portfolio$get_replaced_security()</code></a></span></li>
@@ -52,7 +52,6 @@ Create a new SMA R6 object.
   long_name,
   short_name,
   holdings_url,
-  trade_url,
   nav,
   positions = NULL,
   base_portfolio = NULL
@@ -67,8 +66,6 @@ Create a new SMA R6 object.
 \item{\code{short_name}}{Character. SMA Short Name.}
 
 \item{\code{holdings_url}}{Character. URL to Enfusion Holdings Report.}
-
-\item{\code{trade_url}}{Character. URL to Enfusion Trade Report.}
 
 \item{\code{nav}}{Numeric. SMA Net Asset Value.}
 
@@ -106,9 +103,34 @@ Get a position in the Base portfolio
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID}
+\item{\code{security_id}}{Security ID
+Check Rule Compliance}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-check_rule_compliance"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-check_rule_compliance}{}}}
+\subsection{Method \code{check_rule_compliance()}}{
+Check if the SMA is compliant with all its rules.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$check_rule_compliance(update_bbfields = TRUE, verbose = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{update_bbfields}}{Logical. Whether to update Bloomberg data before
+checking rules. Defaults to TRUE.}
+
+\item{\code{verbose}}{Logical. Whether to print compliance results. Defaults to 
+FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list of rule compliance results.
 }
 }
 \if{html}{\out{<hr>}}

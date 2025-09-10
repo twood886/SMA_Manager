@@ -9,6 +9,7 @@
 #'
 #' @importFrom R6 R6Class
 #' @import Rblpapi
+#' @import checkmate
 #' @export
 Security <- R6::R6Class( #nolint
   "Security",
@@ -38,7 +39,7 @@ Security <- R6::R6Class( #nolint
       price = NULL, underlying_price = NULL, delta = NULL,
       bics_level_2 = NULL, bics_level_3 = NULL
     ) {
-      assert_string(bbid, "bbid")
+      checkmate::assert_character(bbid)
       private$bbid_ <- bbid
 
       if (!is.null(description)) {
@@ -103,7 +104,7 @@ Security <- R6::R6Class( #nolint
     #' @description Get Rule Data
     #' @param bbfield Character. bbfield.
     get_rule_data = function(bbfield) {
-      assert_string(bbfield, "bbfield")
+      checkmate::assert_character(bbfield)
       if (bbfield %in% names(private$rule_data_)) {
         private$rule_data_[[bbfield]]
       } else {
@@ -146,14 +147,14 @@ Security <- R6::R6Class( #nolint
     #' @description Set Price
     #' @param price Numeric. New price of the security.
     set_price = function(price) {
-      assert_numeric(price, "price")
+      checkmate::assert_numeric(price)
       private$price_ <- price
       invisible(TRUE)
     },
     #' @description Set Delta
     #' @param delta Numeric. New delta of the security.
     set_delta = function(delta) {
-      assert_numeric(delta, "delta")
+      checkmate::assert_numeric(delta)
       private$delta_ <- delta
       invisible(TRUE)
     },
@@ -161,7 +162,7 @@ Security <- R6::R6Class( #nolint
     #' @param bbfield Character. Name of the rule.
     #' @param data value
     set_rule_data = function(bbfield, data) {
-      assert_string(bbfield, "bbfield")
+      checkmate::assert_character(bbfield)
       private$rule_data_[[bbfield]] <- data
       invisible(TRUE)
     }

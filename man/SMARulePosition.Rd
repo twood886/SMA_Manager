@@ -12,7 +12,7 @@ R6 Class that encapsulates rule for SMAs
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-SMARulePosition-check_rule_current}{\code{SMARulePosition$check_rule_current()}}
+\item \href{#method-SMARulePosition-check_compliance}{\code{SMARulePosition$check_compliance()}}
 \item \href{#method-SMARulePosition-check_swap_current}{\code{SMARulePosition$check_swap_current()}}
 \item \href{#method-SMARulePosition-get_security_limits}{\code{SMARulePosition$get_security_limits()}}
 \item \href{#method-SMARulePosition-check_swap_security}{\code{SMARulePosition$check_swap_security()}}
@@ -40,14 +40,21 @@ R6 Class that encapsulates rule for SMAs
 </details>
 }}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-check_rule_current"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-check_rule_current}{}}}
-\subsection{Method \code{check_rule_current()}}{
+\if{html}{\out{<a id="method-SMARulePosition-check_compliance"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-check_compliance}{}}}
+\subsection{Method \code{check_compliance()}}{
 Check the rule against the current holdings
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_rule_current()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_compliance(positions)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{positions}}{List of Position objects}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 List of security IDs that do not comply with the rule
 }

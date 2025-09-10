@@ -37,6 +37,8 @@
 #' @include api-functions.R
 #' @include class-portfolio.R
 #' @include class-security.R
+#' @import dplyr
+#' @import checkmate
 #' @export
 create_proposed_trade_qty <- function(
   portfolio_id = NULL,
@@ -45,8 +47,8 @@ create_proposed_trade_qty <- function(
   swap = FALSE,
   flow_to_derived = TRUE
 ) {
-  assert_string(portfolio_id, "portfolio_id")
-  assert_string(security_id, "security_id")
+  checkmate::assert_character(portfolio_id)
+  checkmate::assert_character(security_id)
   security <- lapply(security_id, \(sec) .security(sec))
   security_id <- vapply(security, \(x) x$get_id(), character(1))
   portfolio <- .portfolio(portfolio_id, create = FALSE)
@@ -56,7 +58,7 @@ create_proposed_trade_qty <- function(
     \(sec) tryCatch(portfolio$get_position(sec)$get_swap(), error = function(e) swap[[sec]]),
     logical(1)
   )
-  assert_bool(swap, "swap")
+  checkmate::assert_flag(swap)
 
   t <- list()
   t[[portfolio_id]] <- portfolio$calc_proposed_trade(security_id, trade_qty)
@@ -125,6 +127,10 @@ create_proposed_trade_qty <- function(
 #' @seealso \code{\link{create_proposed_trade_qty}}
 #' @include utils.R
 #' @include api-functions.R
+#' @include class-portfolio.R
+#' @include class-security.R
+#' @import dplyr
+#' @import checkmate
 #' @export
 create_proposed_trade_tgt_weight <- function(
   portfolio_id = NULL, 
@@ -133,9 +139,9 @@ create_proposed_trade_tgt_weight <- function(
   swap,
   flow_to_derived = TRUE
 ) {
-  assert_string(portfolio_id, "portfolio_id")
-  assert_string(security_id, "security_id")
-  assert_numeric(tgt_weight, "tgt_weight")
+  checkmate::assert_character(portfolio_id)
+  checkmate::assert_character(security_id)
+  checkmate::assert_numeric(tgt_weight)
 
   portfolio <- .portfolio(portfolio_id, create = FALSE)
   security <- .security(security_id)
@@ -191,11 +197,11 @@ create_proposed_trade_tgt_weight <- function(
 #' @include api-functions.R
 #' @export
 proposed_to_trade <- function(proposed_trade_df) {
-  assert_inherits(proposed_trade_df, "data.frame", "proposed_trade_df")
-  assert_string(proposed_trade_df$'Portfolio', "portfolio_id")
-  assert_string(proposed_trade_df$'Security', "security_id")
-  assert_numeric(proposed_trade_df$'Trade Quantity', "trade_qty")
-  assert_bool(proposed_trade_df$'Swap', "swap")
+  checkmate::assert_data_frame(proposed_trade_df)
+  checkmate::assert_character(proposed_trade_df$'Portfolio')
+  checkmate::assert_character(proposed_trade_df$'Security')
+  checkmate::assert_numeric(proposed_trade_df$'Trade Quantity')
+  checkmate::assert_flag(proposed_trade_df$'Swap')
 
   for (i in seq_len(nrow(proposed_trade_df))) {
     .trade(

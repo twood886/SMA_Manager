@@ -8,7 +8,6 @@
   short_name,
   long_name,
   holdings_url,
-  trade_url,
   nav = 0,
   positions = list(),
   create = FALSE,

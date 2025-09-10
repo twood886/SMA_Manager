@@ -7,16 +7,20 @@ SMARulePortfolio <- R6::R6Class( #nolint
   inherit = SMARule,
   public = list(
     #' @description Check the rule against the current portfolio
-    check_rule_current = function() {
-      private$check_rule_position_(self$get_sma()$get_position())
+    #' @param positions List of Position objects
+    check_compliance = function(positions) {
+      rule_applied <- private$apply_rule_definition_positions_(positions)
+      v <- sum(rule_applied, na.rm = TRUE)
+      comply <- v <= private$max_threshold_ && v >= private$min_threshold_
+      list("pass" = comply)
     },
-    #' @description Check the swap rule against the current portfolio
-    check_swap_current = function() list("pass" = TRUE),
+
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
       setNames(sapply(security_id, \(x) FALSE), security_id)
     },
+    
     #' @description Get the Max and Min value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
@@ -82,12 +86,6 @@ SMARulePortfolio <- R6::R6Class( #nolint
       if (private$gross_exposure_) pos_qty <- abs(pos_qty)
       rule_applied <- pos_qty * self$apply_rule_definition(security_ids)
       setNames(rule_applied, security_ids)
-    },
-    check_rule_position_ = function(positions) {
-      rule_applied <- private$apply_rule_definition_positions_(positions)
-      v <- sum(rule_applied, na.rm = TRUE)
-      comply <- v <= private$max_threshold_ && v >= private$min_threshold_
-      list("pass" = comply)
     }
   )
 )

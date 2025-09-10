@@ -4,18 +4,18 @@
 \alias{.position}
 \title{Create or Retrieve a Position Object}
 \usage{
-.position(portfolio_name, bbid, create = FALSE, assign_to_portfolio = FALSE)
+.position(portfolio_name, sec_id, create = FALSE, assign_to_portfolio = FALSE)
 }
 \arguments{
 \item{portfolio_name}{A string specifying the name of the portfolio.
 The portfolio must already exist.}
 
-\item{bbid}{A string representing the Bloomberg identifier (BBID) of the
+\item{sec_id}{A string representing the Bloomberg identifier (BBID) of the
 security. This will be converted to lowercase.}
 
 \item{create}{A logical value indicating whether to create the position}
 
-\item{assign_to_portfolio}{A logical value indicating whether to add the 
+\item{assign_to_portfolio}{A logical value indicating whether to add the
 position to the portfolio. Defaults to `TRUE`.}
 }
 \value{

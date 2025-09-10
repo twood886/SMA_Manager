@@ -5,7 +5,7 @@
 \title{Create or Retrieve a Trade Object}
 \usage{
 .trade(
-  security_id,
+  sec_id,
   portfolio_id,
   qty,
   swap,
@@ -14,7 +14,7 @@
 )
 }
 \arguments{
-\item{security_id}{A string representing the ID of the security. Must be a valid string.}
+\item{sec_id}{A string representing the ID of the security. Must be a valid string.}
 
 \item{portfolio_id}{A string representing the ID of the portfolio. Must be a valid string.}
 

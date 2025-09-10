@@ -16,9 +16,10 @@
 #'   have the given portfolio as their base portfolio and returns them.
 #'
 #' @include utils.R
+#' @import checkmate
 #' @export
 get_tracking_smas <- function(portfolio) {
-  assert_inherits(portfolio, "Portfolio", "portfolio")
+  checkmate::assert_r6(portfolio, "Portfolio")
   if (inherits(portfolio, "SMA")) {
     stop("The input must be an object of class 'Portfolio'.")
   }

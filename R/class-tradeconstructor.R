@@ -80,10 +80,6 @@ TradeConstructor <- R6::R6Class( #nolint
         cat("\n=== SMA Optimization (relative-L2 in weight space) ===\n\n")
       }
 
-      `%||%` <- function(x, y) {
-        if (is.null(x) || length(x) == 0 || (length(x) == 1 && is.na(x))) y else x #nolint
-      }
-
       # --- Data
       target_quantities <- self$calc_target_quantities(sma)
       current_positions <- private$.extract_qty(sma$get_position())
@@ -357,7 +353,6 @@ SMAConstructor <- R6::R6Class( #nolint
       nav_ratio <- sma_portfolio$get_nav() / base_portfolio$get_nav()
       base_pos_qty * nav_ratio
     },
-
     #' @description Get the scale ratio for the SMA
     #' @param base_portfolio Base portfolio object
     #' @param sma_portfolio SMA portfolio object
@@ -366,47 +361,6 @@ SMAConstructor <- R6::R6Class( #nolint
       sma_nav  <- sma_portfolio$get_nav()
       if (base_nav == 0) return(0)
       sma_nav / base_nav
-    },
-
-    #' Calculate the target quantity for the SMA based on the base portfolio
-    #' @param sma SMA object
-    #' @param target_sec_id Security ID to calculate for
-    #' @param base_trade_qty Base trade quantity to adjust
-    calc_want_qty = function(
-      sma, target_sec_id = NULL, base_trade_qty = 0
-    ) {
-      base <- sma$get_base_portfolio()
-      base_qty <- private$.extract_qty(base$get_target_position())
-      if (!is.null(target_sec_id) && length(target_sec_id) == 1) {
-        base_qty[target_sec_id] <- base_qty[target_sec_id] + base_trade_qty
-      }
-
-      sma_qty <- private$.extract_qty(sma$get_target_position())
-      if (is.null(target_sec_id)) target_sec_id <- names(base_qty)
-
-      scale_ratio <- self$get_scale_ratio(base, sma)
-      replacements <- sma$get_replacement_security()
-      all_secs_id <- unique(c(
-        names(base_qty),
-        names(sma_qty),
-        unlist(replacements, use.names = FALSE)
-      ))
-
-      want <- setNames(
-        vapply(
-          all_secs_id,
-          function(s) {
-            if (s %in% target_sec_id) {
-              base_pos_qty <- tryCatch(base_qty[[s]], error = function(e) 0)
-              return(scale_ratio * (base_qty[[s]] %||% 0))
-            }
-            if (s %in% names(sma_qty)) return(sma_qty[s])
-            0
-          },
-          numeric(1)
-        ),
-        all_secs_id
-      )
     },
     #' Calculate target quantities for the SMA based on scaled base portfolio
     #' @param sma SMA object

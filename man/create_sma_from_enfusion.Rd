@@ -4,13 +4,7 @@
 \alias{create_sma_from_enfusion}
 \title{Create SMA from Enfusion}
 \usage{
-create_sma_from_enfusion(
-  long_name,
-  short_name,
-  base_portfolio,
-  holdings_url,
-  trade_url
-)
+create_sma_from_enfusion(long_name, short_name, base_portfolio, holdings_url)
 }
 \arguments{
 \item{long_name}{Character long name}
@@ -19,7 +13,7 @@ create_sma_from_enfusion(
 
 \item{base_portfolio}{Portfolio object}
 
-\item{enfusion_url}{URL to fetch Enfusion report}
+\item{holdings_url}{URL to fetch Enfusion report}
 }
 \value{
 SMA R6 object

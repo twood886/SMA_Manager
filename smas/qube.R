@@ -1,3 +1,24 @@
+library(SMAManager)
+library(Rblpapi)
+
+
+con <- blpConnect()
+
+
+ccmf <- create_portfolio_from_enfusion(
+  long_name = "Callodine Capital Master Fund",
+  short_name = "ccmf",
+  holdings_url = paste0(
+    "https://webservices.enfusionsystems.com/mobile/",
+    "rest/reportservice/exportReport?",
+    "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
+    "CCMF+-+Positions.ppr"
+  )
+)
+
+
+
+
 load_qsma <- function() {
   blpConnect()
   qsma <- SMAManager::create_sma_from_enfusion(
@@ -8,16 +29,10 @@ load_qsma <- function() {
       "https://webservices.enfusionsystems.com/mobile/",
       "rest/reportservice/exportReport?",
       "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "BAMSF+Consolidated+Position+Listing+-+Options.ppr"
-    ),
-    trade_url = paste0(
-      "https://webservices.enfusionsystems.com/mobile/",
-      "rest/reportservice/exportReport?",
-      "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "BAMSF_Trade_Detail.trb"
+      "QUBE+-+Positions.ppr"
     )
   )
-
+  
   ## Restrictions ##############################################################
   # 1. invest in securities listed in countries other than United States of
   #    America (each, a “Permitted Country”);
@@ -29,14 +44,14 @@ load_qsma <- function() {
     definition = function(security_id, sma) {
       permitted_countries <- c("US")
       exch_cty <- sapply(security_id, \(id) .security(id)$get_rule_data("DS144"))
-      case_when(
-        exch_cty %in% permitted_countries ~ 1,
-        TRUE ~ 0
+      dplyr::case_when(
+        exch_cty %in% permitted_countries ~ 0,
+        TRUE ~ 1
       )
     },
     swap_only = FALSE,
-    max_threshold = 1,
-    min_threshold = 1
+    max_threshold = 0,
+    min_threshold = 0
   ))
 
   # 2. hold, trade or purchase positions synthetically other than equity
@@ -57,7 +72,7 @@ load_qsma <- function() {
     scope = "position",
     bbfields = "DS381",
     definition = function(security_id, sma) {
-      shares <- sapply(security_id, \(id). security(id)$get_rule_data("DS381"))
+      shares <- sapply(security_id, \(id) .security(id)$get_rule_data("DS381"))
       1 / shares
     },
     swap_only = FALSE,
@@ -108,7 +123,7 @@ load_qsma <- function() {
     bbfields = "FD634",
     definition = function(security_id, sma) {
       inv_comp <- sapply(security_id, \(id) .security(id)$get_rule_data("FD634"))
-      case_when(
+      dplyr::case_when(
         is.na(inv_comp) ~ FALSE,
         TRUE ~ TRUE
       )
@@ -137,7 +152,7 @@ load_qsma <- function() {
     bbfields = "DS213",
     definition = function(security_id, sma) {
       sec_typ <- sapply(security_id, \(id) .security(id)$get_rule_data("DS213"))
-      case_when(
+      dplyr::case_when(
         sec_typ == "MLP" ~ 1,
         TRUE ~ 0
       )
@@ -153,7 +168,7 @@ load_qsma <- function() {
     bbfields = "DS674",
     definition = function(security_id, sma) {
       sec_typ <- sapply(security_id, \(id) .security(id)$get_rule_data("DS674"))
-      case_when(
+      dplyr::case_when(
         sec_typ == "Partnership Shares" ~ 1,
         TRUE ~ 0
       )
@@ -179,7 +194,7 @@ load_qsma <- function() {
     bbfields = "DS213",
     definition = function(security_id, sma) {
       sec_typ <- sapply(security_id, \(id) .security(id)$get_rule_data("DS213"))
-      case_when(
+      dplyr::case_when(
         sec_typ == "REIT" ~ 1,
         TRUE ~ 0
       )
@@ -198,7 +213,7 @@ load_qsma <- function() {
     bbfields = "PR175",
     definition = function(security_id, sma) {
       act <- sapply(security_id, \(id) .security(id)$get_rule_data("DS213"))
-      case_when(
+      dplyr::case_when(
         act == "INAC" ~ 1,
         TRUE ~ 0
       )
@@ -257,7 +272,7 @@ load_qsma <- function() {
     bbfields = "DQ451",
     definition = function(security_id, sma) {
       crypto <- sapply(security_id, \(id) .security(id)$get_rule_data("DQ451"))
-      case_when(
+      dplyr::case_when(
         crypto == "Direct" ~ 1,
         TRUE ~ 0
       )

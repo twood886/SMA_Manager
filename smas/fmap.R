@@ -1,6 +1,6 @@
 load_fmap <- function() {
   blpConnect()
-  fmap <- SMAManager::create_sma_from_enfusion(
+  fmap <- create_sma_from_enfusion(
     long_name = "Citco Bank Canada Ref Blackstone CSP-MST FMAP Fund",
     short_name = "fmap",
     base_portfolio = "ccmf",
@@ -8,13 +8,7 @@ load_fmap <- function() {
       "https://webservices.enfusionsystems.com/mobile/",
       "rest/reportservice/exportReport?",
       "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "FMAP+Consolidated+Position+Listing+-+Options.ppr"
-    ),
-    trade_url = paste0(
-      "https://webservices.enfusionsystems.com/mobile/",
-      "rest/reportservice/exportReport?",
-      "name=shared%2FTaylor%2FSMA_Mgr_Reports%2F",
-      "FMAP_Trade_Detail.trb"
+      "FMAP+-+Positions.ppr"
     )
   )
 

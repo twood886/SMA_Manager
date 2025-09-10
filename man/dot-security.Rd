@@ -4,10 +4,10 @@
 \alias{.security}
 \title{Retrieve or Create a Security Object}
 \usage{
-.security(bbid, create = TRUE, assign_to_registry = TRUE)
+.security(sec_id, create = TRUE, assign_to_registry = TRUE)
 }
 \arguments{
-\item{bbid}{A string representing the Bloomberg ID of the security.
+\item{sec_id}{A string representing the Bloomberg ID of the security.
 Must be a non-empty string.}
 
 \item{create}{A logical value indicating whether to create a new security

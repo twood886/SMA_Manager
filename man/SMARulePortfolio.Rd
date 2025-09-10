@@ -14,7 +14,7 @@ SMA Rule for Portfolio
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-SMARulePortfolio-check_rule_current}{\code{SMARulePortfolio$check_rule_current()}}
+\item \href{#method-SMARulePortfolio-check_compliance}{\code{SMARulePortfolio$check_compliance()}}
 \item \href{#method-SMARulePortfolio-check_swap_current}{\code{SMARulePortfolio$check_swap_current()}}
 \item \href{#method-SMARulePortfolio-check_swap_security}{\code{SMARulePortfolio$check_swap_security()}}
 \item \href{#method-SMARulePortfolio-get_security_limits}{\code{SMARulePortfolio$get_security_limits()}}
@@ -42,14 +42,21 @@ SMA Rule for Portfolio
 </details>
 }}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-check_rule_current"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_rule_current}{}}}
-\subsection{Method \code{check_rule_current()}}{
+\if{html}{\out{<a id="method-SMARulePortfolio-check_compliance"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_compliance}{}}}
+\subsection{Method \code{check_compliance()}}{
 Check the rule against the current portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_rule_current()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_compliance(positions)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{positions}}{List of Position objects}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePortfolio-check_swap_current"></a>}}

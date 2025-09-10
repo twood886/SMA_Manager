@@ -29,9 +29,8 @@ Portfolio <- R6::R6Class( #nolint
     #' @param nav NAV of portfolio
     #' @param positions list of position items
     #' @param holdings_url URL to Enfusion Holdings Report
-    #' @param trade_url URL to Enfusion Trade Report
     initialize = function(
-      long_name, short_name, holdings_url, trade_url, nav, positions
+      long_name, short_name, holdings_url, nav, positions
     ) {
       private$long_name_ <- long_name
       private$short_name_ <- short_name
@@ -41,7 +40,6 @@ Portfolio <- R6::R6Class( #nolint
       private$replacements_ <- list()
       private$trade_constructor <- TradeConstructor$new()
       private$holdings_url_ <- holdings_url
-      private$trade_url_ <- trade_url
     },
     # Getter Functions ---------------------------------------------------------
     #' @description Get Portfolio short name
@@ -82,15 +80,6 @@ Portfolio <- R6::R6Class( #nolint
       if (length(idx) == 0) return(NULL)
       names(u)[idx]
     },
-    #' @description Check SMA rules against the current positions
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
-    check_rules_current = function(update_bbfields = TRUE) {
-      assert_bool(update_bbfields, "update_bbfields")
-      if (update_bbfields) {
-        update_bloomberg_fields()
-      }
-      lapply(self$get_rules(), function(x) x$check_rule_current())
-    },
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
     #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
@@ -98,7 +87,7 @@ Portfolio <- R6::R6Class( #nolint
       security_id = NULL,
       update_bbfields = TRUE
     ) {
-      assert_bool(update_bbfields, "update_bbfields")
+      checkmate::assert_flag(update_bbfields)
       if (update_bbfields) {
         update_bloomberg_fields()
       }
@@ -111,7 +100,7 @@ Portfolio <- R6::R6Class( #nolint
       security_id = NULL,
       update_bbfields = TRUE
     ) {
-      assert_bool(update_bbfields, "update_bbfields")
+      checkmate::assert_flag(update_bbfields)
       if (update_bbfields) {
         update_bloomberg_fields()
       }
@@ -149,7 +138,7 @@ Portfolio <- R6::R6Class( #nolint
     #' @description Create Rule and Add to Portfolio
     #' @param rule An object of class SMARule
     add_rule = function(rule) {
-      assert_inherits(rule, "SMARule", "rule")
+      checkmate::assert_r6(rule, "SMARule")
       private$rules_[[rule$get_name()]] <- rule
       invisible(rule)
     },
@@ -190,7 +179,7 @@ Portfolio <- R6::R6Class( #nolint
     #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
     #' @param as.df Logical. Return as data frame (default: TRUE)
     rebalance = function(update_bbfields = TRUE, as.df = TRUE) {
-      assert_bool(update_bbfields, "update_bbfields")
+      checkmate::assert_flag(update_bbfields)
       if (update_bbfields) update_bloomberg_fields()
       rebal <- self$get_trade_constructor()$optimize_sma(self, verbose = FALSE)
       current_shares <- sapply(

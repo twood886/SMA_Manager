@@ -17,7 +17,6 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_trade_constructor}{\code{Portfolio$get_trade_constructor()}}
 \item \href{#method-Portfolio-get_replacement_security}{\code{Portfolio$get_replacement_security()}}
 \item \href{#method-Portfolio-get_replaced_security}{\code{Portfolio$get_replaced_security()}}
-\item \href{#method-Portfolio-check_rules_current}{\code{Portfolio$check_rules_current()}}
 \item \href{#method-Portfolio-get_security_position_limits}{\code{Portfolio$get_security_position_limits()}}
 \item \href{#method-Portfolio-get_swap_flag_position_rules}{\code{Portfolio$get_swap_flag_position_rules()}}
 \item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
@@ -35,7 +34,7 @@ R6 Class representing a portfolio object.
 \subsection{Method \code{new()}}{
 Create New Portfolio R6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$new(long_name, short_name, holdings_url, trade_url, nav, positions)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$new(long_name, short_name, holdings_url, nav, positions)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -46,8 +45,6 @@ Create New Portfolio R6 object
 \item{\code{short_name}}{Portfolio Short Name}
 
 \item{\code{holdings_url}}{URL to Enfusion Holdings Report}
-
-\item{\code{trade_url}}{URL to Enfusion Trade Report}
 
 \item{\code{nav}}{NAV of portfolio}
 
@@ -149,23 +146,6 @@ Get replaced security for a given replacement security
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{replacement_security_id}}{Security ID of the replacement security (in SMA) #nolint}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-check_rules_current"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-check_rules_current}{}}}
-\subsection{Method \code{check_rules_current()}}{
-Check SMA rules against the current positions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$check_rules_current(update_bbfields = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
 }
 \if{html}{\out{</div>}}
 }
@@ -297,18 +277,11 @@ Update Enfusion Data}
 \if{latex}{\out{\hypertarget{method-Portfolio-update_enfusion}{}}}
 \subsection{Method \code{update_enfusion()}}{
 Update Positions
+Rebalance Portfolio
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$update_enfusion()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{url}}{URL to fetch Enfusion Holdings Report
-Rebalance Portfolio}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-rebalance"></a>}}

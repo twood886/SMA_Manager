@@ -8,7 +8,6 @@
   short_name,
   long_name,
   holdings_url,
-  trade_url,
   nav = 0,
   positions = list(),
   base_portfolio,
@@ -20,6 +19,8 @@
 \item{short_name}{A string representing the short name of the SMA. Must be unique.}
 
 \item{long_name}{A string representing the long name of the SMA.}
+
+\item{holdings_url}{A string representing the URL for holdings data.}
 
 \item{nav}{A numeric value representing the net asset value (NAV) of the SMA. Defaults to 0.}
 

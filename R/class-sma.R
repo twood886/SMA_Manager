@@ -25,7 +25,6 @@ SMA <- R6::R6Class(   #nolint
     #' @param long_name Character. SMA Long Name.
     #' @param short_name Character. SMA Short Name.
     #' @param holdings_url Character. URL to Enfusion Holdings Report.
-    #' @param trade_url Character. URL to Enfusion Trade Report.
     #' @param nav Numeric. SMA Net Asset Value.
     #' @param positions Optional. SMA Positions. Default is NULL.
     #' @param base_portfolio An object representing the base portfolio.
@@ -34,7 +33,6 @@ SMA <- R6::R6Class(   #nolint
       long_name,
       short_name,
       holdings_url,
-      trade_url,
       nav,
       positions = NULL,
       base_portfolio = NULL
@@ -42,7 +40,6 @@ SMA <- R6::R6Class(   #nolint
       private$long_name_ <- long_name
       private$short_name_ <- short_name
       private$holdings_url_ <- holdings_url
-      private$trade_url_ <- trade_url
       private$nav_ <- nav
       private$base_portfolio_ <- base_portfolio
       private$positions_ <- positions
@@ -59,6 +56,43 @@ SMA <- R6::R6Class(   #nolint
     #' @param security_id Security ID
     get_base_portfolio_position = function(security_id = NULL) {
       self$get_base_portfolio()$get_position(security_id)
+    },
+    # Checkers -----------------------------------------------------------------
+    #' Check Rule Compliance
+    #' @description Check if the SMA is compliant with all its rules.
+    #' @param update_bbfields Logical. Whether to update Bloomberg data before
+    #'  checking rules. Defaults to TRUE.
+    #' @param verbose Logical. Whether to print compliance results. Defaults to 
+    #' FALSE.
+    #' @import checkmate
+    #' @return A list of rule compliance results.
+    check_rule_compliance = function(update_bbfields = TRUE, verbose = FALSE) {
+      checkmate::assert_logical(update_bbfields)
+      checkmate::assert_logical(verbose)
+      rules <- self$get_rules()
+      if (length(rules) == 0) {
+        if (verbose) {
+          message("No rules to check.")
+        }
+        return(list())
+      }
+      if (update_bbfields) update_bloomberg_fields()
+      positions <- self$get_position()
+      results <- lapply(rules, \(rule) rule$check_compliance(positions))      
+      if (verbose) return(results)
+
+      non_comply <- which(sapply(results, function(x) !x$pass))
+
+      if (length(non_comply) == 0) {
+        return(list("pass" = TRUE, "message" = "All rules are compliant."))
+      } else {
+        rule_names <- names(rules)[non_comply]
+        messages <- sapply(results[non_comply], function(x) x$message)
+        return(list(
+          "pass" = FALSE, 
+          "non_compliant" = non_comply
+        ))
+      }
     }
   )
 )
