@@ -25,6 +25,7 @@ SMA Trade Constructor Class
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="get_security_position_limits"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-get_security_position_limits'><code>SMAManager::TradeConstructor$get_security_position_limits()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="get_swap_flag_position_rules"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-get_swap_flag_position_rules'><code>SMAManager::TradeConstructor$get_swap_flag_position_rules()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="make_model_context"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-make_model_context'><code>SMAManager::TradeConstructor$make_model_context()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="optimize_sma"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-optimize_sma'><code>SMAManager::TradeConstructor$optimize_sma()</code></a></span></li>
 </ul>
 </details>

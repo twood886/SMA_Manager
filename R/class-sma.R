@@ -76,7 +76,7 @@ SMA <- R6::R6Class(   #nolint
         }
         return(list())
       }
-      if (update_bbfields) update_bloomberg_fields()
+      if (update_bbfields) SMAManager::update_bloomberg_fields()
       positions <- self$get_position()
       results <- lapply(rules, \(rule) rule$check_compliance(positions))      
       if (verbose) return(results)

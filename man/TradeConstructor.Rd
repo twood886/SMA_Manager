@@ -13,6 +13,7 @@ Trade Constructor Parent Class
 \itemize{
 \item \href{#method-TradeConstructor-get_security_position_limits}{\code{TradeConstructor$get_security_position_limits()}}
 \item \href{#method-TradeConstructor-get_swap_flag_position_rules}{\code{TradeConstructor$get_swap_flag_position_rules()}}
+\item \href{#method-TradeConstructor-make_model_context}{\code{TradeConstructor$make_model_context()}}
 \item \href{#method-TradeConstructor-optimize_sma}{\code{TradeConstructor$optimize_sma()}}
 \item \href{#method-TradeConstructor-clone}{\code{TradeConstructor$clone()}}
 }
@@ -21,6 +22,7 @@ Trade Constructor Parent Class
 \if{html}{\out{<a id="method-TradeConstructor-get_security_position_limits"></a>}}
 \if{latex}{\out{\hypertarget{method-TradeConstructor-get_security_position_limits}{}}}
 \subsection{Method \code{get_security_position_limits()}}{
+Calculate target quantities for the trade constructor
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$get_security_position_limits(
   portfolio,
@@ -45,6 +47,7 @@ Trade Constructor Parent Class
 \if{html}{\out{<a id="method-TradeConstructor-get_swap_flag_position_rules"></a>}}
 \if{latex}{\out{\hypertarget{method-TradeConstructor-get_swap_flag_position_rules}{}}}
 \subsection{Method \code{get_swap_flag_position_rules()}}{
+Identify securities that are part of any swap rule
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$get_swap_flag_position_rules(portfolio, security_id = NULL)}\if{html}{\out{</div>}}
 }
@@ -54,7 +57,32 @@ Trade Constructor Parent Class
 \describe{
 \item{\code{portfolio}}{An object of class Portfolio}
 
-\item{\code{security_id}}{A character vector of security IDs
+\item{\code{security_id}}{A character vector of security IDs}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TradeConstructor-make_model_context"></a>}}
+\if{latex}{\out{\hypertarget{method-TradeConstructor-make_model_context}{}}}
+\subsection{Method \code{make_model_context()}}{
+Build the Optimzation Model Context (called by optimize_sma)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$make_model_context(ids, price_vec, nav, t_w, params)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ids}}{Character vector of security IDs}
+
+\item{\code{price_vec}}{Numeric vector of security prices}
+
+\item{\code{nav}}{Numeric, portfolio NAV}
+
+\item{\code{t_w}}{Numeric vector of target weights (+/-/0)}
+
+\item{\code{params}}{List of parameters (lambda_alpha, tau_rel, etc.)
 Main optimization using CVXR}
 }
 \if{html}{\out{</div>}}
@@ -66,20 +94,19 @@ Main optimization using CVXR}
 \subsection{Method \code{optimize_sma()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$optimize_sma(
-  sma,
+  portfolio,
   lambda_alpha = 10,
   tau_rel = 0.001,
   beta_free = 5,
   alpha_min = 0.8,
-  alpha_max = 5,
-  verbose = TRUE
+  alpha_max = 5
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{sma}}{SMA object}
+\item{\code{portfolio}}{An object of class Portfolio}
 
 \item{\code{lambda_alpha}}{Regularization parameter for alpha}
 

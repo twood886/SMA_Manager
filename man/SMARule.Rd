@@ -22,6 +22,8 @@ R6 Class that encapsultes rules for SMAs.
 \item \href{#method-SMARule-get_gross_exposure}{\code{SMARule$get_gross_exposure()}}
 \item \href{#method-SMARule-get_sma}{\code{SMARule$get_sma()}}
 \item \href{#method-SMARule-apply_rule_definition}{\code{SMARule$apply_rule_definition()}}
+\item \href{#method-SMARule-build_constraints}{\code{SMARule$build_constraints()}}
+\item \href{#method-SMARule-objective_terms}{\code{SMARule$objective_terms()}}
 \item \href{#method-SMARule-clone}{\code{SMARule$clone()}}
 }
 }
@@ -201,7 +203,43 @@ Apply the rule definition to a set of security IDs
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID}
+\item{\code{security_id}}{Security ID
+Build Constraints}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-build_constraints"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-build_constraints}{}}}
+\subsection{Method \code{build_constraints()}}{
+Build any additional constraints for the optimization
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$build_constraints(ctx)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ctx}}{ModelContext
+Objective Terms}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-objective_terms"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-objective_terms}{}}}
+\subsection{Method \code{objective_terms()}}{
+Build any additional objective terms for the optimization
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$objective_terms(ctx)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ctx}}{ModelContext}
 }
 \if{html}{\out{</div>}}
 }

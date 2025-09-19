@@ -55,31 +55,24 @@ SMARule <- R6::R6Class( #nolint
     #' Get SMA Name
     #' @description Get the name of the SMA
     get_sma_name = function() private$sma_name_,
-
     #' Get Id
     #' @description Get Id of SMA Rule
     get_id = function() paste0(private$sma_name_, "::", private$name_),
-
     #' Get Name
     #' @description Get name of SMA Rule
     get_name = function() private$name_,
-
     #' Get Scope
     #' @description Get the scope of the SMA Rule
     get_scope = function() private$scope_,
-
     #' Get Bloomberg Fields
     #' @description Get the Bloomberg fields of the SMA Rule
     get_bbfields = function() private$bbfields_,
-
     #' Get Definition
     #' @description Get the definition of the SMA Rule
     get_definition = function() private$definition_,
-
     #' Get Max Threshold
     #' @description Get the threshold of the SMA Rule
     get_max_threshold = function() private$max_threshold_,
-
     #' Get Min Threshold
     #' @description Get the threshold of the SMA Rule
     get_min_threshold = function() private$min_threshold_,
@@ -91,13 +84,11 @@ SMARule <- R6::R6Class( #nolint
     #' Get Gross Exposure Flag
     #' @description Get the gross exposure flag of the SMA Rule
     get_gross_exposure = function() private$gross_exposure_,
-
     #'Get the SMA Object
     #' @description Get the SMA Object that this rule belongs to
     get_sma = function() {
       get(private$sma_name_, envir = registries$portfolios, inherits = TRUE)
     },
-
     #' Apply the Rule Definition
     #' @description Apply the rule definition to a set of security IDs
     #' @param security_id Security ID
@@ -106,6 +97,14 @@ SMARule <- R6::R6Class( #nolint
         private$definition_(security_id, private$get_portfolio()),
         security_id
       )
-    }
+    },
+    #' Build Constraints
+    #' @description Build any additional constraints for the optimization
+    #' @param ctx ModelContext
+    build_constraints = function(ctx) list(),
+    #' Objective Terms
+    #' @description Build any additional objective terms for the optimization
+    #' @param ctx ModelContext
+    objective_terms = function(ctx) list()
   )
 )

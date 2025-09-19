@@ -17,7 +17,8 @@ SMARulePosition <- R6::R6Class( #nolint
       # Get the security ids from the positions
       security_ids <- vapply(
         positions, 
-        \(x) x$get_security()$get_id(), character(1)
+        \(x) x$get_security()$get_id(),
+        character(1)
       )
       # Find non-compliant securities
       if (private$swap_only_) {
@@ -26,8 +27,10 @@ SMARulePosition <- R6::R6Class( #nolint
         non_comply <- security_ids[which(need_swap & !is_swap)]
       } else {
         qtys <- vapply(positions, \(x) x$get_qty(), numeric(1))
-        exp <- qtys * self$get_definition()(security_ids, portfolio)
-        comply <- exp <= self$get_max_threshold() & exp >= self$get_min_threshold()
+        exp <- qtys * self$get_definition()(security_ids, self$get_sma())
+        comply <- (
+          exp <= self$get_max_threshold() & exp >= self$get_min_threshold()
+        )
         non_comply <- sapply(positions[which(!comply)], function(x) x$get_id())
       }
       # Return results
@@ -111,6 +114,37 @@ SMARulePosition <- R6::R6Class( #nolint
         attr(violations, "scope") <- "position"
       }
       violations
+    },
+    #' @description Build the constraints for the optimization model
+    #' @param ctx Context object with optimization variables and parameters
+    build_constraints = function(ctx) {
+      f <- self$apply_rule_definition(ctx$ids)
+      if (is.logical(f)) return(list())
+      f <- as.numeric(f)
+      f[!is.finite(f)] <- NA_real_
+
+      max_t <- self$get_max_threshold()
+      min_t <- self$get_min_threshold()
+
+      wmin <- rep(-Inf, length(ctx$ids))
+      wmax <- rep(Inf, length(ctx$ids))
+      hasf <- which(!is.na(f) & f != 0)
+      if (length(hasf) > 0) {
+        ratio <- (ctx$price[hasf] / ctx$nav) / f[hasf]
+        if (is.finite(max_t)) wmax[hasf] <- max_t * ratio
+        if (is.finite(min_t)) wmin[hasf] <- min_t * ratio
+      }
+      cons <- list()
+      lo <- which(is.finite(wmin))
+      hi <- which(is.finite(wmax))
+      if (length(lo)) {
+        cons <- c(cons, list(ctx$w[lo] >= wmin[lo]))
+      }
+      if (length(hi)) {
+        hi <- which(is.finite(wmax))
+        cons <- c(cons, list(ctx$w[hi] <= wmax[hi]))
+      }
+      cons
     }
   )
 )

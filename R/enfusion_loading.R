@@ -130,7 +130,7 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
   new_ids   <- uniq_ids[!have_mask]
 
   if (length(new_ids)) {
-    fields  <- c("DX615", "EX028", "PX_LAST", "BI012", "BI013")
+    fields  <- c("DX615", "EX028", "PX_LAST")
     data    <- Rblpapi::bdp(new_ids, fields)
     data_key <- if ("security" %in% names(data)) {
       data[["security"]]
@@ -152,9 +152,7 @@ get_enfusion_report <- function(reportWebServiceURL) { #nolint
           bbid            = bbid,
           description     = data$DX615[pos[i]],
           instrument_type = inst_type[i],
-          price           = px_final[i],
-          bics_level_2    = data$BI012[pos[i]],
-          bics_level_3    = data$BI013[pos[i]]
+          price           = px_final[i]
         ),
         envir = env
       )

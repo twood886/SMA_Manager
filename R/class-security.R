@@ -20,8 +20,6 @@ Security <- R6::R6Class( #nolint
     price_ = NULL,
     underlying_price_ = NULL,
     delta_ = NULL,
-    bics_level_2_ = NULL,
-    bics_level_3_ = NULL,
     rule_data_ = list(NULL)
   ),
   public = list(
@@ -32,12 +30,9 @@ Security <- R6::R6Class( #nolint
     #' @param price Numeric. Price of the security.
     #' @param underlying_price Numeric. Price of underlying security.
     #' @param delta Numeric. Delta of the security.
-    #' @param bics_level_2 Character string. BICS Level 2 classification.
-    #' @param bics_level_3 Character string. BICS Level 3 classification.
     initialize = function(
       bbid, description = NULL, instrument_type = NULL,
-      price = NULL, underlying_price = NULL, delta = NULL,
-      bics_level_2 = NULL, bics_level_3 = NULL
+      price = NULL, underlying_price = NULL, delta = NULL
     ) {
       checkmate::assert_character(bbid)
       private$bbid_ <- bbid
@@ -71,18 +66,6 @@ Security <- R6::R6Class( #nolint
       } else {
         private$delta_ <- self$update_delta()
       }
-
-      if (!is.null(bics_level_2)) {
-        private$bics_level_2_ <- bics_level_2
-      } else {
-        private$bics_level_2_ <- Rblpapi::bdp(bbid, "BI012")$BI012
-      }
-
-      if (!is.null(bics_level_3)) {
-        private$bics_level_3_ <- bics_level_3
-      } else {
-        private$bics_level_3_ <- Rblpapi::bdp(bbid, "BI013")$BI013
-      }
     },
     # Getters ------------------------------------------------------------------
     #' @description Get ID
@@ -97,10 +80,6 @@ Security <- R6::R6Class( #nolint
     get_underlying_price = function() private$underlying_price_,
     #' @description Get Delta
     get_delta = function() private$delta_,
-    #' @description Get BICS Level 2
-    get_bics_level_2 = function() private$bics_level_2_,
-    #' @description Get BICS Level 3
-    get_bics_level_3 = function() private$bics_level_3_,
     #' @description Get Rule Data
     #' @param bbfield Character. bbfield.
     get_rule_data = function(bbfield) {

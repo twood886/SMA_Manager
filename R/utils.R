@@ -69,6 +69,9 @@ update_bloomberg_fields <- function() {
       use.names = FALSE
     )
   )
+  if (is.null(rule_bbfields) || length(rule_bbfields) == 0) {
+    return(invisible(TRUE))
+  }
   security_ids <- ls(get_registries()$securities)
   bbdata <- Rblpapi::bdp(
     security_ids,

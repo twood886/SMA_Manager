@@ -46,8 +46,7 @@ Portfolio <- R6::R6Class( #nolint
     get_short_name = function() private$short_name_,
     #' @description Get Fund NAV
     get_nav = function() private$nav_,
-    #' @description
-    #' Get list of positions in portfolio
+    #' @description Get list of positions in portfolio
     #' @param id Ticker
     get_position = function(id = NULL) {
       positions <- private$positions_

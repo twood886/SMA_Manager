@@ -10,6 +10,7 @@
 TradeConstructor <- R6::R6Class( #nolint
   "TradeConstructor",
   public = list(
+    #' @description Calculate target quantities for the trade constructor
     #' @param portfolio An object of class Portfolio
     #' @param security_id A character vector of security IDs
     #' @param position_only Logical, if TRUE only consider position rules
@@ -41,7 +42,7 @@ TradeConstructor <- R6::R6Class( #nolint
         security_id
       )
     },
-
+    #' @description Identify securities that are part of any swap rule
     #' @param portfolio An object of class Portfolio
     #' @param security_id A character vector of security IDs
     get_swap_flag_position_rules = function(portfolio, security_id = NULL) {
@@ -56,9 +57,36 @@ TradeConstructor <- R6::R6Class( #nolint
         security_id
       )
     },
+    #' @description Build the Optimzation Model Context (called by optimize_sma)
+    #' @param ids Character vector of security IDs
+    #' @param price_vec Numeric vector of security prices
+    #' @param nav Numeric, portfolio NAV
+    #' @param t_w Numeric vector of target weights (+/-/0)
+    #' @param params List of parameters (lambda_alpha, tau_rel, etc.)
+    make_model_context = function(ids, price_vec, nav, t_w, params) {
+      n  <- length(ids)
+      vf <- VariableFactory$new()
+      w  <- CVXR::Variable(n, name = "w")
+      alpha <- CVXR::Variable(1, name = "alpha")
+      index_of <- function(id) match(id, ids)
+      ModelContext$new(
+        n = n,
+        ids = ids,
+        price = price_vec,
+        nav = nav,
+        t_w = t_w,
+        sgn = sign(t_w),
+        w = w,
+        alpha = alpha,
+        params = params,
+        index_of = index_of,
+        var_factory = vf
+      )
+    },
+
 
     #' Main optimization using CVXR
-    #' @param sma SMA object
+    #' @param portfolio An object of class Portfolio
     #' @param lambda_alpha Regularization parameter for alpha
     #' @param tau_rel Small denominator to stabilize relative error
     #' @param beta_free Extra weight for "unaffected" names
@@ -67,168 +95,70 @@ TradeConstructor <- R6::R6Class( #nolint
     #' @param verbose Print progress
     #' @importFrom stats setNames
     optimize_sma = function(
-      sma,
+      portfolio,
       lambda_alpha   = 10,
       tau_rel        = 1e-3,
       beta_free      = 5.0,
       alpha_min      = 0.8,
-      alpha_max      = 5.0,
-      verbose        = TRUE
+      alpha_max      = 5.0
     ) {
-      t1 <- Sys.time()
-      if (verbose) {
-        cat("\n=== SMA Optimization (relative-L2 in weight space) ===\n\n")
-      }
-
-      # --- Data
-      target_quantities <- self$calc_target_quantities(sma)
-      current_positions <- private$.extract_qty(sma$get_position())
-      replacements <- sma$get_replacement_security()
-
-      all_securities <- unique(c(
-        names(target_quantities),
-        names(current_positions),
-        unlist(replacements, use.names = FALSE)
-      ))
-      n <- length(all_securities)
-
-      prices <- setNames(
-        vapply(all_securities, \(s) .security(s)$get_price(), numeric(1)),
-        all_securities
-      )
-      prices[!is.finite(prices) | prices <= 0] <- 1
-      nav <- sma$get_nav()
-
-      # align
-      target_vec <- setNames(numeric(n), all_securities)
-      for (sec in all_securities) {
-        target_vec[sec] <- target_quantities[sec] %||% 0
-      }
-
-      price_vec <- setNames(as.numeric(prices[all_securities]), all_securities)
-      t_w <- (price_vec * target_vec) / nav   # target weights (+/-/0)
-      sgn <- sign(t_w)
-
-      # share limits -> weight limits
-      w_min <- setNames(rep(-Inf, n), all_securities)
-      w_max <- setNames(rep(Inf, n), all_securities)
-      for (i in seq_len(n)) {
-        sec  <- all_securities[i]
-        lims <- self$get_security_position_limits(sma, sec, TRUE)
-        sh_max <- as.numeric((lims$max %||% (lims[[1]]$max %||% NA_real_)))
-        sh_min <- as.numeric((lims$min %||% (lims[[1]]$min %||% NA_real_)))
-        if (is.finite(sh_max)) w_max[i] <- (prices[sec] * sh_max) / nav
-        if (is.finite(sh_min)) w_min[i] <- (prices[sec] * sh_min) / nav
-      }
-
-      # --- Variables
-      w     <- CVXR::Variable(n, name = "w")      # weights
-      alpha <- CVXR::Variable(1, name = "alpha")  # global scale
-
-      # --- Constraints
-      cons <- list(alpha >= alpha_min, alpha <= alpha_max)
-      for (i in seq_len(n)) {
-        cons <- c(cons, list(w[i] >= w_min[i], w[i] <= w_max[i]))
-      }
-
-      # zero-target names that are not overflow targets -> clamp to 0
-      S_ids <- names(replacements)
-      T_ids <- if (length(replacements)) {
+      tgt_qty <- self$calc_target_quantities(portfolio)
+      current_pos <- private$.extract_qty(portfolio$get_position())
+      replacements <- portfolio$get_replacement_security()
+      s_ids <- names(replacements)
+      t_ids <- if (length(replacements)) {
         unique(unlist(replacements, use.names = FALSE))
       } else {
-        character()
-      }
-      zero_idx <- which(abs(t_w) < 1e-12)
-      if (length(zero_idx)) {
-        zero_not_targets <- setdiff(zero_idx, match(T_ids, all_securities))
-        zero_not_targets <- zero_not_targets[!is.na(zero_not_targets)]
-        if (length(zero_not_targets)) {
-          cons <- c(cons, list(w[zero_not_targets] == 0))
-        }
+        character(0)
       }
 
-      # helper: convert rule f (shares-space %NAV) to gamma (weight space)
-      .gamma_from_f <- function(f_raw, names_vec, nav, price_vec) {
-        f <- setNames(numeric(length(names_vec)), names_vec)
-        if (!is.null(names(f_raw))) {
-          ov <- intersect(names(f_raw), names_vec)
-          if (length(ov)) f[ov] <- as.numeric(f_raw[ov])
-        } else if (length(f_raw) == length(names_vec)) {
-          f <- as.numeric(f_raw)
-          names(f) <- names_vec
-        }
-        f[!is.finite(f)] <- 0
-        as.numeric((nav / price_vec) * f)
+      sec_ids <- unique(c(names(tgt_qty), names(current_pos), t_ids))
+      n <- length(sec_ids)
+
+      price_vec <- vapply(sec_ids, \(s) .security(s)$get_price(), numeric(1))
+      price_vec[!is.finite(price_vec) | price_vec <= 0] <- 1
+      nav <- portfolio$get_nav()
+
+      tgt_qty <- vapply(sec_ids, \(s) tgt_qty[s] %||% 0, numeric(1))
+      t_w <- (price_vec * tgt_qty) / nav
+      sgn <- sign(t_w)
+
+      # Context ----------------------------------------------------------------
+      params <- list(
+        lambda_alpha = lambda_alpha,
+        tau_rel = tau_rel,
+        beta_free = beta_free,
+        alpha_min = alpha_min,
+        alpha_max = alpha_max
+      )
+      ctx <- self$make_model_context(sec_ids, price_vec, nav, t_w, params)
+      w <- ctx$w
+      alpha <- ctx$alpha
+
+      # --- Base constraints (global box on alpha) -----------------------------
+      cons <- list(alpha >= alpha_min, alpha <= alpha_max)
+      # Zero-target names that are not overflow targets -> clamp to 0
+      zero_not_targets <- which(abs(t_w) < 1e-12 & !(sec_ids %in% t_ids))
+      if (length(zero_not_targets)) {
+        cons <- c(cons, list(w[zero_not_targets] == 0))
       }
 
-      # portfolio rules
-      rules <- sma$get_rules()
-      rules <- Filter(function(r) !r$get_swap_only(), rules)
-      rules_ptfl <- Filter(\(r) r$get_scope() == "portfolio", rules)
-
-      # collect subset indices (true subsets only) to know who's "affected"
-      subset_union <- logical(n)
-      for (rule in Filter(\(r) isTRUE(r$get_gross_exposure()), rules_ptfl)) {
-        f_raw <- rule$apply_rule_definition(all_securities)
-        gamma <- .gamma_from_f(f_raw, all_securities, nav, price_vec)
-        idx   <- which(abs(gamma) > 0)
-        if (length(idx) > 0 && length(idx) < n) subset_union[idx] <- TRUE
-        max_t <- rule$get_max_threshold()
-        if (is.finite(max_t) && max_t > 0)
-          cons <- c(cons, list(CVXR::sum_entries(abs(gamma * w)) <= max_t))
-      }
-
-      # net exposure rules
-      for (rule in Filter(\(r) !isTRUE(r$get_gross_exposure()), rules_ptfl)) {
-        f_raw <- rule$apply_rule_definition(all_securities)
-        gamma <- .gamma_from_f(f_raw, all_securities, nav, price_vec)
-        max_t <- rule$get_max_threshold()
-        min_t <- rule$get_min_threshold()
-        port_val <- CVXR::sum_entries(gamma * w)
-        if (is.finite(max_t)) cons <- c(cons, list(port_val <= max_t))
-        if (is.finite(min_t)) cons <- c(cons, list(port_val >= min_t))
-      }
-
-      # overflow: directions + conservation (in weight space)
+      # --- Let rules contribute constraints -----------------------------------
+      rules <- portfolio$get_rules()
       if (length(replacements) > 0) {
-        for (src in names(replacements)) {
-          src_idx <- match(src, all_securities)
-          tgt_ids <- as.character(replacements[[src]])
-          tgt_idx <- match(tgt_ids, all_securities)
-          tgt_idx <- tgt_idx[!is.na(tgt_idx)]
-          if (is.na(src_idx) || length(tgt_idx) == 0) next
-
-          if (t_w[src_idx] >= 0) {
-            cons <- c(cons, list(w[src_idx] <= alpha * t_w[src_idx]))
-          } else {
-            cons <- c(cons, list(w[src_idx] >= alpha * t_w[src_idx]))
-          }
-          for (j in tgt_idx) {
-            if (t_w[j] >= 0) {
-              cons <- c(cons, list(w[j] >= alpha * t_w[j]))
-            } else {
-              cons <- c(cons, list(w[j] <= alpha * t_w[j]))
-            }
-          }
-          cons <- c(
-            cons,
-            list((
-                  alpha * t_w[src_idx] - w[src_idx]) ==
-              CVXR::sum_entries(w[tgt_idx] - alpha * t_w[tgt_idx]
-              ))
-          )
-        }
+        rules <- c(rules, list(OverflowRule$new(replacements)))
       }
+      rule_cons  <- unlist(
+        lapply(rules, \(r) r$build_constraints(ctx)),
+        recursive = FALSE
+      )
+      cons <- c(cons, rule_cons)
 
-      # --- Objective: relative-error L2; extra weight for "unaffected" names
-      denom <- pmax(abs(t_w), tau_rel)  # vector (constants)
+      # --- Objective ----------------------------------------------------------
+      denom <- pmax(abs(t_w), tau_rel)
       base_err <- (w - alpha * t_w) / denom
 
-      # "unaffected" = not in overflow sets and not in any subset gross rule
-      affected <-
-        (names(all_securities) %in% S_ids) |
-        (names(all_securities) %in% T_ids) |
-        subset_union
+      affected <- (sec_ids %in% s_ids) | (sec_ids %in% t_ids)
       free_idx <- which(!affected)
 
       term_base <- CVXR::sum_squares(base_err)
@@ -237,23 +167,25 @@ TradeConstructor <- R6::R6Class( #nolint
       } else {
         0
       }
-      net_tgt   <- sum(t_w)
+      net_tgt <- sum(t_w)
+      rule_terms <- unlist(
+        lapply(rules, \(r) r$objective_terms(ctx)),
+        recursive = FALSE
+      )
+      rule_obj_sum <- if (length(rule_terms)) Reduce(`+`, rule_terms) else 0
 
       objective <- CVXR::Minimize(
-        term_base + term_free +
-          lambda_alpha * CVXR::square(alpha - 1) +
-          10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)   # soft net anchor
+        term_base
+        + term_free
+        + rule_obj_sum
+        + lambda_alpha
+        * CVXR::square(alpha - 1)
+        + 10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)
       )
 
       prob <- CVXR::Problem(objective, cons)
-      t2 <- Sys.time()
-      message(
-        sprintf(
-          "Problem setup time: %.2f seconds",
-          as.numeric(difftime(t2, t1, units = "secs"))
-        )
-      )
-      # solve
+
+      # --- Solve --------------------------------------------------------------
       res <- tryCatch({
         CVXR::solve(
           prob,
@@ -275,37 +207,33 @@ TradeConstructor <- R6::R6Class( #nolint
           feastol = 1e-8
         )
       })
-      t3 <- Sys.time()
-      message(
-        sprintf(
-          "Problem solve time: %.2f seconds",
-          as.numeric(difftime(t3, t2, units = "secs"))
-        )
-      )
+
       if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved")))
         stop(sprintf("Optimization failed with status: %s", res$status))
 
-      w_hat     <- setNames(as.numeric(res$getValue(w)), all_securities)
+      w_hat     <- setNames(as.numeric(res$getValue(w)), sec_ids)
       alpha_hat <- as.numeric(res$getValue(alpha))
-      sh  <- setNames((w_hat * nav) / price_vec,  all_securities)
-      sh_final <- sh
+      sh        <- setNames((w_hat * nav) / price_vec,  sec_ids)
+      sh_final  <- sh
       sh_final[sh > 0] <- floor(sh[sh > 0])
       sh_final[sh < 0] <- ceiling(sh[sh < 0])
 
-      sf <- setNames(rep(NA_real_, n), all_securities)
+      sf <- setNames(rep(NA_real_, n), sec_ids)
       nz <- which(abs(t_w) > 1e-12)
       sf[nz] <- w_hat[nz] / t_w[nz]
 
       list(
         shares          = sh_final,
         weights         = w_hat,
-        target_shares   = target_vec,
+        target_shares   = tgt_qty,
         target_weights  = t_w,
         alpha_hat       = alpha_hat,
         scaling_factors = sf,
         objective_value = res$value,
         status          = res$status
       )
+
+
     }
   ),
   private = list(
@@ -347,7 +275,7 @@ SMAConstructor <- R6::R6Class( #nolint
     #' @param base_security_id Security ID in the base portfolio
     get_scale_qty = function(base_portfolio, sma_portfolio, base_security_id) {
       base_pos_qty <- tryCatch(
-        {base_portfolio$get_target_position(base_security_id)$get_qty()},
+        {base_portfolio$get_position(base_security_id)$get_qty()},
         error = function(e) 0
       )
       nav_ratio <- sma_portfolio$get_nav() / base_portfolio$get_nav()
@@ -368,7 +296,7 @@ SMAConstructor <- R6::R6Class( #nolint
       base <- sma$get_base_portfolio()
       scale_ratio <- self$get_scale_ratio(base, sma)
       # Get base positions
-      base_positions <- private$.extract_qty(base$get_target_position())
+      base_positions <- private$.extract_qty(base$get_position())
       # Scale all base positions by NAV ratio
       target_quantities <- base_positions * scale_ratio
       # Clean up non-finite values

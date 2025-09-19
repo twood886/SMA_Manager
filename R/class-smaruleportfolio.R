@@ -14,13 +14,11 @@ SMARulePortfolio <- R6::R6Class( #nolint
       comply <- v <= private$max_threshold_ && v >= private$min_threshold_
       list("pass" = comply)
     },
-
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
       setNames(sapply(security_id, \(x) FALSE), security_id)
     },
-    
     #' @description Get the Max and Min value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
@@ -76,6 +74,31 @@ SMARulePortfolio <- R6::R6Class( #nolint
         slack_to_min = if (is.finite(min_t)) value - min_t else Inf,
         is_gross = private$gross_exposure_
       )
+    },
+    #' @description Build the constraints for the optimization model
+    #' @param ctx Context object with optimization variables and parameters
+    build_constraints = function(ctx) {
+      f <- self$apply_rule_definition(ctx$ids)
+      f <- as.numeric(f)
+      f[!is.finite(f)] <- 0
+      gamma <- f * (ctx$price / ctx$nav)
+      idx <- which(abs(gamma) > 1e-12)
+      if (length(idx) == 0) return(list())
+
+      cons <- list()
+      max_t <- private$max_threshold_
+      min_t <- private$min_threshold_
+      if (isTRUE(self$get_gross_exposure())) {
+        if (is.finite(max_t)) {
+          lim <- CVXR::sum_entries(abs(ctx$w[idx] * gamma[idx]))
+          cons <- c(cons, list(lim <= max_t))
+        }
+      } else {
+        lim <- CVXR::sum_entries(ctx$w[idx] * gamma[idx])
+        if (is.finite(max_t)) cons <- c(cons, list(lim <= max_t))
+        if (is.finite(min_t)) cons <- c(cons, list(lim >= min_t))
+      }
+      cons
     }
   ),
   private = list(

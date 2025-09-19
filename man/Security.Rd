@@ -17,8 +17,6 @@ R6 class for a security with time-series and non-time-series data.
 \item \href{#method-Security-get_price}{\code{Security$get_price()}}
 \item \href{#method-Security-get_underlying_price}{\code{Security$get_underlying_price()}}
 \item \href{#method-Security-get_delta}{\code{Security$get_delta()}}
-\item \href{#method-Security-get_bics_level_2}{\code{Security$get_bics_level_2()}}
-\item \href{#method-Security-get_bics_level_3}{\code{Security$get_bics_level_3()}}
 \item \href{#method-Security-get_rule_data}{\code{Security$get_rule_data()}}
 \item \href{#method-Security-update_price}{\code{Security$update_price()}}
 \item \href{#method-Security-update_delta}{\code{Security$update_delta()}}
@@ -41,9 +39,7 @@ Create new Security R6 object
   instrument_type = NULL,
   price = NULL,
   underlying_price = NULL,
-  delta = NULL,
-  bics_level_2 = NULL,
-  bics_level_3 = NULL
+  delta = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -61,10 +57,6 @@ Create new Security R6 object
 \item{\code{underlying_price}}{Numeric. Price of underlying security.}
 
 \item{\code{delta}}{Numeric. Delta of the security.}
-
-\item{\code{bics_level_2}}{Character string. BICS Level 2 classification.}
-
-\item{\code{bics_level_3}}{Character string. BICS Level 3 classification.}
 }
 \if{html}{\out{</div>}}
 }
@@ -126,26 +118,6 @@ Get Underlying Price
 Get Delta
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Security$get_delta()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Security-get_bics_level_2"></a>}}
-\if{latex}{\out{\hypertarget{method-Security-get_bics_level_2}{}}}
-\subsection{Method \code{get_bics_level_2()}}{
-Get BICS Level 2
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$get_bics_level_2()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Security-get_bics_level_3"></a>}}
-\if{latex}{\out{\hypertarget{method-Security-get_bics_level_3}{}}}
-\subsection{Method \code{get_bics_level_3()}}{
-Get BICS Level 3
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$get_bics_level_3()}\if{html}{\out{</div>}}
 }
 
 }

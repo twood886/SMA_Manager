@@ -15,10 +15,10 @@ SMA Rule for Portfolio
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMARulePortfolio-check_compliance}{\code{SMARulePortfolio$check_compliance()}}
-\item \href{#method-SMARulePortfolio-check_swap_current}{\code{SMARulePortfolio$check_swap_current()}}
 \item \href{#method-SMARulePortfolio-check_swap_security}{\code{SMARulePortfolio$check_swap_security()}}
 \item \href{#method-SMARulePortfolio-get_security_limits}{\code{SMARulePortfolio$get_security_limits()}}
 \item \href{#method-SMARulePortfolio-check_violations}{\code{SMARulePortfolio$check_violations()}}
+\item \href{#method-SMARulePortfolio-build_constraints}{\code{SMARulePortfolio$build_constraints()}}
 \item \href{#method-SMARulePortfolio-clone}{\code{SMARulePortfolio$clone()}}
 }
 }
@@ -38,6 +38,7 @@ SMA Rule for Portfolio
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma_name'><code>SMAManager::SMARule$get_sma_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="objective_terms"><a href='../../SMAManager/html/SMARule.html#method-SMARule-objective_terms'><code>SMAManager::SMARule$objective_terms()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -57,16 +58,6 @@ Check the rule against the current portfolio
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePortfolio-check_swap_current"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_swap_current}{}}}
-\subsection{Method \code{check_swap_current()}}{
-Check the swap rule against the current portfolio
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_swap_current()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARulePortfolio-check_swap_security"></a>}}
@@ -120,6 +111,23 @@ Check if a position set would violate this rule
 \item{\code{shares}}{Named vector of shares}
 
 \item{\code{tolerance}}{Numerical tolerance for constraint checking}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARulePortfolio-build_constraints"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePortfolio-build_constraints}{}}}
+\subsection{Method \code{build_constraints()}}{
+Build the constraints for the optimization model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_constraints(ctx)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ctx}}{Context object with optimization variables and parameters}
 }
 \if{html}{\out{</div>}}
 }
