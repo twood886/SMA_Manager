@@ -9,9 +9,9 @@ ModelContext <- R6::R6Class( #nolint
     sgn = NULL,
     w = NULL,
     alpha = NULL,
-    params = NULL,             # list(lambda_alpha, tau_rel, etc.)
-    index_of = NULL,           # function(id) -> integer index
-    var_factory = NULL,        # VariableFactory (below)
+    params = NULL,
+    index_of = NULL,
+    var_factory = NULL,
     initialize = function(
       n, ids, price, nav, t_w, sgn, w, alpha, params, index_of, var_factory
     ) {

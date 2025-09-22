@@ -76,11 +76,9 @@ SMARule <- R6::R6Class( #nolint
     #' Get Min Threshold
     #' @description Get the threshold of the SMA Rule
     get_min_threshold = function() private$min_threshold_,
-
     #' Get Swap Only Flag
     #' @description Get the swap only flag of the SMA Rule
     get_swap_only = function() private$swap_only_,
-
     #' Get Gross Exposure Flag
     #' @description Get the gross exposure flag of the SMA Rule
     get_gross_exposure = function() private$gross_exposure_,

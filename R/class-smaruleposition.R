@@ -16,7 +16,7 @@ SMARulePosition <- R6::R6Class( #nolint
     check_compliance = function(positions) {
       # Get the security ids from the positions
       security_ids <- vapply(
-        positions, 
+        positions,
         \(x) x$get_security()$get_id(),
         character(1)
       )

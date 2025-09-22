@@ -44,10 +44,16 @@ OverflowRule <- R6::R6Class(
         )
 
         for (j in js) {
-          cons <- c(cons, list(if (t_w[j] >= 0) w[j] >= a * t_w[j] else w[j] <= a * t_w[j]))
+          cons <- c(
+            cons,
+            list(if (t_w[j] >= 0) w[j] >= a * t_w[j] else w[j] <= a * t_w[j])
+          )
         }
         # conservation: (alpha t_w_src - w_src) == sum_j (w_j - alpha t_w_j)
-        cons <- c(cons, list( (a * t_w[i] - w[i]) == CVXR::sum_entries(w[js] - a * t_w[js]) ))
+        cons <- c(
+          cons,
+          list((a * t_w[i] - w[i]) == CVXR::sum_entries(w[js] - a * t_w[js]))
+        )
       }
       cons
     },

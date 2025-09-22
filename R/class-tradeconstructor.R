@@ -190,18 +190,15 @@ TradeConstructor <- R6::R6Class( #nolint
         CVXR::solve(
           prob,
           solver = "OSQP",
-          verbose = verbose,
           eps_abs = 1e-8,
           eps_rel = 1e-8,
           max_iter = 200000,
           polish = TRUE
         )
       }, error = function(e) {
-        if (verbose) cat("OSQP failed; trying ECOS...\n")
         CVXR::solve(
           prob,
           solver = "ECOS",
-          verbose = verbose,
           abstol = 1e-8,
           reltol = 1e-8,
           feastol = 1e-8
