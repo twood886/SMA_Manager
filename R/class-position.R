@@ -80,7 +80,7 @@ Position <- R6::R6Class(  #nolint
         },
         error = function(e) {
           port <- .portfolio(private$portfolio_short_name_, create = FALSE)
-          nav <- .port$get_nav()
+          nav <- port$get_nav()
           self$get_delta_val() / nav
         }
       )

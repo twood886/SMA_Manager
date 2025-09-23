@@ -180,7 +180,7 @@ Portfolio <- R6::R6Class( #nolint
     rebalance = function(update_bbfields = TRUE, as.df = TRUE) {
       checkmate::assert_flag(update_bbfields)
       if (update_bbfields) update_bloomberg_fields()
-      rebal <- self$get_trade_constructor()$optimize_sma(self, verbose = FALSE)
+      rebal <- self$get_trade_constructor()$optimize_sma(self)
       current_shares <- sapply(
         self$get_position(),
         \(pos) setNames(pos$get_qty(), pos$get_id())
