@@ -181,11 +181,10 @@ Portfolio <- R6::R6Class( #nolint
       checkmate::assert_flag(update_bbfields)
       if (update_bbfields) update_bloomberg_fields()
       rebal <- self$get_trade_constructor()$optimize_sma(self)
-      current_shares <- sapply(
-        self$get_position(),
-        \(pos) setNames(pos$get_qty(), pos$get_id())
-      )
-      sec_ids <- unique(c(names(rebal$target_weights), names(current_shares)))
+      current_sh <- vapply(self$get_position(), \(p) p$get_qty(), numeric(1))
+      current_ids <- vapply(self$get_position(), \(p) p$get_id(), character(1))
+      names(current_sh) <- current_ids
+      sec_ids <- unique(c(names(rebal$target_weights), current_ids))
 
       if (!as.df) return(rebal)
       data.frame(
@@ -193,9 +192,9 @@ Portfolio <- R6::R6Class( #nolint
         target_weights = tidyr::replace_na(rebal$target_weights[sec_ids], 0),
         final_weights = tidyr::replace_na(rebal$weights[sec_ids], 0),
         final_shares  = tidyr::replace_na(rebal$shares[sec_ids], 0),
-        current_shares = tidyr::replace_na(current_shares[sec_ids], 0),
+        current_shares = tidyr::replace_na(current_sh[sec_ids], 0),
         trade = tidyr::replace_na(rebal$shares[sec_ids], 0) -
-          tidyr::replace_na(current_shares[sec_ids], 0),
+          tidyr::replace_na(current_sh[sec_ids], 0),
         stringsAsFactors = FALSE,
         row.names = NULL
       )

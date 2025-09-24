@@ -26,21 +26,20 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- Filter(\(r) r$get_scope() == "position", rules)
       }
 
-      limits <- lapply(rules, \(r) r$get_security_limits(security_id))
+      limits_all <- lapply(rules, \(r) r$get_security_limits(security_id))
 
-      setNames(
-        lapply(
-          security_id,
-          \(sec) {
-            sec_limit <- lapply(limits, \(limit) limit[[sec]])
-            if (length(sec_limit) == 0) return(list(max = Inf, min = -Inf))
-            max_limit <- min(sapply(sec_limit, \(x) x$max), na.rm = TRUE)
-            min_limit <- max(sapply(sec_limit, \(x) x$min), na.rm = TRUE)
-            list(max = max_limit, min = min_limit)
-          }
-        ),
-        security_id
+      limits <- lapply(
+        security_id,
+        \(sec) {
+          sec_limit <- lapply(limits_all, \(l) l[[sec]])
+          if (length(sec_limit) == 0) return(list(max = Inf, min = -Inf))
+          max_limit <- min(sapply(sec_limit, \(x) x$max), na.rm = TRUE)
+          min_limit <- max(sapply(sec_limit, \(x) x$min), na.rm = TRUE)
+          list(max = max_limit, min = min_limit)
+        }
       )
+      names(limits) <- security_id
+      limits
     },
     #' @description Identify securities that are part of any swap rule
     #' @param portfolio An object of class Portfolio
@@ -49,13 +48,12 @@ TradeConstructor <- R6::R6Class( #nolint
       if (is.null(security_id)) stop("Security ID must be supplied")
       rules <- portfolio$get_rules()
       swaps <- lapply(rules, \(rule) rule$check_swap_security(security_id))
-      setNames(
-        lapply(
-          security_id,
-          \(sec) any(vapply(swaps, \(swap) swap[[sec]], logical(1)))
-        ),
-        security_id
+      swap_flag <- lapply(
+        security_id,
+        \(sec) any(vapply(swaps, \(swap) swap[[sec]], logical(1)))
       )
+      names(swap_flag) <- security_id
+      swap_flag
     },
     #' @description Build the Optimzation Model Context (called by optimize_sma)
     #' @param ids Character vector of security IDs

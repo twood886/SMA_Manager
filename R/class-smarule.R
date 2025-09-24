@@ -91,10 +91,9 @@ SMARule <- R6::R6Class( #nolint
     #' @description Apply the rule definition to a set of security IDs
     #' @param security_id Security ID
     apply_rule_definition = function(security_id) {
-      setNames(
-        private$definition_(security_id, private$get_portfolio()),
-        security_id
-      )
+      exp <- private$definition_(security_id, private$get_portfolio())
+      names(exp) <- security_id
+      exp
     },
     #' Build Constraints
     #' @description Build any additional constraints for the optimization

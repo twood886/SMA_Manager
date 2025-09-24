@@ -69,14 +69,17 @@ SMARulePosition <- R6::R6Class( #nolint
           min = if (is.finite(min_t)) min_t / exp else -Inf
         )
       }
-
-      setNames(lapply(exp, .set_ind_sec_limits), security_id)
+      lim <- lapply(exp, .set_ind_sec_limits)
+      names(lim) <- security_id
+      lim
     },
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
       if (!private$swap_only_) {
-        return(setNames(sapply(security_id, \(x) FALSE), security_id))
+        swap <- sapply(security_id, \(x) FALSE)
+        names(swap) <- security_id
+        return(swap)
       }
       self$apply_rule_definition(security_id)
     },

@@ -17,7 +17,9 @@ SMARulePortfolio <- R6::R6Class( #nolint
     #' @description Get the swap flag for a given security
     #' @param security_id Security ID
     check_swap_security = function(security_id) {
-      setNames(sapply(security_id, \(x) FALSE), security_id)
+      swap <- sapply(security_id, \(x) FALSE)
+      names(swap) <- security_id
+      swap
     },
     #' @description Get the Max and Min value of the security based on the rule
     #' @param security_id Security ID
@@ -45,7 +47,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
           list(max = max_q, min = min_q)
         }
       })
-      setNames(limits, security_id)
+      names(limits) <- security_id
+      limits
     },
 
     #' Check if a position set would violate this rule
@@ -108,7 +111,8 @@ SMARulePortfolio <- R6::R6Class( #nolint
       pos_qty <- vapply(positions, \(x) x$get_qty(), numeric(1))
       if (private$gross_exposure_) pos_qty <- abs(pos_qty)
       rule_applied <- pos_qty * self$apply_rule_definition(security_ids)
-      setNames(rule_applied, security_ids)
+      names(rule_applied) <- security_ids
+      rule_applied
     }
   )
 )
