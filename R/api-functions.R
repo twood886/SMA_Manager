@@ -380,7 +380,8 @@
   sma_name,
   rule_name, scope, definition, bbfields,
   max_threshold = Inf, min_threshold = -Inf,
-  swap_only = FALSE, gross_exposure = FALSE
+  swap_only = FALSE, gross_exposure = FALSE,
+  relative_to = "nav", divisor = NULL
 ) {
   checkmate::assert_character(sma_name)
   sma <- .sma(sma_name, create = FALSE)
@@ -395,6 +396,13 @@
   checkmate::assert_numeric(min_threshold)
 
   if (!scope %in% c("position", "portfolio", "all")) stop("scope not valid")
+  checkmate::assert_character("relative_to")
+  if (!relative_to %in% c("nav", "gmv", "long_gmv", "short_gmv")) {
+    stop("relative_to not valid")
+  }
+  if (!is.null(divisor)) {
+    checkmate::assert_r6(divisor, "DivisorProvider")
+  }
   if (scope == "position") {
     smarule <- SMARulePosition$new(
       sma_name = sma_name,
@@ -405,7 +413,9 @@
       max_threshold = max_threshold,
       min_threshold = min_threshold,
       swap_only = swap_only,
-      gross_exposure = gross_exposure
+      gross_exposure = gross_exposure,
+      relative_to = relative_to,
+      divisor = divisor
     )
   }
   if (scope == "portfolio") {
@@ -418,7 +428,9 @@
       max_threshold = max_threshold,
       min_threshold = min_threshold,
       swap_only = swap_only,
-      gross_exposure = gross_exposure
+      gross_exposure = gross_exposure,
+      relative_to = relative_to,
+      divisor = divisor
     )
   }
   assign(name, smarule, envir = env)

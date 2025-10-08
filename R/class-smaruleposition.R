@@ -13,140 +13,196 @@ SMARulePosition <- R6::R6Class( #nolint
     #' @description Check the rule against the current holdings
     #' @param positions List of Position objects
     #' @return List of security IDs that do not comply with the rule
-    check_compliance = function(positions) {
-      # Get the security ids from the positions
-      security_ids <- vapply(
-        positions,
-        \(x) x$get_security()$get_id(),
-        character(1)
-      )
-      # Find non-compliant securities
-      if (private$swap_only_) {
-        need_swap <- self$check_swap_security(security_ids)
+    check_compliance = function(positions, tolerance = 1e-6) {
+      ids <- vapply(positions, \(p) p$get_id(), character(1))
+      qty <- vapply(positions, \(p) p$get_qty(), numeric(1))
+      sma <- self$get_sma()
+      d <- self$get_divisor()
+      max_t <- self$get_max_threshold()
+      min_t <- self$get_min_threshold()
+
+      if (isTRUE(self$get_swap_only())) {
+        need_swap <- self$check_swap_security(ids)
         is_swap <- vapply(positions, \(x) x$get_swap(), logical(1))
-        non_comply <- security_ids[which(need_swap & !is_swap)]
-      } else {
-        qtys <- vapply(positions, \(x) x$get_qty(), numeric(1))
-        exp <- qtys * self$get_definition()(security_ids, self$get_sma())
-        comply <- (
-          exp <= self$get_max_threshold() & exp >= self$get_min_threshold()
+        non_comply <- ids[which(need_swap & !is_swap)]
+        return(
+          if (!length(non_comply)) {
+            list("pass" = TRUE)
+          } else {
+            list("pass" = FALSE, "non_comply" = non_comply)
+          }
         )
-        non_comply <- sapply(positions[which(!comply)], function(x) x$get_id())
       }
-      # Return results
-      if (length(non_comply) == 0) {
+
+      f <- self$apply_rule_definition(ids)
+      f[!is.finite(f)] <- 0
+
+      exp_i <- qty * as.numeric(f)
+      denom <- d$value(self$get_sma(), ids, shares = qty)
+
+      violates_max <- is.finite(max_t) & (exp_i > max_t * denom + tolerance)
+      violates_min <- is.finite(min_t) & (exp_i < min_t * denom - tolerance)
+
+      non_comply <- ids[which(violates_max | violates_min)]
+      if (!length(non_comply)) {
         list("pass" = TRUE)
       } else {
-        list("pass" = FALSE, "non_comply" = non_comply)
+        list(
+          "pass" = FALSE,
+          "violates_max" = any(violates_max),
+          "violates_min" = any(violates_min),
+          "non_comply" = non_comply,
+          "divisor_kind" = d$kind,
+          "divisor_value" = denom
+        )
       }
+    },
+    #' @description Get the swap flag for a given security
+    #' @param security_id Security ID
+    check_swap_security = function(security_id) {
+      if (!isTRUE(self$get_swap_only())) {
+        swap <- vapply(security_id, \(x) FALSE, logical(1))
+        return(swap)
+      }
+      self$apply_rule_definition(security_id)
     },
     #' @description Get the Max and Min Value of the security based on the rule
     #' @param security_id Security ID
     #' @return List of Max and Min Value
     get_security_limits = function(security_id) {
-      exp <- self$apply_rule_definition(security_id)
+      d <- self$get_divisor()
+      sma <- self$get_sma()
+      nav <- sma$get_nav()
       max_t <- self$get_max_threshold()
       min_t <- self$get_min_threshold()
 
-      .set_ind_sec_limits <- function(exp) {
-        if (is.logical(exp)) {
-          if (exp) {
-            max  <- max_t
-            min  <- min_t
-          } else {
-            max <- +Inf
-            min <- -Inf
+      if (d$kind == "nav") {
+        exp <- self$apply_rule_definition(security_id)
+        .set_ind_sec_limits <- function(e) {
+          if (is.logical(e)) {
+            if (isTRUE(e)) {
+              return(list("max" = max_t, "min" = min_t))
+            }
+            return(list("max" = Inf, "min" = -Inf))
           }
-          return(list("max" = max, "min" = min))
+          if (is.na(e) || e == 0) return(list("max" = Inf, "min" = -Inf))
+          list(
+            "max" = if (is.finite(max_t)) max_t / e else Inf,
+            "min" = if (is.finite(min_t)) min_t / e else -Inf
+          )
         }
+        lim <- lapply(exp, .set_ind_sec_limits)
+        names(lim) <- security_id
+        return(lim)
+      }
 
-        if (is.na(exp) || exp == 0) {
-          return(list(max = Inf, min = -Inf))
+      pos <- sma$get_position()
+      ids_all <- vapply(pos, \(p) p$get_id(), character(1))
+      qty_all <- vapply(pos, \(p) p$get_qty(), numeric(1))
+      price_all <- vapply(ids_all, \(id) .security(id)$get_price(), numeric(1))
+      price_all[!is.finite(price_all) | price_all <= 0] <- 1
+      w_all <- qty_all * (price_all / nav)
+      contrib <- d$contrib_vec(w_all)
+      denom_all <- sum(contrib)
+
+      f_all <- self$apply_rule_definition(ids_all)
+      f_all[!is.finite(f_all)] <- 0
+      gamma_all <- as.numeric(f_all) / (price_all / nav)
+      s_num_abs_all <- abs(gamma_all * w_all)
+
+      # choose conservative c for net rules
+      is_gross <- isTRUE(self$get_gross_exposure())
+      c_star <- if (is_gross) {
+        max_t
+      } else {
+        max(abs(max_t), abs(min_t), na.rm = TRUE)
+      }
+
+      out <- lapply(security_id, function(sec) {
+        i <- match(sec, ids_all)
+        contrib_i <- if (is.na(i)) 0 else contrib[i]
+        s_den <- max(denom_all - contrib_i, 0)
+
+        p_i <- .security(sec)$get_price()
+        if (!is.finite(p_i) || p_i <= 0) p_i <- 1
+        sc_i <- p_i / nav
+        f_i  <- as.numeric(self$apply_rule_definition(sec))
+        if (!is.finite(f_i)) f_i <- 0
+        gamma_i <- if (sc_i != 0) f_i / sc_i else 0
+
+        if (!is.finite(c_star) || c_star <= 0 || c_star >= 1 || gamma_i == 0) {
+          cap_w <- Inf
+        } else if (is_gross) {
+          s_num_excl <- if (is.na(i)) {
+            sum(s_num_abs_all)
+          } else {
+            sum(s_num_abs_all) - s_num_abs_all[i]
+          }
+          num <- c_star * s_den - s_num_excl
+          den <- abs(gamma_i) - c_star
+          cap_w <- if (den > 0) max(0, num / den) else if (num >= 0) Inf else 0
+        } else {
+          s_num_excl_abs <- if (is.na(i)) {
+            sum(s_num_abs_all)
+          } else {
+            sum(s_num_abs_all) - s_num_abs_all[i]
+          }
+          num <- c_star * s_den - s_num_excl_abs
+          den <- abs(gamma_i) - c_star
+          cap_w <- if (den > 0) max(0, num / den) else if (num >= 0) Inf else 0
         }
 
         list(
-          max = if (is.finite(max_t)) max_t / exp else Inf,
-          min = if (is.finite(min_t)) min_t / exp else -Inf
+          "max" =  cap_w * nav / p_i,
+          "min" = -cap_w * nav / p_i
         )
-      }
-      lim <- lapply(exp, .set_ind_sec_limits)
-      names(lim) <- security_id
-      lim
-    },
-    #' @description Get the swap flag for a given security
-    #' @param security_id Security ID
-    check_swap_security = function(security_id) {
-      if (!private$swap_only_) {
-        swap <- sapply(security_id, \(x) FALSE)
-        names(swap) <- security_id
-        return(swap)
-      }
-      self$apply_rule_definition(security_id)
-    },
-    #' Check violations for specific securities
-    #' @param shares Named vector of shares
-    #' @param tolerance Numerical tolerance
-    check_violations = function(shares, tolerance = 1e-6) {
-      factors <- self$apply_rule_definition(names(shares))
-      max_t <- self$get_max_threshold()
-      min_t <- self$get_min_threshold()
-      violations <- list()
-      for (i in seq_along(shares)) {
-        sec <- names(shares)[i]
-        if (is.na(factors[i]) || factors[i] == 0) next
-        value <- factors[i] * shares[i]
-        violates_max <- is.finite(max_t) && value > max_t + tolerance
-        violates_min <- is.finite(min_t) && value < min_t - tolerance
-        if (violates_max || violates_min) {
-          violations[[sec]] <- list(
-            security = sec,
-            shares = shares[i],
-            factors = factors[i],
-            value = value,
-            max_threshold = max_t,
-            min_threshold = min_t,
-            violates_max = violates_max,
-            violates_min = violates_min,
-            excess = if (violates_max) value - max_t else 0,
-            shortfall = if (violates_min) min_t - value else 0
-          )
-        }
-      }
-      if (length(violations) > 0) {
-        attr(violations, "rule_name") <- private$name_
-        attr(violations, "scope") <- "position"
-      }
-      violations
+      })
+      names(out) <- security_id
+      out
     },
     #' @description Build the constraints for the optimization model
     #' @param ctx Context object with optimization variables and parameters
     build_constraints = function(ctx) {
-      f <- self$apply_rule_definition(ctx$ids)
-      if (is.logical(f)) return(list())
-      f <- as.numeric(f)
-      f[!is.finite(f)] <- NA_real_
-
+      d <- self$get_divisor()
+      kind <- d$kind %||% "nav"
       max_t <- self$get_max_threshold()
       min_t <- self$get_min_threshold()
 
-      wmin <- rep(-Inf, length(ctx$ids))
-      wmax <- rep(Inf, length(ctx$ids))
-      hasf <- which(!is.na(f) & f != 0)
-      if (length(hasf) > 0) {
-        ratio <- (ctx$price[hasf] / ctx$nav) / f[hasf]
-        if (is.finite(max_t)) wmax[hasf] <- max_t * ratio
-        if (is.finite(min_t)) wmin[hasf] <- min_t * ratio
+      f <- self$apply_rule_definition(ctx$ids)
+
+      if (is.logical(f)) {
+        fnum <- ifelse(f, ctx$price / ctx$nav, 0)
+      } else {
+        fnum <- as.numeric(f)
+        fnum[!is.finite(fnum)] <- 0
       }
-      cons <- list()
-      lo <- which(is.finite(wmin))
-      hi <- which(is.finite(wmax))
-      if (length(lo)) {
-        cons <- c(cons, list(ctx$w[lo] >= wmin[lo]))
+
+      gamma <- ifelse(
+        ctx$price > 0 & is.finite(ctx$price),
+        fnum / (ctx$price / ctx$nav),
+        0
+      )
+
+      idx <- which(abs(gamma) > 1e-12)
+      if (!length(idx)) return(list())
+
+      if (kind == "nav") {
+        cons <- list()
+        if (is.finite(max_t)) cons <- c(cons, list(gamma[idx] * ctx$w[idx] <= max_t))
+        if (is.finite(min_t)) cons <- c(cons, list(gamma[idx] * ctx$w[idx] >= min_t))
+        return(cons)
       }
-      if (length(hi)) {
-        hi <- which(is.finite(wmax))
-        cons <- c(cons, list(ctx$w[hi] <= wmax[hi]))
-      }
+
+      t_ <- CVXR::Variable(1, name = paste0("T_", self$get_name(), "_", kind))
+      denom_cons <- switch(kind,
+        "gmv" = list(CVXR::sum_entries(abs(ctx$w)) <= t_),
+        "long_gmv" = list(CVXR::sum_entries(CVXR::pos(ctx$w)) <= t_),
+        "short_gmv" = list(CVXR::sum_entries(CVXR::pos(-ctx$w)) <= t_),
+        stop("Unknown divisor kind: ", kind)
+      )
+      cons <- denom_cons
+      if (is.finite(max_t)) cons <- c(cons, list(gamma[idx] * ctx$w[idx] <= max_t * t_))
+      if (is.finite(min_t)) cons <- c(cons, list(gamma[idx] * ctx$w[idx] >= min_t * t_))
       cons
     }
   )
