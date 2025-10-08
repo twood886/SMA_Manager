@@ -38,10 +38,13 @@ SMARulePosition <- R6::R6Class( #nolint
       f[!is.finite(f)] <- 0
 
       exp_i <- qty * as.numeric(f)
+      if (isTRUE(self$get_gross_exposure())) exp_i <- abs(exp_i)
       denom <- d$value(self$get_sma(), ids, shares = qty)
 
       violates_max <- is.finite(max_t) & (exp_i > max_t * denom + tolerance)
-      violates_min <- is.finite(min_t) & (exp_i < min_t * denom - tolerance)
+      violates_min <- !isTRUE(self$get_gross_exposure()) &
+        is.finite(min_t) &
+        (exp_i < min_t * denom - tolerance)
 
       non_comply <- ids[which(violates_max | violates_min)]
       if (!length(non_comply)) {

@@ -396,7 +396,7 @@
   checkmate::assert_numeric(min_threshold)
 
   if (!scope %in% c("position", "portfolio", "all")) stop("scope not valid")
-  checkmate::assert_character("relative_to")
+  checkmate::assert_character(relative_to)
   if (!relative_to %in% c("nav", "gmv", "long_gmv", "short_gmv")) {
     stop("relative_to not valid")
   }
