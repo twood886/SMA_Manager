@@ -15,9 +15,12 @@ R6 class for a security with time-series and non-time-series data.
 \item \href{#method-Security-get_description}{\code{Security$get_description()}}
 \item \href{#method-Security-get_instrument_type}{\code{Security$get_instrument_type()}}
 \item \href{#method-Security-get_price}{\code{Security$get_price()}}
+\item \href{#method-Security-get_underlying_security}{\code{Security$get_underlying_security()}}
 \item \href{#method-Security-get_underlying_price}{\code{Security$get_underlying_price()}}
 \item \href{#method-Security-get_delta}{\code{Security$get_delta()}}
+\item \href{#method-Security-get_delta_price}{\code{Security$get_delta_price()}}
 \item \href{#method-Security-get_rule_data}{\code{Security$get_rule_data()}}
+\item \href{#method-Security-update_prices_delta}{\code{Security$update_prices_delta()}}
 \item \href{#method-Security-update_price}{\code{Security$update_price()}}
 \item \href{#method-Security-update_delta}{\code{Security$update_delta()}}
 \item \href{#method-Security-update_underlying_price}{\code{Security$update_underlying_price()}}
@@ -38,8 +41,8 @@ Create new Security R6 object
   description = NULL,
   instrument_type = NULL,
   price = NULL,
-  underlying_price = NULL,
-  delta = NULL
+  delta = NULL,
+  underlying_security = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -54,9 +57,9 @@ Create new Security R6 object
 
 \item{\code{price}}{Numeric. Price of the security.}
 
-\item{\code{underlying_price}}{Numeric. Price of underlying security.}
-
 \item{\code{delta}}{Numeric. Delta of the security.}
+
+\item{\code{underlying_security}}{Security. Underlying security for options.}
 }
 \if{html}{\out{</div>}}
 }
@@ -102,6 +105,16 @@ Get Price
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_underlying_security"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_underlying_security}{}}}
+\subsection{Method \code{get_underlying_security()}}{
+Get Underlying Security
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_underlying_security()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-get_underlying_price"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-get_underlying_price}{}}}
 \subsection{Method \code{get_underlying_price()}}{
@@ -122,21 +135,44 @@ Get Delta
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_delta_price"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_delta_price}{}}}
+\subsection{Method \code{get_delta_price()}}{
+Get Delta-Adjusted Price (Delta * Underlying Price)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_delta_price()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-get_rule_data"></a>}}
 \if{latex}{\out{\hypertarget{method-Security-get_rule_data}{}}}
 \subsection{Method \code{get_rule_data()}}{
 Get Rule Data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Security$get_rule_data(bbfield)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_rule_data(bbfield, underlying = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{bbfield}}{Character. bbfield.}
+
+\item{\code{underlying}}{Logical. If TRUE and the security is an option, get the
+data from the underlying security. Defaults to FALSE.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-update_prices_delta"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-update_prices_delta}{}}}
+\subsection{Method \code{update_prices_delta()}}{
+Update Prices & Delta
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$update_prices_delta()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Security-update_price"></a>}}

@@ -18,8 +18,8 @@ Security <- R6::R6Class( #nolint
     description_ = NULL,
     instrument_type_ = NULL,
     price_ = NULL,
-    underlying_price_ = NULL,
     delta_ = NULL,
+    underlying_security_ = NULL,
     rule_data_ = list(NULL)
   ),
   public = list(
@@ -28,11 +28,11 @@ Security <- R6::R6Class( #nolint
     #' @param description Character string. Security description.
     #' @param instrument_type Character string. Type of instrument.
     #' @param price Numeric. Price of the security.
-    #' @param underlying_price Numeric. Price of underlying security.
+    #' @param underlying_security Security. Underlying security for options.
     #' @param delta Numeric. Delta of the security.
     initialize = function(
       bbid, description = NULL, instrument_type = NULL,
-      price = NULL, underlying_price = NULL, delta = NULL
+      price = NULL, delta = NULL, underlying_security = NULL
     ) {
       checkmate::assert_character(bbid)
       private$bbid_ <- bbid
@@ -55,16 +55,24 @@ Security <- R6::R6Class( #nolint
         private$price_ <- self$update_price()
       }
 
-      if (!is.null(underlying_price)) {
-        private$underlying_price_ <- underlying_price
-      } else {
-        private$underlying_price_ <- self$update_underlying_price()
-      }
-
       if (!is.null(delta)) {
         private$delta_ <- delta
       } else {
         private$delta_ <- self$update_delta()
+      }
+
+      if (private$instrument_type_ == "Option") {
+        if(!is.null(underlying_security)) {
+          checkmate::assert_r6(underlying_security, "Security")
+          private$underlying_security_ <- underlying_security
+        } else {
+          underlying_id <- Rblpapi::bdp(bbid, "DS492")$DS492
+          underlying_sec <- .security(paste0(underlying_id, " Equity"))
+          checkmate::assert_r6(underlying_sec, "Security")
+          private$underlying_security_ <- underlying_sec
+        }
+      } else {
+        private$underlying_security_ <- NULL
       }
     },
     # Getters ------------------------------------------------------------------
@@ -76,21 +84,45 @@ Security <- R6::R6Class( #nolint
     get_instrument_type = function() private$instrument_type_,
     #' @description Get Price
     get_price = function() private$price_,
+    #' @description Get Underlying Security
+    get_underlying_security = function() {
+       if (is.null(private$underlying_security_)) return(self)
+       private$underlying_security_
+    },
     #' @description Get Underlying Price
-    get_underlying_price = function() private$underlying_price_,
+    get_underlying_price = function() {
+      if (is.null(private$underlying_security_)) return(self$get_price())
+      return(private$underlying_security_$get_price())
+    },
     #' @description Get Delta
     get_delta = function() private$delta_,
+    #' @description Get Delta-Adjusted Price (Delta * Underlying Price)
+    get_delta_price = function() {
+      self$get_delta() * self$get_underlying_price()
+    },
     #' @description Get Rule Data
     #' @param bbfield Character. bbfield.
-    get_rule_data = function(bbfield) {
+    #' @param underlying Logical. If TRUE and the security is an option, get the
+    #'  data from the underlying security. Defaults to FALSE.
+    get_rule_data = function(bbfield, underlying = FALSE) {
       checkmate::assert_character(bbfield)
+      if (isTRUE(underlying) & private$instrument_type_ == "Option") {
+        return(private$underlying_security_$get_rule_data(bbfield))
+      }
       if (bbfield %in% names(private$rule_data_)) {
-        private$rule_data_[[bbfield]]
+        return(private$rule_data_[[bbfield]])
       } else {
         stop(paste("bbfield", bbfield, "not found in security data."))
       }
     },
     # Update Data --------------------------------------------------
+    #' @description Update Prices & Delta
+    update_prices_delta = function() {
+      self$update_price()
+      self$update_delta()
+      self$update_underlying_price()
+      invisible(TRUE)
+    },
     #' @description Update Price
     update_price = function() {
       if (private$instrument_type_ == "FixedIncome") {
@@ -103,25 +135,24 @@ Security <- R6::R6Class( #nolint
     },
     #' @description Update Delta
     update_delta = function() {
+      delta <- NULL
       if (private$instrument_type_ == "Option") {
         delta <- (Rblpapi::bdp(private$bbid_, "OP006")$OP006)
-      }else {
-        delta <- 1
       }
+      if (is.null(delta) || !is.finite(delta)) delta <- 1
       private$delta_ <- delta
       invisible(delta)
     },
     #' @description Update Underlying Price
     update_underlying_price = function() {
-      if (private$instrument_type_ == "Option") {
-        underlying_price <- Rblpapi::bdp(private$bbid_, "OP004")$OP004
-      } else {
-        underlying_price <- private$price_
+      underlying_price <- NULL
+      if (self$get_instrument_type() == "Option") {
+        if (!is.null(self$get_underlying_security())) {
+          underlying_price <- private$underlying_security_$update_price()
+        }
       }
-      private$underlying_price_ <- underlying_price
       invisible(underlying_price)
     },
-
     # Setters ------------------------------------------------------------------
     #' @description Set Price
     #' @param price Numeric. New price of the security.

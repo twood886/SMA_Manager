@@ -8,45 +8,57 @@
   sma_name,
   rule_name,
   scope,
-  definition,
-  bbfields,
+  definition = NULL,
+  bbfields = NULL,
   max_threshold = Inf,
   min_threshold = -Inf,
   swap_only = FALSE,
-  gross_exposure = FALSE
+  gross_exposure = FALSE,
+  relative_to = "nav",
+  divisor = NULL,
+  side = NULL
 )
 }
 \arguments{
-\item{sma_name}{A string representing the name of the SMA. Must be a valid SMA name.}
+\item{sma_name}{A string representing the name of the SMA.
+Must be a valid SMA name.}
 
-\item{rule_name}{A string representing the name of the rule. Must be unique within the SMA.}
+\item{rule_name}{A string representing the name of the rule.}
 
-\item{scope}{A string indicating the scope of the rule. Valid values are "position", 
-"portfolio", or "all".}
+\item{scope}{One of "position", "portfolio", or "count" indicating the scope
+of the rule.}
 
-\item{definition}{A function defining the rule's logic. Must be a valid function object.}
+\item{definition}{A function defining the rule's logic.
+Must be a valid function object. May be `NULL` if `scope` is "count".}
 
-\item{bbfields}{A character vector of Bloomberg fields to be used in the rule's logic.}
+\item{bbfields}{A character vector of Bloomberg fields to be used in the
+rule's logic.}
 
-\item{max_threshold}{(Optional) A numeric value specifying the maximum threshold for the rule.}
+\item{max_threshold}{(Optional) A numeric value specifying the maximum
+threshold for the rule. If not provided, defaults to `Inf`.}
 
-\item{min_threshold}{(Optional) A numeric value specifying the minimum threshold for the rule.}
+\item{min_threshold}{(Optional) A numeric value specifying the minimum
+threshold for the rule. If not provided, defaults to `-Inf`.}
 
-\item{swap_only}{A logical value indicating whether the rule applies only to swaps. Defaults to `FALSE`.}
+\item{swap_only}{A logical value indicating whether the rule applies only to
+swaps. Defaults to `FALSE`.}
+
+\item{side}{(Optional) A string indicating the side of the rule.
+Valid values are "long", "short", or "gross". Used for position count rules.}
 }
 \value{
-An object of class `SMARulePosition` representing the SMA rule.
+An object of class `SMARule` representing the SMA rule.
 }
 \description{
-This function creates or retrieves an SMA (Simple Moving Average) rule object 
-associated with a specific SMA. The rule defines certain conditions or thresholds 
-for the SMA and can be scoped to positions, portfolios, or all.
+This function creates or retrieves an SMA rule object associated with a
+ specific SMA. The rule defines certain conditions or thresholds for the SMA
+ and can be scoped to positions, portfolios, or count.
 }
 \details{
-The function first checks if the rule already exists in the `smarules` registry. 
-If it exists, the existing rule is returned. Otherwise, a new rule is created 
-and stored in the registry. The rule's scope determines whether it applies to 
-individual positions, the entire portfolio, or all.
+The function first checks if the rule already exists in the `smarules`
+ registry. If it exists, the existing rule is returned. Otherwise, a new
+ rule is created and stored in the registry. The rule's scope determines
+ whether it applies to individual positions, the entire portfolio, or count.
 }
 \examples{
 # Example usage:

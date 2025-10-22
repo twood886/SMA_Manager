@@ -3,7 +3,7 @@
 OverflowRule <- R6::R6Class(
   "OverflowRule",
   private = list(
-    replacements_ = NULL 
+    replacements_ = NULL
   ),
   public = list(
     #' @description Create a new OverflowRule R6 object.

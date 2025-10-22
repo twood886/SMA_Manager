@@ -7,19 +7,20 @@ SMARulePortfolio <- R6::R6Class( #nolint
   inherit = SMARule,
   public = list(
     #' @description Check the rule against the current portfolio
-    #' @param positions List of Position objects
+    #' @param sma SMA object
     #' @param tolerance Numerical tolerance for constraint checking
-    check_compliance = function(positions, tolerance = 1e-6) {
+    check_compliance = function(sma, tolerance = 1e-6) {
+      positions <- sma$get_position()
       ids   <- vapply(positions, \(p) p$get_id(),  character(1))
       qty   <- vapply(positions, \(p) p$get_qty(), numeric(1))
-      sma   <- self$get_sma()
       nav   <- sma$get_nav()
 
       price <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
       price[!is.finite(price) | price <= 0] <- 1
       w <- qty * price / nav
 
-      f <- self$apply_rule_definition(ids); f[!is.finite(f)] <- 0
+      f <- self$apply_rule_definition(ids, sma)
+      f[!is.finite(f)] <- 0
       gamma <- as.numeric(f) / (price / nav)  # so gamma * w = f * qty
 
       lhs <- if (isTRUE(self$get_gross_exposure())) {
@@ -29,15 +30,13 @@ SMARulePortfolio <- R6::R6Class( #nolint
       }
 
       d <- self$get_divisor()
-      denom <- d$value(sma, ids, shares = qty)
+      denom <- d$value(sma, ids = NULL, shares = NULL)
 
       max_t <- self$get_max_threshold()
       min_t <- self$get_min_threshold()
 
       violates_max <- is.finite(max_t) && (lhs > max_t * denom + tolerance)
-      violates_min <- (!isTRUE(self$get_gross_exposure())) &&
-        is.finite(min_t) &&
-        (lhs < min_t * denom - tolerance)
+      violates_min <- is.finite(min_t) && (lhs < min_t * denom - tolerance)
 
       if (!(violates_max || violates_min)) {
         list(pass = TRUE)
@@ -61,10 +60,10 @@ SMARulePortfolio <- R6::R6Class( #nolint
     },
     #' @description Get the Max and Min value of the security based on the rule
     #' @param security_id Security ID
+    #' @param sma SMA object
     #' @return List of Max and Min Value
-    get_security_limits = function(security_id) {
+    get_security_limits = function(security_id, sma) {
       d      <- self$get_divisor()
-      sma    <- self$get_sma()
       nav    <- sma$get_nav()
       max_t  <- self$get_max_threshold()
       min_t  <- self$get_min_threshold()
@@ -72,7 +71,7 @@ SMARulePortfolio <- R6::R6Class( #nolint
 
       # NAV: simple closed form
       if (identical(d$kind, "nav")) {
-        exp_i <- self$apply_rule_definition(security_id)
+        exp_i <- self$apply_rule_definition(security_id, sma)
         .set <- function(e) {
           if (is.logical(e)) {
             if (isTRUE(e)) return(list(max = max_t, min = min_t))
@@ -84,7 +83,9 @@ SMARulePortfolio <- R6::R6Class( #nolint
             min = if (is.finite(min_t)) min_t / e else -Inf
           )
         }
-        out <- lapply(exp_i, .set); names(out) <- security_id; return(out)
+        out <- lapply(exp_i, .set)
+        names(out) <- security_id
+        return(out)
       }
 
       # GMV / long / short: others-frozen local caps
@@ -98,10 +99,9 @@ SMARulePortfolio <- R6::R6Class( #nolint
       contrib   <- d$contrib_vec(w_all)
       denom_all <- sum(contrib)
 
-      f_all <- self$apply_rule_definition(ids_all)
+      f_all <- self$apply_rule_definition(ids_all, sma)
       f_all[!is.finite(f_all)] <- 0
       gamma_all <- as.numeric(f_all) / (price_all / nav)
-
       s_num_abs_all <- abs(gamma_all * w_all)
 
       c_star <- if (is_gross) {
@@ -118,7 +118,7 @@ SMARulePortfolio <- R6::R6Class( #nolint
         p_i <- .security(sec)$get_price()
         if (!is.finite(p_i) || p_i <= 0) p_i <- 1
         sc_i <- p_i / nav
-        f_i  <- as.numeric(self$apply_rule_definition(sec))
+        f_i  <- as.numeric(self$apply_rule_definition(sec, sma))
         if (!is.finite(f_i)) f_i <- 0
         gamma_i <- if (sc_i != 0) f_i / sc_i else 0
 
@@ -154,8 +154,9 @@ SMARulePortfolio <- R6::R6Class( #nolint
     },
     #' @description Build the constraints for the optimization model
     #' @param ctx Context object with optimization variables and parameters
-    build_constraints = function(ctx) {
-      f <- self$apply_rule_definition(ctx$ids)
+    #' @param sma SMA object
+    build_constraints = function(ctx, sma) {
+      f <- self$apply_rule_definition(ctx$ids, sma)
       f <- as.numeric(f)
       f[!is.finite(f)] <- 0
 
@@ -184,17 +185,6 @@ SMARulePortfolio <- R6::R6Class( #nolint
         cons <- c(cons, list(lhs >= min_t * dres$expr))
       }
       cons
-    }
-  ),
-  private = list(
-    apply_rule_definition_positions_  = function(positions) {
-      if (length(positions) == 0) return(numeric(0))
-      security_ids <- sapply(positions, \(x) x$get_id())
-      pos_qty <- vapply(positions, \(x) x$get_qty(), numeric(1))
-      if (private$gross_exposure_) pos_qty <- abs(pos_qty)
-      rule_applied <- pos_qty * self$apply_rule_definition(security_ids)
-      names(rule_applied) <- security_ids
-      rule_applied
     }
   )
 )

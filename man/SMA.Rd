@@ -115,7 +115,7 @@ Check Rule Compliance}
 \subsection{Method \code{check_rule_compliance()}}{
 Check if the SMA is compliant with all its rules.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$check_rule_compliance(update_bbfields = TRUE, verbose = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$check_rule_compliance(update_bbfields = TRUE, verbose = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

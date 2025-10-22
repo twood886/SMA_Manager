@@ -64,7 +64,7 @@ Position <- R6::R6Class(  #nolint
           self$get_mkt_val() / nav
         },
         error = function(e) {
-          port <- 
+          port <- .portfolio(private$portfolio_short_name_, create = FALSE)
           nav <- port$get_nav()
           self$get_mkt_val() / nav
         }

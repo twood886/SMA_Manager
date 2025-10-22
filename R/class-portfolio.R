@@ -121,7 +121,7 @@ Portfolio <- R6::R6Class( #nolint
       checkmate::assert_r6(position, "Position")
       position_ids <- sapply(self$get_position(), \(x) x$get_id())
       existing_pos <- position$get_id() %in% position_ids
-      if (!is.null(existing_pos)) {
+      if (isTRUE(existing_pos)) {
         if (overwrite) {
           other_positions <- self$get_position()[
             which(position_ids != position$get_id())
@@ -179,6 +179,7 @@ Portfolio <- R6::R6Class( #nolint
     #' @param as.df Logical. Return as data frame (default: TRUE)
     rebalance = function(update_bbfields = TRUE, as.df = TRUE) {
       checkmate::assert_flag(update_bbfields)
+      checkmate::assert_flag(as.df)
       if (update_bbfields) update_bloomberg_fields()
       rebal <- self$get_trade_constructor()$optimize_sma(self)
       current_sh <- vapply(self$get_position(), \(p) p$get_qty(), numeric(1))

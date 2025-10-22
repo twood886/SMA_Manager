@@ -20,7 +20,8 @@ R6 Class that encapsultes rules for SMAs.
 \item \href{#method-SMARule-get_min_threshold}{\code{SMARule$get_min_threshold()}}
 \item \href{#method-SMARule-get_swap_only}{\code{SMARule$get_swap_only()}}
 \item \href{#method-SMARule-get_gross_exposure}{\code{SMARule$get_gross_exposure()}}
-\item \href{#method-SMARule-get_sma}{\code{SMARule$get_sma()}}
+\item \href{#method-SMARule-get_relative_to}{\code{SMARule$get_relative_to()}}
+\item \href{#method-SMARule-get_divisor}{\code{SMARule$get_divisor()}}
 \item \href{#method-SMARule-apply_rule_definition}{\code{SMARule$apply_rule_definition()}}
 \item \href{#method-SMARule-build_constraints}{\code{SMARule$build_constraints()}}
 \item \href{#method-SMARule-objective_terms}{\code{SMARule$objective_terms()}}
@@ -41,7 +42,9 @@ R6 Class that encapsultes rules for SMAs.
   max_threshold = NULL,
   min_threshold = NULL,
   swap_only = FALSE,
-  gross_exposure = FALSE
+  gross_exposure = FALSE,
+  relative_to = "nav",
+  divisor = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -64,7 +67,11 @@ R6 Class that encapsultes rules for SMAs.
 
 \item{\code{swap_only}}{logical}
 
-\item{\code{gross_exposure}}{logical
+\item{\code{gross_exposure}}{logical}
+
+\item{\code{relative_to}}{Character}
+
+\item{\code{divisor}}{DivisorProvider object
 Get SMA Name}
 }
 \if{html}{\out{</div>}}
@@ -174,22 +181,39 @@ Get Gross Exposure Flag
 \if{latex}{\out{\hypertarget{method-SMARule-get_gross_exposure}{}}}
 \subsection{Method \code{get_gross_exposure()}}{
 Get the gross exposure flag of the SMA Rule
-Get the SMA Object
+Get Relative To
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARule$get_gross_exposure()}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARule-get_sma"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARule-get_sma}{}}}
-\subsection{Method \code{get_sma()}}{
-Get the SMA Object that this rule belongs to
-Apply the Rule Definition
+\if{html}{\out{<a id="method-SMARule-get_relative_to"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_relative_to}{}}}
+\subsection{Method \code{get_relative_to()}}{
+Get the relative to field of the SMA Rule
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_sma()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_relative_to()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Character
+Get Divisor
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_divisor"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_divisor}{}}}
+\subsection{Method \code{get_divisor()}}{
+Get the DivisorProvider object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_divisor()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+DivisorProvider object
+Apply the Rule Definition
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARule-apply_rule_definition"></a>}}
@@ -197,13 +221,15 @@ Apply the Rule Definition
 \subsection{Method \code{apply_rule_definition()}}{
 Apply the rule definition to a set of security IDs
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARule$apply_rule_definition(security_id)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$apply_rule_definition(security_id, sma)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID
+\item{\code{security_id}}{Security ID}
+
+\item{\code{sma}}{SMA object
 Build Constraints}
 }
 \if{html}{\out{</div>}}

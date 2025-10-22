@@ -59,24 +59,14 @@ update_bloomberg_fields <- function() {
     envir = get_registries()$smarules,
     inherits = TRUE
   )
-  rule_bbfields <- unique(
-    unlist(
-      sapply(
-        rules,
-        function(rule) rule$get_bbfields(),
-        simplify = TRUE
-      ),
-      use.names = FALSE
-    )
-  )
-  if (is.null(rule_bbfields) || length(rule_bbfields) == 0) {
+  rules_bbfields_all <- sapply(rules, \(r) r$get_bbfields(), simplify = TRUE)
+  rules_bbfields <- unique(unlist(rules_bbfields_all, use.names = FALSE))
+  if (is.null(rules_bbfields) || length(rules_bbfields) == 0) {
     return(invisible(TRUE))
   }
-  security_ids <- ls(get_registries()$securities)
-  bbdata <- Rblpapi::bdp(
-    security_ids,
-    fields = rule_bbfields
-  )
+  sec_id <- ls(get_registries()$securities)
+  sec <- lapply(sec_id, function(id) .security(id))
+  bbdata <- Rblpapi::bdp(sec_id, fields = rules_bbfields)
   for (col in seq_len(ncol(bbdata))) {
     field <- colnames(bbdata)[col]
     for (row in seq_len(nrow(bbdata))) {

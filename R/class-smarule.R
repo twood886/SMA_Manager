@@ -19,9 +19,7 @@ SMARule <- R6::R6Class( #nolint
     swap_only_ = NULL,
     gross_exposure_ = NULL,
     divisor_ = NULL,
-    get_portfolio = function() {
-      get(private$sma_name_, envir = registries$portfolios, inherits = FALSE)
-    }
+    relative_to_ = NULL
   ),
   public = list(
     #' @param sma_name Character
@@ -41,7 +39,8 @@ SMARule <- R6::R6Class( #nolint
       scope = NULL,
       bbfields = NULL,
       definition = NULL,
-      max_threshold = NULL, min_threshold = NULL,
+      max_threshold = NULL,
+      min_threshold = NULL,
       swap_only = FALSE,
       gross_exposure = FALSE,
       relative_to = "nav",
@@ -57,7 +56,7 @@ SMARule <- R6::R6Class( #nolint
       private$swap_only_ <- swap_only
       private$gross_exposure_ <- gross_exposure
       private$relative_to_ <- relative_to
-      if (checkmate::check_class(divisor, "DivisorProvider")) {
+      if (checkmate::test_r6(divisor, "DivisorProvider")) {
         private$divisor_ <- divisor
       } else {
         if (relative_to %in% c("nav", "gmv", "long_gmv", "short_gmv")) {
@@ -107,12 +106,6 @@ SMARule <- R6::R6Class( #nolint
     #' @description Get the gross exposure flag of the SMA Rule
     get_gross_exposure = function() private$gross_exposure_,
 
-    #'Get the SMA Object
-    #' @description Get the SMA Object that this rule belongs to
-    get_sma = function() {
-      get(private$sma_name_, envir = registries$portfolios, inherits = TRUE)
-    },
-
     #' Get Relative To
     #' @description Get the relative to field of the SMA Rule
     #' @return Character
@@ -126,8 +119,9 @@ SMARule <- R6::R6Class( #nolint
     #' Apply the Rule Definition
     #' @description Apply the rule definition to a set of security IDs
     #' @param security_id Security ID
-    apply_rule_definition = function(security_id) {
-      exp <- private$definition_(security_id, private$get_portfolio())
+    #' @param sma SMA object
+    apply_rule_definition = function(security_id, sma) {
+      exp <- private$definition_(security_id, sma)
       names(exp) <- security_id
       exp
     },

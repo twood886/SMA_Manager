@@ -13,9 +13,8 @@ R6 Class that encapsulates rule for SMAs
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMARulePosition-check_compliance}{\code{SMARulePosition$check_compliance()}}
-\item \href{#method-SMARulePosition-get_security_limits}{\code{SMARulePosition$get_security_limits()}}
 \item \href{#method-SMARulePosition-check_swap_security}{\code{SMARulePosition$check_swap_security()}}
-\item \href{#method-SMARulePosition-check_violations}{\code{SMARulePosition$check_violations()}}
+\item \href{#method-SMARulePosition-get_security_limits}{\code{SMARulePosition$get_security_limits()}}
 \item \href{#method-SMARulePosition-build_constraints}{\code{SMARulePosition$build_constraints()}}
 \item \href{#method-SMARulePosition-clone}{\code{SMARulePosition$clone()}}
 }
@@ -26,13 +25,14 @@ R6 Class that encapsulates rule for SMAs
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="apply_rule_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-apply_rule_definition'><code>SMAManager::SMARule$apply_rule_definition()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_bbfields"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_bbfields'><code>SMAManager::SMARule$get_bbfields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_divisor"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_divisor'><code>SMAManager::SMARule$get_divisor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_gross_exposure"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_gross_exposure'><code>SMAManager::SMARule$get_gross_exposure()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_min_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_min_threshold'><code>SMAManager::SMARule$get_min_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_name'><code>SMAManager::SMARule$get_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_relative_to"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_relative_to'><code>SMAManager::SMARule$get_relative_to()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_scope"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_scope'><code>SMAManager::SMARule$get_scope()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma'><code>SMAManager::SMARule$get_sma()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma_name'><code>SMAManager::SMARule$get_sma_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
@@ -46,38 +46,20 @@ R6 Class that encapsulates rule for SMAs
 \subsection{Method \code{check_compliance()}}{
 Check the rule against the current holdings
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_compliance(positions)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_compliance(sma, tolerance = 1e-06)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{positions}}{List of Position objects}
+\item{\code{sma}}{SMA object}
+
+\item{\code{tolerance}}{Numeric tolerance level for compliance check}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 List of security IDs that do not comply with the rule
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-get_security_limits"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-get_security_limits}{}}}
-\subsection{Method \code{get_security_limits()}}{
-Get the Max and Min Value of the security based on the rule
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$get_security_limits(security_id)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{security_id}}{Security ID}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-List of Max and Min Value
 }
 }
 \if{html}{\out{<hr>}}
@@ -92,28 +74,31 @@ Get the swap flag for a given security
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID
-Check violations for specific securities}
+\item{\code{security_id}}{Security ID}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARulePosition-check_violations"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARulePosition-check_violations}{}}}
-\subsection{Method \code{check_violations()}}{
+\if{html}{\out{<a id="method-SMARulePosition-get_security_limits"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARulePosition-get_security_limits}{}}}
+\subsection{Method \code{get_security_limits()}}{
+Get the Max and Min Value of the security based on the rule
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$check_violations(shares, tolerance = 1e-06)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$get_security_limits(security_id, sma)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{shares}}{Named vector of shares}
+\item{\code{security_id}}{Security ID}
 
-\item{\code{tolerance}}{Numerical tolerance}
+\item{\code{sma}}{SMA object}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+List of Max and Min Value
 }
 }
 \if{html}{\out{<hr>}}
@@ -122,13 +107,15 @@ Check violations for specific securities}
 \subsection{Method \code{build_constraints()}}{
 Build the constraints for the optimization model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$build_constraints(ctx)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePosition$build_constraints(ctx, sma)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{ctx}}{Context object with optimization variables and parameters}
+
+\item{\code{sma}}{SMA object}
 }
 \if{html}{\out{</div>}}
 }

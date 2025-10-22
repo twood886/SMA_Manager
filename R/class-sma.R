@@ -66,19 +66,14 @@ SMA <- R6::R6Class(   #nolint
     #' FALSE.
     #' @import checkmate
     #' @return A list of rule compliance results.
-    check_rule_compliance = function(update_bbfields = TRUE, verbose = FALSE) {
+    check_rule_compliance = function(update_bbfields = TRUE, verbose = TRUE) {
       checkmate::assert_logical(update_bbfields)
       checkmate::assert_logical(verbose)
       rules <- self$get_rules()
-      if (length(rules) == 0) {
-        if (verbose) {
-          message("No rules to check.")
-        }
-        return(list())
-      }
+      if (length(rules) == 0) return(list())
       if (update_bbfields) SMAManager::update_bloomberg_fields()
       positions <- self$get_position()
-      results <- lapply(rules, \(rule) rule$check_compliance(positions))      
+      results <- lapply(rules, \(rule) rule$check_compliance(self))
       if (verbose) return(results)
 
       non_comply <- which(sapply(results, function(x) !x$pass))

@@ -4,7 +4,7 @@
 #' @import R6
 #' @import checkmate
 #' @export
-Holding <- R6::R6Class( 
+Holding <- R6::R6Class(
   "Holding",
   private = list(
     id_ = NULL,

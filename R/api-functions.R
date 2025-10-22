@@ -337,29 +337,39 @@
   }
   invisible(sma)
 }
+
+
 #' Create or Retrieve an SMA Rule
 #'
-#' This function creates or retrieves an SMA (Simple Moving Average) rule object 
-#' associated with a specific SMA. The rule defines certain conditions or thresholds 
-#' for the SMA and can be scoped to positions, portfolios, or all.
+#' This function creates or retrieves an SMA rule object associated with a
+#'  specific SMA. The rule defines certain conditions or thresholds for the SMA
+#'  and can be scoped to positions, portfolios, or count.
 #'
-#' @param sma_name A string representing the name of the SMA. Must be a valid SMA name.
-#' @param rule_name A string representing the name of the rule. Must be unique within the SMA.
-#' @param scope A string indicating the scope of the rule. Valid values are "position", 
-#'   "portfolio", or "all".
-#' @param bbfields A character vector of Bloomberg fields to be used in the rule's logic.
-#' @param definition A function defining the rule's logic. Must be a valid function object.
-#' @param max_threshold (Optional) A numeric value specifying the maximum threshold for the rule.
-#' @param min_threshold (Optional) A numeric value specifying the minimum threshold for the rule.
-#' @param swap_only A logical value indicating whether the rule applies only to swaps. Defaults to `FALSE`.
+#' @param sma_name A string representing the name of the SMA.
+#'  Must be a valid SMA name.
+#' @param rule_name A string representing the name of the rule.
+#' @param scope One of "position", "portfolio", or "count" indicating the scope
+#'  of the rule.
+#' @param bbfields A character vector of Bloomberg fields to be used in the
+#'  rule's logic.
+#' @param definition A function defining the rule's logic.
+#'  Must be a valid function object. May be `NULL` if `scope` is "count".
+#' @param max_threshold (Optional) A numeric value specifying the maximum
+#'  threshold for the rule. If not provided, defaults to `Inf`.
+#' @param min_threshold (Optional) A numeric value specifying the minimum
+#'  threshold for the rule. If not provided, defaults to `-Inf`.
+#' @param swap_only A logical value indicating whether the rule applies only to
+#'  swaps. Defaults to `FALSE`.
+#' @param side (Optional) A string indicating the side of the rule.
+#'  Valid values are "long", "short", or "gross". Used for position count rules.
 #'
-#' @return An object of class `SMARulePosition` representing the SMA rule.
+#' @return An object of class `SMARule` representing the SMA rule.
 #'
 #' @details
-#' The function first checks if the rule already exists in the `smarules` registry. 
-#' If it exists, the existing rule is returned. Otherwise, a new rule is created 
-#' and stored in the registry. The rule's scope determines whether it applies to 
-#' individual positions, the entire portfolio, or all.
+#' The function first checks if the rule already exists in the `smarules`
+#'  registry. If it exists, the existing rule is returned. Otherwise, a new
+#'  rule is created and stored in the registry. The rule's scope determines
+#'  whether it applies to individual positions, the entire portfolio, or count.
 #'
 #' @examples
 #' # Example usage:
@@ -378,35 +388,50 @@
 #' @export
 .sma_rule <- function(
   sma_name,
-  rule_name, scope, definition, bbfields,
-  max_threshold = Inf, min_threshold = -Inf,
-  swap_only = FALSE, gross_exposure = FALSE,
-  relative_to = "nav", divisor = NULL
+  rule_name,
+  scope,
+  definition = NULL,
+  bbfields = NULL,
+  max_threshold = Inf,
+  min_threshold = -Inf,
+  swap_only = FALSE,
+  gross_exposure = FALSE,
+  relative_to = "nav",
+  divisor = NULL,
+  side = NULL
 ) {
-  checkmate::assert_character(sma_name)
+  checkmate::assert_character(sma_name, len = 1)
   sma <- .sma(sma_name, create = FALSE)
   checkmate::assert_r6(sma, "SMA")
-  checkmate::assert_character(rule_name)
-  name <- paste(sma_name, rule_name)
+
+  checkmate::assert_character(rule_name, len = 1)
+  key_name <- paste0(sma_name, "::", rule_name)
   env <- registries$smarules
-  if (exists(name, envir = env)) return(get(name, envir = env))
-  checkmate::assert_character(scope)
-  checkmate::assert_function(definition)
+  if (exists(key_name, envir = env)) return(get(key_name, envir = env))
+
+  scope_types <- c("position", "portfolio", "count")
+  checkmate::assert_choice(scope, scope_types)
+
+  if (scope != "count") checkmate::assert_function(definition)
+
   checkmate::assert_numeric(max_threshold)
   checkmate::assert_numeric(min_threshold)
 
-  if (!scope %in% c("position", "portfolio", "all")) stop("scope not valid")
-  checkmate::assert_character(relative_to)
-  if (!relative_to %in% c("nav", "gmv", "long_gmv", "short_gmv")) {
-    stop("relative_to not valid")
+  checkmate::assert_choice(
+    relative_to, c("nav", "gmv", "long_gmv", "short_gmv")
+  )
+
+  if (!is.null(divisor)) checkmate::assert_r6(divisor, "DivisorProvider")
+
+  if (scope == "count") {
+    checkmate::assert_choice(side, c("long", "short", "gross"))
   }
-  if (!is.null(divisor)) {
-    checkmate::assert_r6(divisor, "DivisorProvider")
-  }
+
+
   if (scope == "position") {
     smarule <- SMARulePosition$new(
       sma_name = sma_name,
-      name = name,
+      name = rule_name,
       scope = scope,
       bbfields = bbfields,
       definition = definition,
@@ -421,7 +446,7 @@
   if (scope == "portfolio") {
     smarule <- SMARulePortfolio$new(
       sma_name = sma_name,
-      name = name,
+      name = rule_name,
       scope = scope,
       bbfields = bbfields,
       definition = definition,
@@ -433,86 +458,22 @@
       divisor = divisor
     )
   }
-  assign(name, smarule, envir = env)
+  if (scope == "count") {
+    smarule <- SMARuleCount$new(
+      sma_name = sma_name,
+      name = rule_name,
+      scope = scope,
+      bbfields = bbfields,
+      definition = definition,
+      max_threshold = max_threshold,
+      min_threshold = min_threshold,
+      swap_only = swap_only,
+      gross_exposure = gross_exposure,
+      relative_to = relative_to,
+      divisor = divisor,
+      side = side
+    )
+  }
+  assign(key_name, smarule, envir = env)
   invisible(smarule)
-}
-
-
-#' Create or Retrieve a Trade Object
-#'
-#' This function manages trades for a given security and portfolio. It retrieves or creates a trade object,
-#' updates the trade quantity, and adjusts the position in the portfolio accordingly.
-#'
-#' @param sec_id A string representing the ID of the security. Must be a valid string.
-#' @param portfolio_id A string representing the ID of the portfolio. Must be a valid string.
-#' @param qty A numeric value representing the quantity of the trade. Must be a valid numeric value.
-#' @param swap A boolean indicating whether the trade is a swap. Must be `TRUE` or `FALSE`.
-#' @param create A boolean indicating whether to create a new trade if it does not exist. Must be `TRUE` or `FALSE`.
-#' @param assign_to_registry A boolean indicating whether to assign the trade object to the registry. Defaults to `TRUE`.
-#'
-#' @return If `create` is `FALSE`, returns a list of existing trades for the given security and swap flag.
-#'         If `create` is `TRUE`, returns the trade object after updating its quantity and the portfolio's position.
-#'
-#' @details
-#' The function first validates the input parameters. It retrieves all existing trades from the `registries$trades`
-#' environment and filters them based on the `security_id` and `swap` flag. If `create` is `FALSE`, it returns the
-#' filtered trades. If `create` is `TRUE`, it creates a new trade if none exists, updates the trade quantity, and
-#' adjusts the position in the portfolio.
-#'
-#' @examples
-#' # Example usage:
-#' # Retrieve existing trades
-#' trades <- .trade("SEC123", "PORT456", qty = 0, swap = FALSE, create = FALSE)
-#'
-#' # Create or update a trade
-#' trade <- .trade("SEC123", "PORT456", qty = 100, swap = FALSE, create = TRUE)
-#'
-#' @seealso \code{\link{Trade}}, \code{\link{Portfolio}}
-#' @include class-trade.R
-#' @import checkmate
-#' @export
-.trade <- function(
-  sec_id, portfolio_id, qty, swap, create = FALSE, assign_to_registry = TRUE
-) {
-  checkmate::assert_character(sec_id)
-  security_id <- tolower(sec_id)
-  checkmate::assert_character(portfolio_id)
-  portfolio <- .portfolio(portfolio_id, create = FALSE)
-  checkmate::assert_r6(portfolio, "Portfolio")
-  checkmate::assert_numeric(qty)
-  checkmate::assert_flag(swap)
-  checkmate::assert_flag(create)
-  checkmate::assert_flag(assign_to_registry)
-
-  all_trades <- mget(
-    ls(envir = registries$trades, all.names = TRUE),
-    envir = registries$trades,
-    inherits = TRUE
-  )
-  all_trades_ids <- vapply(all_trades, \(x) x$get_security_id(), character(1))
-  all_trades_swap_flag <- vapply(all_trades, \(x) x$get_swap_flag(), logical(1))
-  sec_trades <- all_trades[all_trades_ids == security_id & all_trades_swap_flag == swap] #nolint
-
-  if (!create) return(sec_trades)
-
-  if (length(sec_trades) == 0) {
-    trade <- Trade$new(security_id, swap)
-  } else {
-    trade <- sec_trades[[1]]
-  }
-
-  trade$add_trade_qty(portfolio_id, qty)
-  tgt_pos <- tryCatch(
-    {portfolio$get_position(security_id)},
-    error = function(e) {
-      .position(portfolio_id, security_id, qty = 0, swap = swap)
-    }
-  )
-  existing_tgt_qty <- as.numeric(tgt_pos$get_qty())
-  tgt_pos$set_qty(existing_tgt_qty + qty)
-  portfolio$add_position(tgt_pos, overwrite = TRUE)
-  if (assign_to_registry) {
-    assign(as.character(trade$get_id()), trade, envir = registries$trades)
-  }
-  invisible(trade)
 }

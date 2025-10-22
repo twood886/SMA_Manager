@@ -11,7 +11,10 @@
 DivisorProvider <- R6::R6Class( #nolint
   "DivisorProvider",
   public = list(
+    #' @field kind (`character(1)`)\cr
+    #' Indicates the type of divisor: "nav", "gmv", "long_gmv", or "short_gmv"
     kind = NULL,
+
     #' @description Initialize a DivisorProvider
     #' @param kind Character string specifying the type of divisor:
     #'  "nav" (default), "gmv", "long_gmv", or "short_gmv"
@@ -24,20 +27,25 @@ DivisorProvider <- R6::R6Class( #nolint
     #'  If NULL, current positions in the portfolio are used.
     weights = function(portfolio, ids, shares = NULL) {
       nav <- portfolio$get_nav()
-      price <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
-      if (is.null(shares)) {
-        # current positions
+      if (is.null(ids)) {
         pos <- portfolio$get_position()
-        pid <- vapply(pos, \(p) p$get_id(), character(1))
+        ids <- vapply(pos, \(p) p$get_id(), character(1))
         qty <- vapply(pos, \(p) p$get_qty(), numeric(1))
-        w <- rep(0, length(ids))
-        m <- match(pid, ids)
-        ok <- which(!is.na(m))
-        if (length(ok)) w[m[ok]] <- qty[ok] * price[m[ok]] / nav
       } else {
-        w <- shares * price / nav
+        if (is.null(shares)) {
+          pos <- portfolio$get_position()
+          pid <- vapply(pos, \(p) p$get_id(), character(1))
+          qty <- vapply(pos, \(p) p$get_qty(), numeric(1))
+          m <- match(pid, ids)
+          qty <- ifelse(is.na(m), 0, qty[m])
+        } else {
+          qty <- shares
+        }
       }
-      w
+
+      price <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
+      price[!is.finite(price) | price <= 0] <- 1
+      qty * price / nav
     },
 
     #' @description Per-name contribution to the divisor (vector)
@@ -58,14 +66,14 @@ DivisorProvider <- R6::R6Class( #nolint
     #' @param ids Character vector of security IDs
     #' @param shares Optional numeric vector of shares corresponding to ids.
     value = function(portfolio, ids, shares = NULL) {
-      if (self$kind == "nav") {
-        return(1)
-      }
+      if (self$kind == "nav") return(1)
       w <- self$weights(portfolio, ids, shares)
       sum(self$contrib_vec(w))
     },
 
-    # CVXR expression for optimization, plus any binding constraints
+
+    #' @description Get CVXR expression for divisor
+    #' @param ctx Context object with metric helper
     expr = function(ctx) {
       # leverage your ctx$metric helper if you added it
       if (self$kind == "nav") {

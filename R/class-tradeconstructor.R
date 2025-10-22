@@ -26,7 +26,7 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- Filter(\(r) r$get_scope() == "position", rules)
       }
 
-      limits_all <- lapply(rules, \(r) r$get_security_limits(security_id))
+      limits_all <- lapply(rules, \(r) r$get_security_limits(security_id, portfolio)) #nolint
 
       limits <- lapply(
         security_id,
@@ -97,8 +97,8 @@ TradeConstructor <- R6::R6Class( #nolint
       lambda_alpha   = 10,
       tau_rel        = 1e-3,
       beta_free      = 5.0,
-      alpha_min      = 0.8,
-      alpha_max      = 5.0
+      alpha_min      = 1,
+      alpha_max      = 1
     ) {
       tgt_qty <- self$calc_target_quantities(portfolio)
       current_pos <- private$.extract_qty(portfolio$get_position())
@@ -147,7 +147,7 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- c(rules, list(OverflowRule$new(replacements)))
       }
       rule_cons  <- unlist(
-        lapply(rules, \(r) r$build_constraints(ctx)),
+        lapply(rules, \(r) r$build_constraints(ctx, portfolio)),
         recursive = FALSE
       )
       cons <- c(cons, rule_cons)
@@ -176,9 +176,8 @@ TradeConstructor <- R6::R6Class( #nolint
         term_base
         + term_free
         + rule_obj_sum
-        + lambda_alpha
-        * CVXR::square(alpha - 1)
-        + 10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)
+        + lambda_alpha * CVXR::square(alpha - 1)
+        #+ 10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)
       )
 
       prob <- CVXR::Problem(objective, cons)
@@ -227,8 +226,6 @@ TradeConstructor <- R6::R6Class( #nolint
         objective_value = res$value,
         status          = res$status
       )
-
-
     }
   ),
   private = list(

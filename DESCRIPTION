@@ -11,8 +11,8 @@ LazyData: true
 RoxygenNote: 7.3.2.9000
 Collate: 
     'SMAManager-package.R'
-    'class-trade.R'
     'api-functions.R'
+    'class-divisorprovider.R'
     'class-holding.R'
     'class-modelcontext.R'
     'class-overflowrule.R'
@@ -26,6 +26,8 @@ Collate:
     'class-tradeconstructor.R'
     'class-portfolio.R'
     'class-smaruleportfolio.R'
+    'class-smarulepositioncount.R'
+    'class-trade.R'
     'class-variablefactory.R'
     'create_trade.R'
     'get_tracking_smas.R'

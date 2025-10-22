@@ -98,8 +98,8 @@ Main optimization using CVXR}
   lambda_alpha = 10,
   tau_rel = 0.001,
   beta_free = 5,
-  alpha_min = 0.8,
-  alpha_max = 5
+  alpha_min = 1,
+  alpha_max = 1
 )}\if{html}{\out{</div>}}
 }
 
