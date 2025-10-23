@@ -120,37 +120,61 @@ SMARuleCount <- R6::R6Class( #nolint
     #' @param ctx Context object with optimization variables and parameters
     #' @param sma SMA object
     build_constraints = function(ctx, sma) {
-      w <- ctx$t_w
+      w <- ctx$w
+      n <- ctx$n
       side <- self$get_side()
-
-      n <- if (!length(w)) 0 else switch(
-        side,
-        "gross" = sum(abs(w) > 1e-6),
-        "long" = sum(w > 1e-6),
-        "short" = sum(w < -1e-6)
-      )
-
       min_t <- self$get_min_threshold()
       max_t <- self$get_max_threshold()
 
-      n_pos <- length(which(t_w > 0))
-      n_neg <- length(which(t_w < 0))
-      n_tot <- length(t_w)
-      side <- self$get_side()
+      eps <- 1e-4
 
-      if (is.finite(min_t) && n < min_t) {
-        stop(sprintf(
-          "[%s] requires at least %d %s positions in targets; got %d.",
-          self$get_name(), min_t, side, n
-        ))
+      cons <- list()
+
+      if (side == "long") {
+        z <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_long_", self$get_name())) #nolint
+        p <- CVXR::Variable(n, name = paste0("p_long_", self$get_name()))
+        cons <- c(cons,
+          list(p >= w),
+          list(p >= 0),
+          list(p >= eps * z)
+        )
+        if (is.finite(min_t)) cons <- c(cons, list(CVXR::sum_entries(z) >= min_t)) #nolint
+        if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(z) <= max_t)) #nolint
+        return(cons)
       }
-      if (is.finite(max_t) && n > max_t) {
-        stop(sprintf(
-          "[%s] allows at most %d %s positions in targets; got %d.",
-          self$get_name(), max_t, side, n
-        ))
+
+      if (side == "short") {
+        z <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_short_", self$get_name())) #nolint
+        s <- CVXR::Variable(n, name = paste0("s_short_", self$get_name()))
+        cons <- c(cons,
+          list(s >= -w),
+          list(s >= 0),
+          list(s >= eps * z)
+        )
+        if (is.finite(min_t)) cons <- c(cons, list(CVXR::sum_entries(z) >= min_t)) #nolint
+        if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(z) <= max_t)) #nolint
+        return(cons)
       }
-      list()
+
+      if (side == "gross") {
+        z_long <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_long_", self$get_name())) #nolint
+        z_short <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_short_", self$get_name())) #nolint
+        y <- CVXR::Variable(n, boolean = TRUE, name = paste0("y_gross_", self$get_name())) #nolint
+        p <- CVXR::Variable(n, name = paste0("p_gross_pos_", self$get_name()))
+        s <- CVXR::Variable(n, name = paste0("s_gross_neg_", self$get_name()))
+        cons <- c(cons,
+          list(p >= w), list(p >= 0),
+          list(s >= -w), list(s >= 0),
+          list(p >= eps * z_long),
+          list(s > eps * z_short),
+          list(y >= z_long, y >= z_short),
+          list(y <= z_long + z_short)
+        )
+        if (is.finite(min_t)) cons <- c(cons, list(CVXR::sum_entries(y) >= min_t)) #nolint
+        if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(y) <= max_t)) #nolint
+        return(cons)
+      }
+      stop("Unrecognized side in SMARuleCount: ", side)
     }
   )
 )

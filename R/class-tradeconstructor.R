@@ -81,8 +81,6 @@ TradeConstructor <- R6::R6Class( #nolint
         var_factory = vf
       )
     },
-
-
     #' Main optimization using CVXR
     #' @param portfolio An object of class Portfolio
     #' @param lambda_alpha Regularization parameter for alpha
@@ -181,29 +179,20 @@ TradeConstructor <- R6::R6Class( #nolint
       )
 
       prob <- CVXR::Problem(objective, cons)
-
       # --- Solve --------------------------------------------------------------
-      res <- tryCatch({
-        CVXR::solve(
-          prob,
-          solver = "OSQP",
-          eps_abs = 1e-8,
-          eps_rel = 1e-8,
-          max_iter = 200000,
-          polish = TRUE
-        )
-      }, error = function(e) {
-        CVXR::solve(
-          prob,
-          solver = "ECOS",
-          abstol = 1e-8,
-          reltol = 1e-8,
-          feastol = 1e-8
-        )
-      })
+      if (any(vapply(rules, \(r) r$get_scope(), character(1)) %in% c("count"))) { #nolint
+        res <- CVXR::solve(prob, solver = "ECOS_BB")
+      } else {
+        res <- tryCatch({
+          CVXR::solve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 2e5, polish = TRUE) #nolint
+        }, error = function(e) {
+          CVXR::solve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
+        })
+      }
 
-      if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved")))
+      if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved"))) {
         stop(sprintf("Optimization failed with status: %s", res$status))
+      }
 
       w_hat     <- setNames(as.numeric(res$getValue(w)), sec_ids)
       alpha_hat <- as.numeric(res$getValue(alpha))
