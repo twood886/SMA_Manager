@@ -169,7 +169,6 @@ Portfolio <- R6::R6Class( #nolint
       if (is.na(nav)) nav <- 0
       private$nav_ <- nav
       .bulk_holding_positions(enfusion_report, private$short_name_)
-      # .bulk_trade_positions(private$trade_url_, self)
       invisible(self)
     },
     # Calculators --------------------------------------------------------------

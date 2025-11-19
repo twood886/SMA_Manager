@@ -26,11 +26,6 @@ check_enfusion_connection <- function() {
 #' @importFrom readr read_csv
 #' @importFrom dplyr if_all
 #' @importFrom dplyr everything
-#' @examples
-#' library(enfusion)
-#' enfusion_process <- launch_enfusion("username", "password")
-#' reportWebServiceURL <- "https://webservices.enfusionsystems.com/mobile/rest/reportservice/exportReport?name=test.trb" #nolint
-#' get_enfusion_report(reportWebServiceURL, enfusion_process)
 #' @export
 get_enfusion_report <- function(reportWebServiceURL) { #nolint
   if (!check_enfusion_connection()) {
@@ -272,80 +267,5 @@ create_sma_from_enfusion <- function(
       assign(sec$get_id(), sec, envir = registries$securities)
     }
   }
-  invisible(NULL)
-}
-
-#' Internal helper: create many positions from Enfusion report
-#' @param enfusion_report Data frame of Enfusion report rows
-#' @param short_name Character portfolio short name
-#' @include utils.R
-#' @include api-functions.R
-#' @import Rblpapi
-#' @export
-.bulk_trade_positions <- function(trade_url, portfolio) {
-  # Ensure Bloomberg session
-  con <- tryCatch(Rblpapi:::defaultConnection(), error = function(e) NULL)
-  if (is.null(con)) Rblpapi::blpConnect()
-
-  # Pull report + keep only rows we need
-  trade_report <- get_enfusion_report(trade_url)
-  if (is.null(trade_report) || !nrow(trade_report)) return(invisible(NULL))
-
-  keep <- !is.na(trade_report[["Description"]]) &
-    (trade_report[["Order Remaining Quantity"]] != 0)
-  if (!any(keep)) return(invisible(NULL))
-  tr <- trade_report[keep, , drop = FALSE]
-
-  # ----- Vectorized ID derivation -----
-  types <- tr[["Instrument Type"]]
-  ids   <- tr[["Description"]]                      # default to Description
-  yk    <- tr[["BB Yellow Key"]] %||% tr[["BB Yellow Key Position"]]
-
-  is_eqopt <- types %in% c("Equity", "Listed Option")
-  ids[is_eqopt] <- yk[is_eqopt]
-
-  # One Bloomberg bdp() for all bonds
-  bond_idx <- which(types == "Bond")
-  if (length(bond_idx)) {
-    figi <- tr[["FIGI"]][bond_idx]
-    bond_tab <- Rblpapi::bdp(figi, "DX194")
-    key <- if ("security" %in% names(bond_tab)) {
-      bond_tab[["security"]]
-    } else {
-      rownames(bond_tab)
-    }
-    ids[bond_idx] <- bond_tab$DX194[match(figi, key)]
-  }
-
-  ids <- tolower(ids)
-
-  # ----- Vectorized quantities & flags -----
-  remain <- as.double(tr[["Order Remaining Quantity"]])
-  total  <- as.double(tr[["Notional Quantity"]])
-  # Match your sign flip rule: if total < 0 => negate remain
-  remain <- remain * ifelse(is.na(total), 1, ifelse(total < 0, -1, 1))
-
-  swap_raw <- as.logical(tr[["Is Financed"]])
-  swap     <- ifelse(is.na(swap_raw), FALSE, swap_raw)
-
-  # ----- Execute trades -----
-  # (.trade likely has side effects and cannot be vectorized safely)
-  port_id <- portfolio$get_short_name()
-  mapply(
-    function(id, q, s) {
-      .trade(
-        security_id         = id,
-        portfolio_id        = port_id,
-        qty                 = q,
-        swap                = s,
-        create              = TRUE,
-        assign_to_registry  = TRUE
-      )
-      NULL
-    },
-    id = ids, q = remain, s = swap,
-    SIMPLIFY = FALSE, USE.NAMES = FALSE
-  )
-
   invisible(NULL)
 }

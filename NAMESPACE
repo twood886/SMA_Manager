@@ -2,7 +2,6 @@
 
 export("%||%")
 export(.bulk_holding_positions)
-export(.bulk_trade_positions)
 export(.holding)
 export(.portfolio)
 export(.position)

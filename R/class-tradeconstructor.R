@@ -184,12 +184,11 @@ TradeConstructor <- R6::R6Class( #nolint
         res <- CVXR::solve(prob, solver = "ECOS_BB")
       } else {
         res <- tryCatch({
-          CVXR::solve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 2e5, polish = TRUE) #nolint
+          CVXR::solve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 50000, polish = TRUE) #nolint
         }, error = function(e) {
           CVXR::solve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
         })
       }
-
       if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved"))) {
         stop(sprintf("Optimization failed with status: %s", res$status))
       }
@@ -216,6 +215,8 @@ TradeConstructor <- R6::R6Class( #nolint
         status          = res$status
       )
     }
+
+
   ),
   private = list(
     .extract_qty = function(positions) {
@@ -276,15 +277,11 @@ SMAConstructor <- R6::R6Class( #nolint
     calc_target_quantities = function(sma) {
       base <- sma$get_base_portfolio()
       scale_ratio <- self$get_scale_ratio(base, sma)
-      # Get base positions
       base_positions <- private$.extract_qty(base$get_position())
-      # Scale all base positions by NAV ratio
       target_quantities <- base_positions * scale_ratio
-      # Clean up non-finite values
       if (any(!is.finite(target_quantities))) {
         target_quantities[!is.finite(target_quantities)] <- 0
       }
-      # Include replacement securities
       replacements <- sma$get_replacement_security()
       replacement_secs <- unlist(replacements, use.names = FALSE)
       for (sec in replacement_secs) {

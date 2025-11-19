@@ -362,6 +362,8 @@
 #'  swaps. Defaults to `FALSE`.
 #' @param side (Optional) A string indicating the side of the rule.
 #'  Valid values are "long", "short", or "gross". Used for position count rules.
+#' @param exclusions (Optional) A character vector of security IDs to be
+#'  excluded from the rule.
 #'
 #' @return An object of class `SMARule` representing the SMA rule.
 #'
@@ -398,7 +400,8 @@
   gross_exposure = FALSE,
   relative_to = "nav",
   divisor = NULL,
-  side = NULL
+  side = NULL,
+  exclusions = NULL
 ) {
   checkmate::assert_character(sma_name, len = 1)
   sma <- .sma(sma_name, create = FALSE)
@@ -440,7 +443,8 @@
       swap_only = swap_only,
       gross_exposure = gross_exposure,
       relative_to = relative_to,
-      divisor = divisor
+      divisor = divisor,
+      exclusions = exclusions
     )
   }
   if (scope == "portfolio") {
@@ -455,7 +459,8 @@
       swap_only = swap_only,
       gross_exposure = gross_exposure,
       relative_to = relative_to,
-      divisor = divisor
+      divisor = divisor,
+      exclusions = exclusions
     )
   }
   if (scope == "count") {
@@ -471,6 +476,7 @@
       gross_exposure = gross_exposure,
       relative_to = relative_to,
       divisor = divisor,
+      exclusions = exclusions,
       side = side
     )
   }

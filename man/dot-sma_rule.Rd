@@ -16,7 +16,8 @@
   gross_exposure = FALSE,
   relative_to = "nav",
   divisor = NULL,
-  side = NULL
+  side = NULL,
+  exclusions = NULL
 )
 }
 \arguments{
@@ -45,6 +46,9 @@ swaps. Defaults to `FALSE`.}
 
 \item{side}{(Optional) A string indicating the side of the rule.
 Valid values are "long", "short", or "gross". Used for position count rules.}
+
+\item{exclusions}{(Optional) A character vector of security IDs to be
+excluded from the rule.}
 }
 \value{
 An object of class `SMARule` representing the SMA rule.

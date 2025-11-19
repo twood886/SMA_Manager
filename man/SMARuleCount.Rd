@@ -28,6 +28,7 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_bbfields"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_bbfields'><code>SMAManager::SMARule$get_bbfields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_divisor"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_divisor'><code>SMAManager::SMARule$get_divisor()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_exclusions"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_exclusions'><code>SMAManager::SMARule$get_exclusions()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_gross_exposure"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_gross_exposure'><code>SMAManager::SMARule$get_gross_exposure()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
@@ -57,6 +58,7 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
   swap_only = FALSE,
   gross_exposure = FALSE,
   relative_to = NULL,
+  exclusions = NULL,
   divisor = NULL,
   side = NULL
 )}\if{html}{\out{</div>}}
@@ -84,6 +86,8 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
 \item{\code{gross_exposure}}{logical}
 
 \item{\code{relative_to}}{Character}
+
+\item{\code{exclusions}}{Character vector}
 
 \item{\code{divisor}}{DivisorProvider object}
 

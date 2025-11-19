@@ -21,6 +21,7 @@ R6 Class that encapsultes rules for SMAs.
 \item \href{#method-SMARule-get_swap_only}{\code{SMARule$get_swap_only()}}
 \item \href{#method-SMARule-get_gross_exposure}{\code{SMARule$get_gross_exposure()}}
 \item \href{#method-SMARule-get_relative_to}{\code{SMARule$get_relative_to()}}
+\item \href{#method-SMARule-get_exclusions}{\code{SMARule$get_exclusions()}}
 \item \href{#method-SMARule-get_divisor}{\code{SMARule$get_divisor()}}
 \item \href{#method-SMARule-apply_rule_definition}{\code{SMARule$apply_rule_definition()}}
 \item \href{#method-SMARule-build_constraints}{\code{SMARule$build_constraints()}}
@@ -44,6 +45,7 @@ R6 Class that encapsultes rules for SMAs.
   swap_only = FALSE,
   gross_exposure = FALSE,
   relative_to = "nav",
+  exclusions = NULL,
   divisor = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -70,6 +72,8 @@ R6 Class that encapsultes rules for SMAs.
 \item{\code{gross_exposure}}{logical}
 
 \item{\code{relative_to}}{Character}
+
+\item{\code{exclusions}}{Character vector}
 
 \item{\code{divisor}}{DivisorProvider object
 Get SMA Name}
@@ -198,8 +202,19 @@ Get the relative to field of the SMA Rule
 
 \subsection{Returns}{
 Character
-Get Divisor
+Get Exclusions
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_exclusions"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_exclusions}{}}}
+\subsection{Method \code{get_exclusions()}}{
+Get the exclusions from the SMA Rule
+Get Divisor
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_exclusions()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARule-get_divisor"></a>}}

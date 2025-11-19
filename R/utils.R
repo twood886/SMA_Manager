@@ -65,7 +65,7 @@ update_bloomberg_fields <- function() {
     return(invisible(TRUE))
   }
   sec_id <- ls(get_registries()$securities)
-  sec <- lapply(sec_id, function(id) .security(id))
+  invisible(lapply(sec_id, function(id) .security(id)))
   bbdata <- Rblpapi::bdp(sec_id, fields = rules_bbfields)
   for (col in seq_len(ncol(bbdata))) {
     field <- colnames(bbdata)[col]
@@ -78,7 +78,6 @@ update_bloomberg_fields <- function() {
   invisible(TRUE)
 }
 
-
 #' Convert Bloomberg Yellow Key to Security ID
 #' @param yellow_key Character. Bloomberg Yellow Key (e.g., "AAPL US Equity").
 #' @return Character. Corresponding Security ID.
@@ -88,18 +87,18 @@ update_bloomberg_fields <- function() {
 #' @export
 bbid_to_security_id <- function(id) {
   checkmate::assert_character(id)
-  fraction_string <- "(?x)(-?\\d+(?:\\.\\d+)?)\\s*<\\s*(\\d+)\\s*/\\s*(\\d+)\\s*>"
+  fraction_str <- "(?x)(-?\\d+(?:\\.\\d+)?)\\s*<\\s*(\\d+)\\s*/\\s*(\\d+)\\s*>"
   id_clean <- id %>%
     stringr::str_replace_all("<([A-Za-z]+)>", " \\1") %>%
     stringr::str_replace_all(
-       fraction_string,
-       function(m) {
-          parts <- str_match(m, fraction_string)
-          before <- as.numeric(parts[2])
-          numerator <- as.numeric(parts[3])
-          denominator <- as.numeric(parts[4])
-          format(before + numerator / denominator, scientific = FALSE, trim = TRUE)
-       }
+      fraction_str,
+      function(m) {
+        parts <- str_match(m, fraction_str)
+        before <- as.numeric(parts[2])
+        num <- as.numeric(parts[3])
+        denom <- as.numeric(parts[4])
+        format(before + num / denom, scientific = FALSE, trim = TRUE)
+      }
     )
   id_clean
 }

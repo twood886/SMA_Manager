@@ -21,6 +21,7 @@ SMARuleCount <- R6::R6Class( #nolint
     #' @param swap_only logical
     #' @param gross_exposure logical
     #' @param relative_to Character
+    #' @param exclusions Character vector
     #' @param divisor DivisorProvider object
     #' @param side character
     initialize = function(
@@ -34,6 +35,7 @@ SMARuleCount <- R6::R6Class( #nolint
       swap_only = FALSE,
       gross_exposure = FALSE,
       relative_to = NULL,
+      exclusions = NULL,
       divisor = NULL,
       side = NULL
     ) {
@@ -49,6 +51,7 @@ SMARuleCount <- R6::R6Class( #nolint
         swap_only = swap_only,
         gross_exposure = gross_exposure,
         relative_to = relative_to,
+        exclusions = exclusions,
         divisor = divisor
       )
       if (isTRUE(gross_exposure)) side <- "gross"
@@ -109,7 +112,7 @@ SMARuleCount <- R6::R6Class( #nolint
     get_security_limits = function(security_id, sma) {
       out <- replicate(
         length(security_id),
-        list(list(max = Inf, min = -Inf)),
+        list(max = Inf, min = -Inf),
         simplify = FALSE
       )
       names(out) <- security_id

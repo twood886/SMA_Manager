@@ -17,8 +17,7 @@ This class is used by the TradeConstructor to normalize weights
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{kind}}{(`character(1)`)\cr
-Indicates the type of divisor: "nav", "gmv", "long_gmv", or "short_gmv"}
+\item{\code{kind}}{Indicates the type of divisor: "nav", "gmv", "long_gmv", or "short_gmv"}
 }
 \if{html}{\out{</div>}}
 }

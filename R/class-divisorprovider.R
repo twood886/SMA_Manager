@@ -11,7 +11,7 @@
 DivisorProvider <- R6::R6Class( #nolint
   "DivisorProvider",
   public = list(
-    #' @field kind (`character(1)`)\cr
+    #' @field kind
     #' Indicates the type of divisor: "nav", "gmv", "long_gmv", or "short_gmv"
     kind = NULL,
 
@@ -75,7 +75,6 @@ DivisorProvider <- R6::R6Class( #nolint
     #' @description Get CVXR expression for divisor
     #' @param ctx Context object with metric helper
     expr = function(ctx) {
-      # leverage your ctx$metric helper if you added it
       if (self$kind == "nav") {
         return(list(expr = 1, cons = list()))
       }
