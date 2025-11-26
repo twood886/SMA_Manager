@@ -5,7 +5,7 @@ test_that("SMARulePosition get_security_limits works with NAV divisor", {
     scope = "position",
     definition = function(ids, nav) rep(1, length(ids)),
     max_threshold = 0.05,
-    min_threshold = -0.05
+    min_threshold = -0.04
   )
   security_id <- "CDE"
   ids_all <- c("ABC", "XYZ", "CDE")
@@ -22,5 +22,5 @@ test_that("SMARulePosition get_security_limits works with NAV divisor", {
     f_all = f_all
   )
   expect_equal(limits$CDE$max, 2500, tolerance = 1e-6)
-  expect_equal(limits$CDE$min, -2500, tolerance = 1e-6)
+  expect_equal(limits$CDE$min, -2000, tolerance = 1e-6)
 })
