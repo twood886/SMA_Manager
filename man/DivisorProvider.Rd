@@ -25,10 +25,13 @@ This class is used by the TradeConstructor to normalize weights
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DivisorProvider-new}{\code{DivisorProvider$new()}}
+\item \href{#method-DivisorProvider-weights_from_data}{\code{DivisorProvider$weights_from_data()}}
 \item \href{#method-DivisorProvider-weights}{\code{DivisorProvider$weights()}}
 \item \href{#method-DivisorProvider-contrib_vec}{\code{DivisorProvider$contrib_vec()}}
+\item \href{#method-DivisorProvider-value_from_data}{\code{DivisorProvider$value_from_data()}}
 \item \href{#method-DivisorProvider-value}{\code{DivisorProvider$value()}}
 \item \href{#method-DivisorProvider-expr}{\code{DivisorProvider$expr()}}
+\item \href{#method-DivisorProvider-gamma}{\code{DivisorProvider$gamma()}}
 \item \href{#method-DivisorProvider-clone}{\code{DivisorProvider$clone()}}
 }
 }
@@ -46,6 +49,30 @@ Initialize a DivisorProvider
 \describe{
 \item{\code{kind}}{Character string specifying the type of divisor:
  "nav" (default), "gmv", "long_gmv", or "short_gmv"
+Compute Weights from raw data}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DivisorProvider-weights_from_data"></a>}}
+\if{latex}{\out{\hypertarget{method-DivisorProvider-weights_from_data}{}}}
+\subsection{Method \code{weights_from_data()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DivisorProvider$weights_from_data(ids, shares, nav, prices = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ids}}{Character vector of security IDs}
+
+\item{\code{shares}}{Numeric vector of shares corresponding to ids}
+
+\item{\code{nav}}{Numeric NAV value}
+
+\item{\code{prices}}{Optional numeric vector of prices.
+ If NULL, fetched from securities.
 Compute Weights for a given portfolio and set of securities}
 }
 \if{html}{\out{</div>}}
@@ -90,6 +117,30 @@ Per-name contribution to the divisor (vector)
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DivisorProvider-value_from_data"></a>}}
+\if{latex}{\out{\hypertarget{method-DivisorProvider-value_from_data}{}}}
+\subsection{Method \code{value_from_data()}}{
+Get numeric divisor value from raw data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DivisorProvider$value_from_data(ids, shares, nav, prices = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ids}}{Character vector of security IDs}
+
+\item{\code{shares}}{Numeric vector of shares corresponding to ids}
+
+\item{\code{nav}}{Numeric NAV value}
+
+\item{\code{prices}}{Optional numeric vector of prices.
+If NULL, fetched from securities.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DivisorProvider-value"></a>}}
 \if{latex}{\out{\hypertarget{method-DivisorProvider-value}{}}}
 \subsection{Method \code{value()}}{
@@ -125,6 +176,29 @@ Get CVXR expression for divisor
 \item{\code{ctx}}{Context object with metric helper}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DivisorProvider-gamma"></a>}}
+\if{latex}{\out{\hypertarget{method-DivisorProvider-gamma}{}}}
+\subsection{Method \code{gamma()}}{
+Get gamma values (marginal divisor impact per unit qty)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DivisorProvider$gamma(price, nav)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{price}}{Security price}
+
+\item{\code{nav}}{Portfolio NAV}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+List with gamma_pos (for positive qty direction) and
+ gamma_neg (for negative qty direction)
 }
 }
 \if{html}{\out{<hr>}}

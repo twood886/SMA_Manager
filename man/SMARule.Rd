@@ -236,7 +236,7 @@ Apply the Rule Definition
 \subsection{Method \code{apply_rule_definition()}}{
 Apply the rule definition to a set of security IDs
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARule$apply_rule_definition(security_id, sma)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$apply_rule_definition(security_id, nav)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -244,7 +244,7 @@ Apply the rule definition to a set of security IDs
 \describe{
 \item{\code{security_id}}{Security ID}
 
-\item{\code{sma}}{SMA object
+\item{\code{nav}}{Portfolio NAV
 Build Constraints}
 }
 \if{html}{\out{</div>}}

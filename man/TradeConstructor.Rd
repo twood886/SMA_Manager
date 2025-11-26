@@ -27,7 +27,8 @@ Calculate target quantities for the trade constructor
 \if{html}{\out{<div class="r">}}\preformatted{TradeConstructor$get_security_position_limits(
   portfolio,
   security_id = NULL,
-  position_only = FALSE
+  position_only = FALSE,
+  verbose = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -39,6 +40,8 @@ Calculate target quantities for the trade constructor
 \item{\code{security_id}}{A character vector of security IDs}
 
 \item{\code{position_only}}{Logical, if TRUE only consider position rules}
+
+\item{\code{verbose}}{Logical. Get verbose output (default: FALSE)}
 }
 \if{html}{\out{</div>}}
 }

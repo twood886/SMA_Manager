@@ -124,7 +124,7 @@ Check if the SMA is compliant with all its rules.
 \item{\code{update_bbfields}}{Logical. Whether to update Bloomberg data before
 checking rules. Defaults to TRUE.}
 
-\item{\code{verbose}}{Logical. Whether to print compliance results. Defaults to 
+\item{\code{verbose}}{Logical. Whether to print compliance results. Defaults to
 FALSE.}
 }
 \if{html}{\out{</div>}}

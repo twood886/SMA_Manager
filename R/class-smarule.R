@@ -114,9 +114,9 @@ SMARule <- R6::R6Class( #nolint
     #' Apply the Rule Definition
     #' @description Apply the rule definition to a set of security IDs
     #' @param security_id Security ID
-    #' @param sma SMA object
-    apply_rule_definition = function(security_id, sma) {
-      exp <- private$definition_(security_id, sma)
+    #' @param nav Portfolio NAV
+    apply_rule_definition = function(security_id, nav) {
+      exp <- private$definition_(security_id, nav)
       names(exp) <- security_id
       exp[self$get_exclusions()] <- 0
       exp

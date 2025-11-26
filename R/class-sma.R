@@ -62,8 +62,8 @@ SMA <- R6::R6Class(   #nolint
     #' @description Check if the SMA is compliant with all its rules.
     #' @param update_bbfields Logical. Whether to update Bloomberg data before
     #'  checking rules. Defaults to TRUE.
-    #' @param verbose Logical. Whether to print compliance results. Defaults to 
-    #' FALSE.
+    #' @param verbose Logical. Whether to print compliance results. Defaults to
+    #'  FALSE.
     #' @import checkmate
     #' @return A list of rule compliance results.
     check_rule_compliance = function(update_bbfields = TRUE, verbose = TRUE) {
@@ -73,7 +73,16 @@ SMA <- R6::R6Class(   #nolint
       if (length(rules) == 0) return(list())
       if (update_bbfields) SMAManager::update_bloomberg_fields()
       positions <- self$get_position()
-      results <- lapply(rules, \(rule) rule$check_compliance(self))
+
+      ids <- vapply(positions, \(p) p$get_id(), character(1))
+      qty <- vapply(positions, \(p) p$get_qty(), numeric(1))
+      is_swap <- vapply(positions, \(p) p$get_swap(), logical(1))
+      nav <- self$get_nav()
+
+      results <- lapply(
+        rules,
+        \(r) r$check_compliance(ids = ids, qty = qty, nav = nav, is_swap = is_swap) #nolint
+      )
       if (verbose) return(results)
 
       non_comply <- which(sapply(results, function(x) !x$pass))
@@ -84,7 +93,7 @@ SMA <- R6::R6Class(   #nolint
         rule_names <- names(rules)[non_comply]
         messages <- sapply(results[non_comply], function(x) x$message)
         return(list(
-          "pass" = FALSE, 
+          "pass" = FALSE,
           "non_compliant" = non_comply
         ))
       }

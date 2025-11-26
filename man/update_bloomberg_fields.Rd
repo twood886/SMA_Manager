@@ -4,7 +4,11 @@
 \alias{update_bloomberg_fields}
 \title{Add Bloomberg Data for SMA Rules to Securities}
 \usage{
-update_bloomberg_fields()
+update_bloomberg_fields(sec_id = NULL)
+}
+\arguments{
+\item{sec_id}{Optional character vector of Security IDs to update. If NULL,
+all securities are updated.}
 }
 \value{
 TRUE (invisible)

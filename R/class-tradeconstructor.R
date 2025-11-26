@@ -14,10 +14,12 @@ TradeConstructor <- R6::R6Class( #nolint
     #' @param portfolio An object of class Portfolio
     #' @param security_id A character vector of security IDs
     #' @param position_only Logical, if TRUE only consider position rules
+    #' @param verbose Logical. Get verbose output (default: FALSE)
     get_security_position_limits = function(
       portfolio,
       security_id = NULL,
-      position_only = FALSE
+      position_only = FALSE,
+      verbose = FALSE
     ) {
       if (is.null(security_id)) stop("Security ID must be supplied")
       rules <- Filter(\(r) !r$get_swap_only(), portfolio$get_rules())
@@ -26,15 +28,41 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- Filter(\(r) r$get_scope() == "position", rules)
       }
 
-      limits_all <- lapply(rules, \(r) r$get_security_limits(security_id, portfolio)) #nolint
+      for (sec_id in security_id) {
+        if (!sec_id %in% ls(get_registries()$securities)) {
+          .security(sec_id)
+          update_bloomberg_fields(security_id)
+        }
+      }
+
+      nav <- portfolio$get_nav()
+
+      ids_pos <- vapply(portfolio$get_position(), \(p) p$get_id(), character(1))
+      qty_pos <- vapply(portfolio$get_position(), \(p) p$get_qty(), numeric(1))
+
+      new_ids <- setdiff(security_id, ids_pos)
+      ids_all <- c(ids_pos, new_ids)
+      qty_all <- c(qty_pos, rep(0, length(new_ids)))
+      prices_all <- vapply(ids_all, \(id) .security(id)$get_price(), numeric(1))
+      prices_all[!is.finite(prices_all) | prices_all <= 0] <- 1
+
+      limits_all <- list()
+      for (sec in security_id) {
+        for (r in rules) {
+          limit <- r$get_security_limits(sec, ids_all, qty_all, nav, prices_all)
+          limits_all[[sec]][[r$get_name()]] <- limit
+        }
+      }
+
+      if (isTRUE(verbose)) return(limits_all)
 
       limits <- lapply(
         security_id,
         \(sec) {
-          sec_limit <- lapply(limits_all, \(l) l[[sec]])
+          sec_limit <- limits_all[[sec]]
           if (length(sec_limit) == 0) return(list(max = Inf, min = -Inf))
-          max_limit <- min(sapply(sec_limit, \(x) x$max), na.rm = TRUE)
-          min_limit <- max(sapply(sec_limit, \(x) x$min), na.rm = TRUE)
+          max_limit <- min(sapply(sec_limit, \(x) x[[sec]]$max), na.rm = TRUE)
+          min_limit <- max(sapply(sec_limit, \(x) x[[sec]]$min), na.rm = TRUE)
           list(max = max_limit, min = min_limit)
         }
       )
@@ -145,7 +173,7 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- c(rules, list(OverflowRule$new(replacements)))
       }
       rule_cons  <- unlist(
-        lapply(rules, \(r) r$build_constraints(ctx, portfolio)),
+        lapply(rules, \(r) r$build_constraints(ctx, nav)),
         recursive = FALSE
       )
       cons <- c(cons, rule_cons)

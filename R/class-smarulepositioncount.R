@@ -64,13 +64,16 @@ SMARuleCount <- R6::R6Class( #nolint
     #' @description Get Side argument
     get_side = function() private$side_,
 
-    #' @description Check the rule against the current portfolio
-    #' @param sma SMA object
-    #' @param tolerance Numerical tolerance for constrain checking
-    check_compliance = function(sma, tolerance = 1e-6) {
-      checkmate::assert_r6(sma, "Portfolio")
-      positions <- sma$get_position()
-      qty <- vapply(positions, \(p) p$get_qty(), numeric(1))
+    #' @description Check the rule against raw portfolio data
+    #' @param ids Character vector of security IDs
+    #' @param qty Numeric vector of quantities
+    #' @param nav Numeric NAV value
+    #' @param prices Optional numeric vector of prices. If NULL, fetched.
+    #' @param tolerance Numerical tolerance for constraint checking
+    #' @param ... Additional arguments (not used)
+    check_compliance = function(
+      ids, qty, nav, prices = NULL, tolerance = 1e-6, ...
+    ) {
       side <- self$get_side()
 
       n <- if (!length(qty)) 0 else switch(
@@ -121,8 +124,8 @@ SMARuleCount <- R6::R6Class( #nolint
 
     #' @description Build the constraints for the optimization model
     #' @param ctx Context object with optimization variables and parameters
-    #' @param sma SMA object
-    build_constraints = function(ctx, sma) {
+    #' @param nav Portfolio NAV
+    build_constraints = function(ctx, nav) {
       w <- ctx$w
       n <- ctx$n
       side <- self$get_side()

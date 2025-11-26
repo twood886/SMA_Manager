@@ -20,6 +20,20 @@ DivisorProvider <- R6::R6Class( #nolint
     #'  "nav" (default), "gmv", "long_gmv", or "short_gmv"
     initialize = function(kind = "nav") self$kind <- kind,
 
+    #' Compute Weights from raw data
+    #' @param ids Character vector of security IDs
+    #' @param shares Numeric vector of shares corresponding to ids
+    #' @param nav Numeric NAV value
+    #' @param prices Optional numeric vector of prices.
+    #'  If NULL, fetched from securities.
+    weights_from_data = function(ids, shares, nav, prices = NULL) {
+      if (is.null(prices)) {
+        prices <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
+      }
+      prices[!is.finite(prices) | prices <= 0] <- 1
+      shares * prices / nav
+    },
+
     #' Compute Weights for a given portfolio and set of securities
     #' @param portfolio Portfolio object
     #' @param ids Character vector of security IDs
@@ -43,9 +57,7 @@ DivisorProvider <- R6::R6Class( #nolint
         }
       }
 
-      price <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
-      price[!is.finite(price) | price <= 0] <- 1
-      qty * price / nav
+      self$weights_from_data(ids, qty, nav, prices = NULL)
     },
 
     #' @description Per-name contribution to the divisor (vector)
@@ -60,6 +72,18 @@ DivisorProvider <- R6::R6Class( #nolint
       )
     },
 
+
+    #' @description Get numeric divisor value from raw data
+    #' @param ids Character vector of security IDs
+    #' @param shares Numeric vector of shares corresponding to ids
+    #' @param nav Numeric NAV value
+    #' @param prices Optional numeric vector of prices.
+    #'  If NULL, fetched from securities.
+    value_from_data = function(ids, shares, nav, prices = NULL) {
+      if (self$kind == "nav") return(1)
+      w <- self$weights_from_data(ids, shares, nav, prices)
+      sum(self$contrib_vec(w))
+    },
 
     #' @description Get numeric divisor value for checks or UI
     #' @param portfolio Portfolio object
@@ -91,6 +115,24 @@ DivisorProvider <- R6::R6Class( #nolint
         return(list(expr = m$var, cons = m$cons))
       }
       stop("Unknown divisor kind: ", self$kind)
+    },
+
+    #' @description Get gamma values (marginal divisor impact per unit qty)
+    #' @param price Security price
+    #' @param nav Portfolio NAV
+    #' @return List with gamma_pos (for positive qty direction) and
+    #'  gamma_neg (for negative qty direction)
+    gamma = function(price, nav) {
+      switch(self$kind,
+        "nav" = list(gamma_pos = 0, gamma_neg = 0),
+        "gmv" = {
+          g <- abs(price) / nav
+          list(gamma_pos = g, gamma_neg = g)
+        },
+        "long_gmv" = list(gamma_pos = price / nav, gamma_neg = 0),
+        "short_gmv" = list(gamma_pos = 0, gamma_neg = price / nav),
+        stop("Unknown divisor kind: ", self$kind)
+      )
     }
   )
 )

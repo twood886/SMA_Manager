@@ -48,11 +48,13 @@ update_security_data <- function() {
 }
 
 #' Add Bloomberg Data for SMA Rules to Securities
+#' @param sec_id Optional character vector of Security IDs to update. If NULL,
+#'  all securities are updated.
 #' @return TRUE (invisible)
 #' @export
 #' @include api-functions.R
 #' @include class-security.R
-update_bloomberg_fields <- function() {
+update_bloomberg_fields <- function(sec_id = NULL) {
   rule_names <- ls(get_registries()$smarules)
   rules <- mget(
     rule_names,
@@ -64,7 +66,9 @@ update_bloomberg_fields <- function() {
   if (is.null(rules_bbfields) || length(rules_bbfields) == 0) {
     return(invisible(TRUE))
   }
-  sec_id <- ls(get_registries()$securities)
+  if (is.null(sec_id)) {
+    sec_id <- ls(get_registries()$securities)
+  }
   invisible(lapply(sec_id, function(id) .security(id)))
   bbdata <- Rblpapi::bdp(sec_id, fields = rules_bbfields)
   for (col in seq_len(ncol(bbdata))) {

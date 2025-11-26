@@ -110,17 +110,32 @@ Get Side argument
 \if{html}{\out{<a id="method-SMARuleCount-check_compliance"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARuleCount-check_compliance}{}}}
 \subsection{Method \code{check_compliance()}}{
-Check the rule against the current portfolio
+Check the rule against raw portfolio data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$check_compliance(sma, tolerance = 1e-06)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$check_compliance(
+  ids,
+  qty,
+  nav,
+  prices = NULL,
+  tolerance = 1e-06,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{sma}}{SMA object}
+\item{\code{ids}}{Character vector of security IDs}
 
-\item{\code{tolerance}}{Numerical tolerance for constrain checking}
+\item{\code{qty}}{Numeric vector of quantities}
+
+\item{\code{nav}}{Numeric NAV value}
+
+\item{\code{prices}}{Optional numeric vector of prices. If NULL, fetched.}
+
+\item{\code{tolerance}}{Numerical tolerance for constraint checking}
+
+\item{\code{...}}{Additional arguments (not used)}
 }
 \if{html}{\out{</div>}}
 }
@@ -167,7 +182,7 @@ Get the Max and Min Value of the security based on the rule
 \subsection{Method \code{build_constraints()}}{
 Build the constraints for the optimization model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$build_constraints(ctx, sma)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$build_constraints(ctx, nav)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -175,7 +190,7 @@ Build the constraints for the optimization model
 \describe{
 \item{\code{ctx}}{Context object with optimization variables and parameters}
 
-\item{\code{sma}}{SMA object}
+\item{\code{nav}}{Portfolio NAV}
 }
 \if{html}{\out{</div>}}
 }

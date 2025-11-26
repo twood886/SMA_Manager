@@ -47,17 +47,32 @@ SMA Rule for Portfolio
 \if{html}{\out{<a id="method-SMARulePortfolio-check_compliance"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARulePortfolio-check_compliance}{}}}
 \subsection{Method \code{check_compliance()}}{
-Check the rule against the current portfolio
+Check the rule against raw portfolio data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_compliance(sma, tolerance = 1e-06)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$check_compliance(
+  ids,
+  qty,
+  nav,
+  prices = NULL,
+  tolerance = 1e-06,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{sma}}{SMA object}
+\item{\code{ids}}{Character vector of security IDs}
+
+\item{\code{qty}}{Numeric vector of quantities}
+
+\item{\code{nav}}{Numeric NAV value}
+
+\item{\code{prices}}{Optional numeric vector of prices. If NULL, fetched.}
 
 \item{\code{tolerance}}{Numerical tolerance for constraint checking}
+
+\item{\code{...}}{Additional arguments (not used)}
 }
 \if{html}{\out{</div>}}
 }
@@ -83,22 +98,40 @@ Get the swap flag for a given security
 \if{html}{\out{<a id="method-SMARulePortfolio-get_security_limits"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARulePortfolio-get_security_limits}{}}}
 \subsection{Method \code{get_security_limits()}}{
-Get the Max and Min value of the security based on the rule
+Get limits for securities based on raw portfolio data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$get_security_limits(security_id, sma)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$get_security_limits(
+  security_id,
+  ids_all,
+  qty_all,
+  nav,
+  prices_all = NULL,
+  f_all = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID}
+\item{\code{security_id}}{Vector of security IDs to calculate limits for}
 
-\item{\code{sma}}{SMA object}
+\item{\code{ids_all}}{Character vector of all security IDs (must include
+security_id). For new securities not in portfolio, include with qty=0.}
+
+\item{\code{qty_all}}{Numeric vector of quantities corresponding to ids_all}
+
+\item{\code{nav}}{Numeric NAV value}
+
+\item{\code{prices_all}}{Optional numeric vector of prices corresponding to
+ids_all. If NULL, fetched via .security().}
+
+\item{\code{f_all}}{Optional numeric vector of rule values for security_id.
+If NULL, computed via apply_rule_definition.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-List of Max and Min Value
+List of Max and Min Value for each security
 }
 }
 \if{html}{\out{<hr>}}
@@ -107,7 +140,7 @@ List of Max and Min Value
 \subsection{Method \code{build_constraints()}}{
 Build the constraints for the optimization model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_constraints(ctx, sma)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARulePortfolio$build_constraints(ctx, nav)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -115,7 +148,7 @@ Build the constraints for the optimization model
 \describe{
 \item{\code{ctx}}{Context object with optimization variables and parameters}
 
-\item{\code{sma}}{SMA object}
+\item{\code{nav}}{Portfolio NAV}
 }
 \if{html}{\out{</div>}}
 }

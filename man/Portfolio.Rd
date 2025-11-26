@@ -158,7 +158,9 @@ Get Max and Min Value of the security given all SMA Rules
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_security_position_limits(
   security_id = NULL,
-  update_bbfields = TRUE
+  position_only = FALSE,
+  update_bbfields = TRUE,
+  verbose = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -167,7 +169,11 @@ Get Max and Min Value of the security given all SMA Rules
 \describe{
 \item{\code{security_id}}{Security ID}
 
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
+\item{\code{position_only}}{Logical. Return only position-based limits (default: FALSE) #nolint}
+
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE)}
+
+\item{\code{verbose}}{Logical. Get verbose output (default: FALSE)}
 }
 \if{html}{\out{</div>}}
 }

@@ -81,16 +81,24 @@ Portfolio <- R6::R6Class( #nolint
     },
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
+    #' @param position_only Logical. Return only position-based limits (default: FALSE) #nolint
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
+    #' @param verbose Logical. Get verbose output (default: FALSE)
     get_security_position_limits = function(
       security_id = NULL,
-      update_bbfields = TRUE
+      position_only = FALSE,
+      update_bbfields = TRUE,
+      verbose = FALSE
     ) {
       checkmate::assert_flag(update_bbfields)
-      if (update_bbfields) {
-        update_bloomberg_fields()
-      }
-      private$trade_constructor$get_security_position_limits(self, security_id)
+      checkmate::assert_flag(verbose)
+      checkmate::assert_flag(position_only)
+      if (update_bbfields) update_bloomberg_fields()
+      self$get_trade_constructor()$get_security_position_limits(
+        portfolio = self,
+        security_id = security_id,
+        verbose = verbose
+      )
     },
     #' @description Get Swap Flag for a given security
     #' @param security_id Security ID
@@ -100,9 +108,7 @@ Portfolio <- R6::R6Class( #nolint
       update_bbfields = TRUE
     ) {
       checkmate::assert_flag(update_bbfields)
-      if (update_bbfields) {
-        update_bloomberg_fields()
-      }
+      if (update_bbfields) update_bloomberg_fields()
       private$trade_constructor$get_swap_flag_position_rules(self, security_id)
     },
     # Setter Functions ---------------------------------------------------------
