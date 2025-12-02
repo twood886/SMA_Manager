@@ -19,7 +19,7 @@
 #' \dontrun{
 #'   registries <- get_registries()
 #' }
-#' 
+#'
 #' @export
 get_registries <- function() {
   asNamespace("SMAManager")$registries

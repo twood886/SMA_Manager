@@ -13,7 +13,7 @@ test_that("SMARulePosition get_security_limits works with GMV divisor", {
   qty_all <- c(-1000, 2000, 0)
   prices_all <- c(50, 100, 20)
   nav <- 1000000
-  f_all <- prices_all / nav
+  f_all <- prices_all / nav * .5
   limits <- rule$get_security_limits(
     security_id = security_id,
     ids_all = ids_all,
@@ -22,6 +22,6 @@ test_that("SMARulePosition get_security_limits works with GMV divisor", {
     f_all = f_all,
     nav = nav
   )
-  expect_equal(limits$CDE$max, 657, tolerance = 1)
-  expect_equal(limits$CDE$min, -520, tolerance = 1)
+  expect_equal(limits$CDE$max, 1389, tolerance = 1)
+  expect_equal(limits$CDE$min, -1087, tolerance = 1)
 })
