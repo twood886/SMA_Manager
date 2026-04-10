@@ -12,8 +12,6 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-SMARuleCount-new}{\code{SMARuleCount$new()}}
-\item \href{#method-SMARuleCount-get_side}{\code{SMARuleCount$get_side()}}
 \item \href{#method-SMARuleCount-check_compliance}{\code{SMARuleCount$check_compliance()}}
 \item \href{#method-SMARuleCount-check_swap_security}{\code{SMARuleCount$check_swap_security()}}
 \item \href{#method-SMARuleCount-get_security_limits}{\code{SMARuleCount$get_security_limits()}}
@@ -25,12 +23,14 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="apply_rule_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-apply_rule_definition'><code>SMAManager::SMARule$apply_rule_definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="capacity"><a href='../../SMAManager/html/SMARule.html#method-SMARule-capacity'><code>SMAManager::SMARule$capacity()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_bbfields"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_bbfields'><code>SMAManager::SMARule$get_bbfields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_divisor"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_divisor'><code>SMAManager::SMARule$get_divisor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_exclusions"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_exclusions'><code>SMAManager::SMARule$get_exclusions()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_gross_exposure"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_gross_exposure'><code>SMAManager::SMARule$get_gross_exposure()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_include"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_include'><code>SMAManager::SMARule$get_include()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_min_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_min_threshold'><code>SMAManager::SMARule$get_min_threshold()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_name'><code>SMAManager::SMARule$get_name()</code></a></span></li>
@@ -38,74 +38,12 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_scope"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_scope'><code>SMAManager::SMARule$get_scope()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma_name'><code>SMAManager::SMARule$get_sma_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="objective_terms"><a href='../../SMAManager/html/SMARule.html#method-SMARule-objective_terms'><code>SMAManager::SMARule$objective_terms()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="security_impacted"><a href='../../SMAManager/html/SMARule.html#method-SMARule-security_impacted'><code>SMAManager::SMARule$security_impacted()</code></a></span></li>
 </ul>
 </details>
 }}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARuleCount-new"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARuleCount-new}{}}}
-\subsection{Method \code{new()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$new(
-  sma_name = NULL,
-  name = NULL,
-  scope = "count",
-  bbfields = NULL,
-  definition = NULL,
-  max_threshold = NULL,
-  min_threshold = NULL,
-  swap_only = FALSE,
-  gross_exposure = FALSE,
-  relative_to = NULL,
-  exclusions = NULL,
-  divisor = NULL,
-  side = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{sma_name}}{Character}
-
-\item{\code{name}}{Character}
-
-\item{\code{scope}}{Character}
-
-\item{\code{bbfields}}{Character vector}
-
-\item{\code{definition}}{Formula}
-
-\item{\code{max_threshold}}{numeric}
-
-\item{\code{min_threshold}}{numeirc}
-
-\item{\code{swap_only}}{logical}
-
-\item{\code{gross_exposure}}{logical}
-
-\item{\code{relative_to}}{Character}
-
-\item{\code{exclusions}}{Character vector}
-
-\item{\code{divisor}}{DivisorProvider object}
-
-\item{\code{side}}{character}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMARuleCount-get_side"></a>}}
-\if{latex}{\out{\hypertarget{method-SMARuleCount-get_side}{}}}
-\subsection{Method \code{get_side()}}{
-Get Side argument
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$get_side()}\if{html}{\out{</div>}}
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMARuleCount-check_compliance"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARuleCount-check_compliance}{}}}
@@ -161,19 +99,40 @@ Get the swap flag for a given security
 \if{html}{\out{<a id="method-SMARuleCount-get_security_limits"></a>}}
 \if{latex}{\out{\hypertarget{method-SMARuleCount-get_security_limits}{}}}
 \subsection{Method \code{get_security_limits()}}{
-Get the Max and Min Value of the security based on the rule
+Get limits for securities based on raw portfolio data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$get_security_limits(security_id, sma)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$get_security_limits(
+  security_id,
+  ids_all,
+  qty_all,
+  nav,
+  prices_all = NULL,
+  f_all = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID}
+\item{\code{security_id}}{Vector of security IDs to calculate limits for}
 
-\item{\code{sma}}{SMA object}
+\item{\code{ids_all}}{Character vector of all security IDs (must include
+security_id). For new securities not in portfolio, include with qty=0.}
+
+\item{\code{qty_all}}{Numeric vector of quantities corresponding to ids_all}
+
+\item{\code{nav}}{Numeric NAV value}
+
+\item{\code{prices_all}}{Optional numeric vector of prices corresponding to
+ids_all. If NULL, fetched via .security().}
+
+\item{\code{f_all}}{Optional numeric vector of rule values for ids_all.
+If NULL, computed via apply_rule_definition.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(Returns Inf/-Inf)
 }
 }
 \if{html}{\out{<hr>}}

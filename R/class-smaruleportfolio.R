@@ -24,6 +24,15 @@ SMARulePortfolio <- R6::R6Class( #nolint
 
       f <- self$apply_rule_definition(ids, nav)
       f[!is.finite(f)] <- 0
+
+      # Apply include filter
+      include_filter <- self$get_include()
+      if (include_filter == "long_only") {
+        f[qty <= 0] <- 0
+      } else if (include_filter == "short_only") {
+        f[qty >= 0] <- 0
+      }
+
       gamma <- as.numeric(f) / (prices / nav)
 
       lhs <- if (isTRUE(self$get_gross_exposure())) {
@@ -93,13 +102,23 @@ SMARulePortfolio <- R6::R6Class( #nolint
 
       w_all <- qty_all * prices_all / nav
 
+      # Apply include filter to f_all AFTER calculating num_contrib_all
+      # This ensures we properly account for current positions in the constraint
+      include_filter <- self$get_include()
+      f_all_filtered <- f_all
+      if (include_filter == "long_only") {
+        f_all_filtered[qty_all <= 0] <- 0
+      } else if (include_filter == "short_only") {
+        f_all_filtered[qty_all >= 0] <- 0
+      }
+
       denom_current <- d$value_from_data(ids_all, qty_all, nav, prices_all)
       denom_contrib_all <- d$contrib_vec(w_all)
 
       if (isTRUE(self$get_gross_exposure())) {
-        num_contrib_all <- abs(f_all * qty_all)
+        num_contrib_all <- abs(f_all_filtered * qty_all)
       } else {
-        num_contrib_all <- f_all * qty_all
+        num_contrib_all <- f_all_filtered * qty_all
       }
       num_current <- sum(num_contrib_all)
 
@@ -123,8 +142,28 @@ SMARulePortfolio <- R6::R6Class( #nolint
 
           p_sec <- prices_all[idx]
           f_sec <- f_all[idx]
-          if (f_sec == 0 | !is.finite(f_sec)) {
-            return(list(max = Inf, min = -Inf))
+
+          # For include filters, return unconstrained limits for excluded direction
+          if (include_filter == "long_only") {
+            # Short positions are unconstrained, only longs are limited
+            # We calculate the limit as if this security will be long
+            if (f_sec == 0 || !is.finite(f_sec)) {
+              return(list(max = Inf, min = -Inf))
+            }
+            # For long_only, min should be -Inf (shorts unconstrained)
+            # max is constrained for longs
+          } else if (include_filter == "short_only") {
+            # Long positions are unconstrained, only shorts are limited
+            if (f_sec == 0 || !is.finite(f_sec)) {
+              return(list(max = Inf, min = -Inf))
+            }
+            # For short_only, max should be Inf (longs unconstrained)
+            # min is constrained for shorts
+          } else {
+            # "all" - standard behavior
+            if (f_sec == 0 || !is.finite(f_sec)) {
+              return(list(max = Inf, min = -Inf))
+            }
           }
 
           gamma_vals <- d$gamma(p_sec, nav)
@@ -141,10 +180,17 @@ SMARulePortfolio <- R6::R6Class( #nolint
             denom_excl <- denom_current - denom_sec
           }
 
-          list(
-            max = (denom_excl - 1/max_t * num_excl) / (1/max_t * f_sec - gamma_pos), #nolint
-            min = (denom_excl - 1/min_t * num_excl) / (1/min_t * f_sec - gamma_neg) #nolint
-          )
+          max_limit <- (max_t * denom_excl - num_excl) / (f_sec - max_t * gamma_pos) #nolint
+          min_limit <- (min_t * denom_excl - num_excl) / (f_sec - min_t * gamma_neg) #nolint
+
+          # Apply directional constraints based on include filter
+          if (include_filter == "long_only") {
+            min_limit <- -Inf  # Shorts unconstrained
+          } else if (include_filter == "short_only") {
+            max_limit <- Inf  # Longs unconstrained
+          }
+
+          list(max = max_limit, min = min_limit)
         }
       )
       names(out) <- security_id
@@ -163,10 +209,22 @@ SMARulePortfolio <- R6::R6Class( #nolint
       if (length(idx) == 0) return(list())
 
       gross <- isTRUE(self$get_gross_exposure())
-      lhs <- if (gross) {
-        CVXR::sum_entries(abs(ctx$w[idx] * gamma[idx]))
+      include_filter <- self$get_include()
+
+      # Build LHS based on include filter
+      if (include_filter == "long_only") {
+        # Only include positive weights: use pos(w) * gamma
+        lhs <- CVXR::sum_entries(CVXR::pos(ctx$w[idx]) * gamma[idx])
+      } else if (include_filter == "short_only") {
+        # Only include negative weights: use neg(w) * gamma = -pos(-w) * gamma
+        lhs <- CVXR::sum_entries(CVXR::neg(ctx$w[idx]) * gamma[idx])
       } else {
-        CVXR::sum_entries(ctx$w[idx] * gamma[idx])
+        # "all" - use standard logic
+        lhs <- if (gross) {
+          CVXR::sum_entries(abs(ctx$w[idx] * gamma[idx]))
+        } else {
+          CVXR::sum_entries(ctx$w[idx] * gamma[idx])
+        }
       }
 
       d <- self$get_divisor()

@@ -20,7 +20,8 @@ SMARule <- R6::R6Class( #nolint
     gross_exposure_ = NULL,
     relative_to_ = NULL,
     exclusions_ = NULL,
-    divisor_ = NULL
+    divisor_ = NULL,
+    include_ = NULL
   ),
   public = list(
     #' @param sma_name Character
@@ -35,6 +36,7 @@ SMARule <- R6::R6Class( #nolint
     #' @param relative_to Character
     #' @param exclusions Character vector
     #' @param divisor DivisorProvider object
+    #' @param include Character: "all", "long_only", or "short_only"
     initialize = function(
       sma_name = NULL,
       name = NULL,
@@ -47,7 +49,8 @@ SMARule <- R6::R6Class( #nolint
       gross_exposure = FALSE,
       relative_to = "nav",
       exclusions = NULL,
-      divisor = NULL
+      divisor = NULL,
+      include = "all"
     ) {
       private$sma_name_ <- sma_name
       private$name_ <- name
@@ -60,6 +63,10 @@ SMARule <- R6::R6Class( #nolint
       private$gross_exposure_ <- gross_exposure
       private$relative_to_ <- relative_to
       private$exclusions_ <- exclusions
+      if (!include %in% c("all", "long_only", "short_only")) {
+        stop("include must be 'all', 'long_only', or 'short_only'")
+      }
+      private$include_ <- include
       if (checkmate::test_r6(divisor, "DivisorProvider")) {
         private$divisor_ <- divisor
       } else {
@@ -111,6 +118,10 @@ SMARule <- R6::R6Class( #nolint
     #' @description Get the DivisorProvider object
     #' @return DivisorProvider object
     get_divisor = function() private$divisor_,
+    #' Get Include
+    #' @description Get the include filter ("all", "long_only", "short_only")
+    #' @return Character
+    get_include = function() private$include_,
     #' Apply the Rule Definition
     #' @description Apply the rule definition to a set of security IDs
     #' @param security_id Security ID
@@ -120,6 +131,22 @@ SMARule <- R6::R6Class( #nolint
       names(exp) <- security_id
       exp[self$get_exclusions()] <- 0
       exp
+    },
+    #' Is Security Impacted
+    #' @description Check if a security is impacted by the rule
+    #' @param security_id Security ID
+    #' @param nav Portfolio NAV
+    #' @return Logical
+    security_impacted = function(security_id, nav) {
+      exp <- self$apply_rule_definition(security_id, nav)
+      any(exp != 0)
+    },
+    #' Check Compliance Capacity
+    #' @param security_id Security ID
+    #' @param nav Portfolio NAV
+    #' @return Numeric
+    capacity = function(security_id, nav) {
+      return(NULL)
     },
     #' Build Constraints
     #' @description Build any additional constraints for the optimization

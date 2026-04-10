@@ -18,6 +18,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
 \item \href{#method-SMA-check_rule_compliance}{\code{SMA$check_rule_compliance()}}
+\item \href{#method-SMA-replicate_trade}{\code{SMA$replicate_trade()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -25,10 +26,12 @@ R6 Class representing a seperately managed account.
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_flow"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_flow'><code>SMAManager::Portfolio$add_flow()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_orderconstructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_orderconstructor'><code>SMAManager::Portfolio$add_orderconstructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_replacement"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_replacement'><code>SMAManager::Portfolio$add_replacement()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_rule"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_rule'><code>SMAManager::Portfolio$add_rule()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_order_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_order_constructor'><code>SMAManager::Portfolio$get_order_constructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replaced_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replaced_security'><code>SMAManager::Portfolio$get_replaced_security()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replacement_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replacement_security'><code>SMAManager::Portfolio$get_replacement_security()</code></a></span></li>
@@ -131,6 +134,29 @@ FALSE.}
 }
 \subsection{Returns}{
 A list of rule compliance results.
+Replicate a trade from the base portfolio
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-replicate_trade"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-replicate_trade}{}}}
+\subsection{Method \code{replicate_trade()}}{
+Analyzes the effect of a trade in the base portfolio on the SMA,
+identifying the required trade.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$replicate_trade(security_id, base_trade_qty, update_bbfields = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{The ID of the security traded in the base portfolio.}
+
+\item{\code{base_trade_qty}}{The quantity of the trade in the base portfolio.}
+
+\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

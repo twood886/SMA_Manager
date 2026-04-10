@@ -15,6 +15,7 @@ Collate:
     'class-divisorprovider.R'
     'class-holding.R'
     'class-modelcontext.R'
+    'class-orderconstructor.R'
     'class-overflowrule.R'
     'class-security.R'
     'utils.R'

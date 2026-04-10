@@ -19,6 +19,8 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-get_replaced_security}{\code{Portfolio$get_replaced_security()}}
 \item \href{#method-Portfolio-get_security_position_limits}{\code{Portfolio$get_security_position_limits()}}
 \item \href{#method-Portfolio-get_swap_flag_position_rules}{\code{Portfolio$get_swap_flag_position_rules()}}
+\item \href{#method-Portfolio-get_order_constructor}{\code{Portfolio$get_order_constructor()}}
+\item \href{#method-Portfolio-add_orderconstructor}{\code{Portfolio$add_orderconstructor()}}
 \item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_rule}{\code{Portfolio$add_rule()}}
@@ -196,6 +198,37 @@ Get Swap Flag for a given security
 \item{\code{security_id}}{Security ID}
 
 \item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-get_order_constructor"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-get_order_constructor}{}}}
+\subsection{Method \code{get_order_constructor()}}{
+Get OrderConstructor
+Add OrderConstructor
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_order_constructor()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-add_orderconstructor"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_orderconstructor}{}}}
+\subsection{Method \code{add_orderconstructor()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_orderconstructor(pb_act_num, pb_act_sel, isda_act_sel)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{pb_act_num}}{list of PB and ISDA account numbers}
+
+\item{\code{pb_act_sel}}{formula for determining which PB account to use}
+
+\item{\code{isda_act_sel}}{formula for determining which ISDA account to use}
 }
 \if{html}{\out{</div>}}
 }

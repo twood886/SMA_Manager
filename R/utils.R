@@ -25,7 +25,6 @@ get_registries <- function() {
   asNamespace("SMAManager")$registries
 }
 
-
 #' Update Data in all Security Object
 #' @export
 update_security_data <- function() {
@@ -105,4 +104,51 @@ bbid_to_security_id <- function(id) {
       }
     )
   id_clean
+}
+
+
+#' @title Get Tracking Portfolios
+#' @description Get all portfolios that have a specified base portfolio
+#' @param base_portfolio Character of base portfolio short name or Portfolio 
+#'  object
+#' @returns list of portfolios
+get_tracking_portfolios <- function(base_portfolio) {
+  port_env <- tryCatch(
+    registries$portfolios,
+    error = function(e) {
+      stop("Failed to access portfolio registry: ", conditionMessage(e))
+    }
+  )
+  
+  if (is.null(port_env)) return(NULL)
+  
+  if (checkmate::test_r6(base_portfolio, "Portfolio")) {
+    base_portfolio_name <- base_portfolio$get_short_name()
+  } else if (checkmate::test_character(base_portfolio, len = 1)) {
+    base_portfolio_name <- base_portfolio
+  } else {
+    checkmate::assert_r6(base_portfolio, "Portfolio")
+  }
+
+  checkmate::assert_character(base_portfolio_name, len = 1)
+
+  portfolio_names <- ls(port_env)
+  portfolios <- sapply(
+    portfolio_names, 
+    function(p) get(p, envir = port_env),
+    simplify = FALSE,
+    USE.NAMES = TRUE
+  )
+  portfolio_base <- vapply(
+    portfolios,
+    function(p) {
+      tryCatch(
+        p$get_base_portfolio()$get_short_name(),
+        error = function(e) NA_character_
+      )
+    },
+    character(1)
+  )
+
+  portfolios[portfolio_base %in% base_portfolio_name]
 }

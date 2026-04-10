@@ -6,6 +6,7 @@
 #' @include api-functions.R
 #' @include utils.R
 #' @include class-tradeconstructor.R
+#' @include class-orderconstructor.R
 #' @include enfusion_loading.R
 #' @export
 Portfolio <- R6::R6Class( #nolint
@@ -19,7 +20,8 @@ Portfolio <- R6::R6Class( #nolint
     replacements_ = list(),
     trade_constructor = NULL,
     holdings_url_ = NULL,
-    trade_url_ = NULL
+    trade_url_ = NULL,
+    order_constructor_ = NULL
   ),
   public = list(
     #' @description
@@ -97,6 +99,7 @@ Portfolio <- R6::R6Class( #nolint
       self$get_trade_constructor()$get_security_position_limits(
         portfolio = self,
         security_id = security_id,
+        position_only = position_only,
         verbose = verbose
       )
     },
@@ -111,7 +114,21 @@ Portfolio <- R6::R6Class( #nolint
       if (update_bbfields) update_bloomberg_fields()
       private$trade_constructor$get_swap_flag_position_rules(self, security_id)
     },
+    #'@description Get OrderConstructor
+    get_order_constructor = function() private$order_constructor_,
     # Setter Functions ---------------------------------------------------------
+    #' Add OrderConstructor
+    #' @param pb_act_num list of PB and ISDA account numbers
+    #' @param pb_act_sel formula for determining which PB account to use
+    #' @param isda_act_sel formula for determining which ISDA account to use
+    add_orderconstructor = function(pb_act_num, pb_act_sel, isda_act_sel) {
+      checkmate::assert_list(pb_act_num)
+      checkmate::assert_function(pb_act_sel)
+      checkmate::assert_function(isda_act_sel)
+      oc <- OrderConstructor$new(pb_act_num, pb_act_sel, isda_act_sel)
+      private$order_constructor_ <- oc
+      return(invisible(private$order_constructor_))
+    },
     #' @description
     #' Add flow to portfolio
     #' @param flow flow amount
@@ -129,10 +146,8 @@ Portfolio <- R6::R6Class( #nolint
       existing_pos <- position$get_id() %in% position_ids
       if (isTRUE(existing_pos)) {
         if (overwrite) {
-          other_positions <- self$get_position()[
-            which(position_ids != position$get_id())
-          ]
-          private$positions_ <- c(other_positions, position)
+          idx <- which(position_ids == position$get_id())
+          private$positions_[[idx]] <- position
         }
       } else {
         private$positions_ <- c(private$positions_, position)
@@ -171,7 +186,10 @@ Portfolio <- R6::R6Class( #nolint
         get_enfusion_report(private$holdings_url_),
         !is.na(.data$Description) & .data$`Instrument Type` != "Cash"
       )
-      nav <- as.numeric(enfusion_report[["$ GL NAV"]][1])
+      nav_all <- enfusion_report[["$ GL NAV"]]
+      nav_unq <- unique(nav_all)
+      if (length(nav_unq) > 1) warning("Portfolio Has More than 1 NAV")
+      nav <- as.numeric(sum(nav_unq))
       if (is.na(nav)) nav <- 0
       private$nav_ <- nav
       .bulk_holding_positions(enfusion_report, private$short_name_)
@@ -191,6 +209,7 @@ Portfolio <- R6::R6Class( #nolint
       current_ids <- vapply(self$get_position(), \(p) p$get_id(), character(1))
       names(current_sh) <- current_ids
       sec_ids <- unique(c(names(rebal$target_weights), current_ids))
+      swap_rules <- self$get_swap_flag_position_rules(sec_ids)
 
       if (!as.df) return(rebal)
       data.frame(
@@ -201,6 +220,7 @@ Portfolio <- R6::R6Class( #nolint
         current_shares = tidyr::replace_na(current_sh[sec_ids], 0),
         trade = tidyr::replace_na(rebal$shares[sec_ids], 0) -
           tidyr::replace_na(current_sh[sec_ids], 0),
+        swap = as.logical(swap_rules),
         stringsAsFactors = FALSE,
         row.names = NULL
       )

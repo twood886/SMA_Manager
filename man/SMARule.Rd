@@ -23,7 +23,10 @@ R6 Class that encapsultes rules for SMAs.
 \item \href{#method-SMARule-get_relative_to}{\code{SMARule$get_relative_to()}}
 \item \href{#method-SMARule-get_exclusions}{\code{SMARule$get_exclusions()}}
 \item \href{#method-SMARule-get_divisor}{\code{SMARule$get_divisor()}}
+\item \href{#method-SMARule-get_include}{\code{SMARule$get_include()}}
 \item \href{#method-SMARule-apply_rule_definition}{\code{SMARule$apply_rule_definition()}}
+\item \href{#method-SMARule-security_impacted}{\code{SMARule$security_impacted()}}
+\item \href{#method-SMARule-capacity}{\code{SMARule$capacity()}}
 \item \href{#method-SMARule-build_constraints}{\code{SMARule$build_constraints()}}
 \item \href{#method-SMARule-objective_terms}{\code{SMARule$objective_terms()}}
 \item \href{#method-SMARule-clone}{\code{SMARule$clone()}}
@@ -46,7 +49,8 @@ R6 Class that encapsultes rules for SMAs.
   gross_exposure = FALSE,
   relative_to = "nav",
   exclusions = NULL,
-  divisor = NULL
+  divisor = NULL,
+  include = "all"
 )}\if{html}{\out{</div>}}
 }
 
@@ -75,7 +79,9 @@ R6 Class that encapsultes rules for SMAs.
 
 \item{\code{exclusions}}{Character vector}
 
-\item{\code{divisor}}{DivisorProvider object
+\item{\code{divisor}}{DivisorProvider object}
+
+\item{\code{include}}{Character: "all", "long_only", or "short_only"
 Get SMA Name}
 }
 \if{html}{\out{</div>}}
@@ -227,6 +233,20 @@ Get the DivisorProvider object
 
 \subsection{Returns}{
 DivisorProvider object
+Get Include
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_include"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_include}{}}}
+\subsection{Method \code{get_include()}}{
+Get the include filter ("all", "long_only", "short_only")
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_include()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Character
 Apply the Rule Definition
 }
 }
@@ -245,9 +265,54 @@ Apply the rule definition to a set of security IDs
 \item{\code{security_id}}{Security ID}
 
 \item{\code{nav}}{Portfolio NAV
-Build Constraints}
+Is Security Impacted}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-security_impacted"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-security_impacted}{}}}
+\subsection{Method \code{security_impacted()}}{
+Check if a security is impacted by the rule
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$security_impacted(security_id, nav)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+
+\item{\code{nav}}{Portfolio NAV}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Logical
+Check Compliance Capacity
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-capacity"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-capacity}{}}}
+\subsection{Method \code{capacity()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$capacity(security_id, nav)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID}
+
+\item{\code{nav}}{Portfolio NAV}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Numeric
+Build Constraints
 }
 }
 \if{html}{\out{<hr>}}

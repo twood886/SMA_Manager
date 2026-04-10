@@ -338,7 +338,6 @@
   invisible(sma)
 }
 
-
 #' Create or Retrieve an SMA Rule
 #'
 #' This function creates or retrieves an SMA rule object associated with a
@@ -401,7 +400,8 @@
   relative_to = "nav",
   divisor = NULL,
   side = NULL,
-  exclusions = NULL
+  exclusions = NULL,
+  include = NULL
 ) {
   checkmate::assert_character(sma_name, len = 1)
   sma <- .sma(sma_name, create = FALSE)
@@ -444,7 +444,8 @@
       gross_exposure = gross_exposure,
       relative_to = relative_to,
       divisor = divisor,
-      exclusions = exclusions
+      exclusions = exclusions,
+      include = include
     )
   }
   if (scope == "portfolio") {
@@ -460,7 +461,8 @@
       gross_exposure = gross_exposure,
       relative_to = relative_to,
       divisor = divisor,
-      exclusions = exclusions
+      exclusions = exclusions,
+      include = include
     )
   }
   if (scope == "count") {
@@ -477,7 +479,7 @@
       relative_to = relative_to,
       divisor = divisor,
       exclusions = exclusions,
-      side = side
+      include = include
     )
   }
   assign(key_name, smarule, envir = env)

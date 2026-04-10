@@ -85,18 +85,38 @@ SMA <- R6::R6Class(   #nolint
       )
       if (verbose) return(results)
 
-      non_comply <- which(sapply(results, function(x) !x$pass))
+      non_comply_results <- Filter(\(x) !x$pass, results)
 
-      if (length(non_comply) == 0) {
-        return(list("pass" = TRUE, "message" = "All rules are compliant."))
+      if (length(non_comply_results) == 0) {
+        return(list("pass" = TRUE))
       } else {
-        rule_names <- names(rules)[non_comply]
-        messages <- sapply(results[non_comply], function(x) x$message)
+        non_comply <- lapply(non_comply_results, \(x) x$non_comply)
         return(list(
           "pass" = FALSE,
           "non_compliant" = non_comply
         ))
       }
+    },
+    # Replicators --------------------------------------------------------------
+    #' Replicate a trade from the base portfolio
+    #' @description
+    #' Analyzes the effect of a trade in the base portfolio on the SMA,
+    #' identifying the required trade.
+    #' @param security_id The ID of the security traded in the base portfolio.
+    #' @param base_trade_qty The quantity of the trade in the base portfolio.
+    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE).
+    replicate_trade = function(
+      security_id, base_trade_qty, update_bbfields = TRUE
+    ) {
+      checkmate::assert_character(security_id, len = 1)
+      checkmate::assert_numeric(base_trade_qty, len = 1)
+      checkmate::assert_flag(update_bbfields)
+      if (update_bbfields) SMAManager::update_bloomberg_fields()
+      self$get_trade_constructor()$replicate_trade(
+        security_id = security_id,
+        base_trade_qty = base_trade_qty,
+        portfolio = self
+      )
     }
   )
 )

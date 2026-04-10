@@ -46,6 +46,14 @@ SMARulePosition <- R6::R6Class( #nolint
       f <- self$apply_rule_definition(ids, nav)
       f[!is.finite(f)] <- 0
 
+      # Apply include filter
+      include_filter <- self$get_include()
+      if (include_filter == "long_only") {
+        f[qty <= 0] <- 0
+      } else if (include_filter == "short_only") {
+        f[qty >= 0] <- 0
+      }
+
       exp_i <- qty * as.numeric(f)
       if (isTRUE(self$get_gross_exposure())) exp_i <- abs(exp_i)
       denom <- d$value_from_data(ids, qty, nav, prices)
@@ -75,7 +83,9 @@ SMARulePosition <- R6::R6Class( #nolint
       if (!isTRUE(self$get_swap_only())) {
         return(vapply(security_id, \(x) FALSE, logical(1)))
       }
-      self$apply_rule_definition(security_id)
+      swap <- as.logical(self$apply_rule_definition(security_id))
+      names(swap) <- security_id
+      swap
     },
     #' @description Get limits for securities based on raw portfolio data
     #' @param security_id Vector of security IDs to calculate limits for
@@ -108,6 +118,16 @@ SMARulePosition <- R6::R6Class( #nolint
       }
 
       w_all <- qty_all * prices_all / nav
+
+      # Apply include filter
+      include_filter <- self$get_include()
+      f_all_filtered <- f_all
+      if (include_filter == "long_only") {
+        f_all_filtered[qty_all <= 0] <- 0
+      } else if (include_filter == "short_only") {
+        f_all_filtered[qty_all >= 0] <- 0
+      }
+
       denom_current <- d$value_from_data(ids_all, qty_all, nav, prices_all)
       denom_contrib_all <- d$contrib_vec(w_all)
 
@@ -131,8 +151,23 @@ SMARulePosition <- R6::R6Class( #nolint
 
           p_sec <- prices_all[idx]
           f_sec <- f_all[idx]
-          if (f_sec == 0 | !is.finite(f_sec)) {
-            return(list(max = Inf, min = -Inf))
+
+          # For include filters, return unconstrained limits for excluded direction
+          if (include_filter == "long_only") {
+            # Shorts unconstrained, longs limited
+            if (f_sec == 0 || !is.finite(f_sec)) {
+              return(list(max = Inf, min = -Inf))
+            }
+          } else if (include_filter == "short_only") {
+            # Longs unconstrained, shorts limited
+            if (f_sec == 0 || !is.finite(f_sec)) {
+              return(list(max = Inf, min = -Inf))
+            }
+          } else {
+            # "all" - standard behavior
+            if (f_sec == 0 || !is.finite(f_sec)) {
+              return(list(max = Inf, min = -Inf))
+            }
           }
 
           gamma_vals <- d$gamma(p_sec, nav)
@@ -146,10 +181,17 @@ SMARulePosition <- R6::R6Class( #nolint
             denom_excl <- denom_current - denom_sec
           }
 
-          list(
-            max = denom_excl / (1 / max_t * f_sec - gamma_pos),
-            min = -(denom_excl / (1 / min_t * -f_sec - gamma_neg))
-          )
+          max_limit <- denom_excl / (1 / max_t * f_sec - gamma_pos)
+          min_limit <- -(denom_excl / (1 / min_t * -f_sec - gamma_neg))
+
+          # Apply directional constraints based on include filter
+          if (include_filter == "long_only") {
+            min_limit <- -Inf  # Shorts unconstrained
+          } else if (include_filter == "short_only") {
+            max_limit <- Inf  # Longs unconstrained
+          }
+
+          list(max = max_limit, min = min_limit)
         }
       )
       names(out) <- security_id
@@ -181,13 +223,35 @@ SMARulePosition <- R6::R6Class( #nolint
       idx <- which(abs(gamma) > 1e-12)
       if (!length(idx)) return(list())
 
+      include_filter <- self$get_include()
+
       if (d$kind == "nav") {
         cons <- list()
         if (is.finite(max_t)) {
-          cons <- c(cons, list(gamma[idx] * ctx$w[idx] <= max_t))
+          if (include_filter == "long_only") {
+            cons <- c(cons, list(
+              gamma[idx] * CVXR::pos(ctx$w[idx]) <= max_t
+            ))
+          } else if (include_filter == "short_only") {
+            cons <- c(cons, list(
+              gamma[idx] * CVXR::neg(ctx$w[idx]) <= max_t
+            ))
+          } else {
+            cons <- c(cons, list(gamma[idx] * ctx$w[idx] <= max_t))
+          }
         }
         if (is.finite(min_t)) {
-          cons <- c(cons, list(gamma[idx] * ctx$w[idx] >= min_t))
+          if (include_filter == "long_only") {
+            cons <- c(cons, list(
+              gamma[idx] * CVXR::pos(ctx$w[idx]) >= min_t
+            ))
+          } else if (include_filter == "short_only") {
+            cons <- c(cons, list(
+              gamma[idx] * CVXR::neg(ctx$w[idx]) >= min_t
+            ))
+          } else {
+            cons <- c(cons, list(gamma[idx] * ctx$w[idx] >= min_t))
+          }
         }
         return(cons)
       }
@@ -195,10 +259,30 @@ SMARulePosition <- R6::R6Class( #nolint
       dres <- d$expr(ctx)
       cons <- dres$cons
       if (is.finite(max_t)) {
-        cons <- c(cons, list(gamma[idx] * ctx$w[idx] <= max_t * dres$expr))
+        if (include_filter == "long_only") {
+          cons <- c(cons, list(
+            gamma[idx] * CVXR::pos(ctx$w[idx]) <= max_t * dres$expr
+          ))
+        } else if (include_filter == "short_only") {
+          cons <- c(cons, list(
+            gamma[idx] * CVXR::neg(ctx$w[idx]) <= max_t * dres$expr
+          ))
+        } else {
+          cons <- c(cons, list(gamma[idx] * ctx$w[idx] <= max_t * dres$expr))
+        }
       }
       if (is.finite(min_t)) {
-        cons <- c(cons, list(gamma[idx] * ctx$w[idx] >= min_t * dres$expr))
+        if (include_filter == "long_only") {
+          cons <- c(cons, list(
+            gamma[idx] * CVXR::pos(ctx$w[idx]) >= min_t * dres$expr
+          ))
+        } else if (include_filter == "short_only") {
+          cons <- c(cons, list(
+            gamma[idx] * CVXR::neg(ctx$w[idx]) >= min_t * dres$expr
+          ))
+        } else {
+          cons <- c(cons, list(gamma[idx] * ctx$w[idx] >= min_t * dres$expr))
+        }
       }
       cons
     }

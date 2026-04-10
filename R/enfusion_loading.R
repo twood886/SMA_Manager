@@ -28,9 +28,7 @@ check_enfusion_connection <- function() {
 #' @importFrom dplyr everything
 #' @export
 get_enfusion_report <- function(reportWebServiceURL) { #nolint
-  if (!check_enfusion_connection()) {
-    stop("Enfusion is not Running")
-  }
+  if (!check_enfusion_connection()) stop("Enfusion is not Running")
   # Change Web Service URL from rest API to app
   report_url <- gsub(
     "https://webservices.enfusionsystems.com/mobile/rest/reportservice/",
@@ -268,4 +266,50 @@ create_sma_from_enfusion <- function(
     }
   }
   invisible(NULL)
+}
+
+#' Read Portfolio Definition from YAML File
+#' @param file Path to YAML file
+#' @return Portfolio or SMA object
+#' @export
+read_yml_portfolio <- function(file) {
+  yml_data <- yaml::yaml.load_file(file, eval.expr = TRUE)
+  type <- yml_data$portfolio$type
+  long_name <- yml_data$portfolio$long_name
+  short_name <- yml_data$portfolio$short_name
+  holdings_url <- yml_data$portfolio$holdings_url
+  pb_act_num <- yml_data$portfolio$order_constructor$pb_act_num
+  pb_act_sel <- eval(parse(text = yml_data$portfolio$order_constructor$pb_act_sel)) #nolint
+  isda_act_sel <- eval(parse(text = yml_data$portfolio$order_constructor$isda_act_sel)) #nolint
+
+  if (type == "base") {
+    port <- create_portfolio_from_enfusion(long_name, short_name, holdings_url)
+    port$add_orderconstructor(pb_act_num, pb_act_sel, isda_act_sel)
+    return(port)
+  }
+  if (type == "sma") {
+    base_portfolio <- yml_data$portfolio$base_portfolio
+    port <- create_sma_from_enfusion(long_name, short_name, base_portfolio, holdings_url) #nolint
+    port$add_orderconstructor(pb_act_num, pb_act_sel, isda_act_sel)
+    for (r in yml_data$portfolio$rules) {
+      rule <- .sma_rule(
+        sma_name = short_name,
+        rule_name = r$rule_name,
+        scope = r$scope,
+        definition = eval(parse(text = r$definition)),
+        bbfields = r$bbfields %||% c(NULL),
+        max_threshold = r$max_threshold %||% Inf,
+        min_threshold = r$min_threshold %||% -Inf,
+        swap_only = r$swap_only %||% FALSE,
+        gross_exposure = r$gross_exposure %||% FALSE,
+        relative_to = r$relative_to %||% "nav",
+        side = r$side %||% NULL,
+        exclusions = r$exclusions %||% c(NULL),
+        include = r$include %||% "all"
+      )
+      port$add_rule(rule)
+    }
+    return(port)
+  }
+  stop("Unknown portfolio type: ", type)
 }

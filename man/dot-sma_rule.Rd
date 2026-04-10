@@ -17,7 +17,8 @@
   relative_to = "nav",
   divisor = NULL,
   side = NULL,
-  exclusions = NULL
+  exclusions = NULL,
+  include = NULL
 )
 }
 \arguments{

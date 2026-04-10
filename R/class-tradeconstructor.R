@@ -28,11 +28,11 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- Filter(\(r) r$get_scope() == "position", rules)
       }
 
-      for (sec_id in security_id) {
-        if (!sec_id %in% ls(get_registries()$securities)) {
-          .security(sec_id)
-          update_bloomberg_fields(security_id)
-        }
+      new_securities <- setdiff(security_id, ls(get_registries()$securities))
+      if (length(new_securities) > 0) {
+        lapply(new_securities, .security)
+        # Assuming update_bloomberg_fields can take a vector of securities
+        update_bloomberg_fields(new_securities)
       }
 
       nav <- portfolio$get_nav()
@@ -50,7 +50,8 @@ TradeConstructor <- R6::R6Class( #nolint
       for (sec in security_id) {
         for (r in rules) {
           limit <- r$get_security_limits(sec, ids_all, qty_all, nav, prices_all)
-          limits_all[[sec]][[r$get_name()]] <- limit
+          list_limit <- list(max = limit[[sec]]$max, min = limit[[sec]]$min)
+          limits_all[[sec]][[r$get_name()]] <- list_limit
         }
       }
 
@@ -61,8 +62,8 @@ TradeConstructor <- R6::R6Class( #nolint
         \(sec) {
           sec_limit <- limits_all[[sec]]
           if (length(sec_limit) == 0) return(list(max = Inf, min = -Inf))
-          max_limit <- min(sapply(sec_limit, \(x) x[[sec]]$max), na.rm = TRUE)
-          min_limit <- max(sapply(sec_limit, \(x) x[[sec]]$min), na.rm = TRUE)
+          max_limit <- min(sapply(sec_limit, \(x) x$max), na.rm = TRUE)
+          min_limit <- max(sapply(sec_limit, \(x) x$min), na.rm = TRUE)
           list(max = max_limit, min = min_limit)
         }
       )
@@ -160,9 +161,11 @@ TradeConstructor <- R6::R6Class( #nolint
       alpha <- ctx$alpha
 
       # --- Base constraints (global box on alpha) -----------------------------
+      t_w_nz <- t_w[abs(t_w) > 1e-12]
       cons <- list(alpha >= alpha_min, alpha <= alpha_max)
       # Zero-target names that are not overflow targets -> clamp to 0
-      zero_not_targets <- which(abs(t_w) < 1e-12 & !(sec_ids %in% t_ids))
+      zero_target_ids <- setdiff(sec_ids, c(names(t_w_nz), t_ids))
+      zero_not_targets <- match(zero_target_ids, sec_ids)
       if (length(zero_not_targets)) {
         cons <- c(cons, list(w[zero_not_targets] == 0))
       }
@@ -310,14 +313,94 @@ SMAConstructor <- R6::R6Class( #nolint
       if (any(!is.finite(target_quantities))) {
         target_quantities[!is.finite(target_quantities)] <- 0
       }
-      replacements <- sma$get_replacement_security()
-      replacement_secs <- unlist(replacements, use.names = FALSE)
-      for (sec in replacement_secs) {
-        if (!(sec %in% names(target_quantities))) {
-          target_quantities[sec] <- 0
+      target_quantities
+    },
+    #' @description Replicate a trade from the base portfolio to the SMA
+    #' @param security_id Security ID of the traded security in the base portfolio
+    #' @param base_trade_qty Trade quantity in the base portfolio
+    #' @param portfolio SMA portfolio object
+    #' @return A list with trade details and calculations
+    replicate_trade = function(security_id, base_trade_qty, portfolio) {
+      checkmate::assert_character(security_id, len = 1)
+      checkmate::assert_numeric(base_trade_qty, len = 1)
+      checkmate::assert_r6(portfolio, "SMA")
+
+      # --- 1. Calculate Unconstrained Target ---
+      base <- portfolio$get_base_portfolio()
+      scale_ratio <- self$get_scale_ratio(base, portfolio)
+      base_pre_qty <- tryCatch(
+        {base$get_position(security_id)$get_qty()},
+        error = function(e) 0
+      )
+      base_post_qty <- base_pre_qty + base_trade_qty
+      unconstrained_target_qty <- base_post_qty * scale_ratio
+
+      # --- 2. Get Rule-Based Limits for the SMA ---
+      # get_security_position_limits returns limits in SHARES
+      limits_as_shares <- self$get_security_position_limits(
+        portfolio = portfolio,
+        security_id = security_id,
+        position_only = FALSE, # Use FALSE to consider all rules
+        verbose = TRUE
+      )[[security_id]]
+
+      impacted_limits <- list()
+      for (rule_name in names(limits_as_shares)) {
+        limit <- limits_as_shares[[rule_name]]
+        if (!is.infinite(limit$max) & !is.na(limit$max)) {
+          impacted_limits[[rule_name]][["max"]] <- limit$max
+        }
+        if (!is.infinite(limit$min) & !is.na(limit$min)) {
+          impacted_limits[[rule_name]][["min"]] <- limit$min
         }
       }
-      target_quantities
+
+      limits_max <- unlist(sapply(impacted_limits, \(l) l$max))
+      limits_min <- unlist(sapply(impacted_limits, \(l) l$min))
+
+      limit_max <- if (length(limits_max) == 0) Inf else min(limits_max, na.rm = TRUE) #nolint
+      limit_min <- if (length(limits_min) == 0) -Inf else max(limits_min, na.rm = TRUE) #nolint
+
+      # --- 3. Constrain Target and Calculate Final Trade ---
+      # Clamp the target quantity (shares) to the feasible range (shares)
+      constrained_target_qty <- pmin(pmax(
+        unconstrained_target_qty, limit_min
+      ), limit_max)
+      # Round to whole shares
+      final_qty_rounded <- if (constrained_target_qty > 0) {
+        floor(constrained_target_qty)
+      } else {
+        ceiling(constrained_target_qty)
+      }
+
+
+      if (constrained_target_qty == unconstrained_target_qty) {
+        limiting_rule <- NULL
+      } else if (constrained_target_qty == limit_min) {
+        limiting_rule <- limits_min[which(limits_min == limit_min)]
+      } else if (constrained_target_qty == limit_max) {
+        limiting_rule <- limits_max[which(limits_max == limit_max)]
+      }
+
+      sma_pre_qty <- tryCatch(
+        {portfolio$get_position(security_id)$get_qty()},
+        error = function(e) 0
+      )
+      trade_qty <- final_qty_rounded - sma_pre_qty
+
+      # --- 4. Return a descriptive list ---
+      list(
+        security_id = security_id,
+        trade_shares = trade_qty,
+        unconstrained_target_shares = unconstrained_target_qty,
+        constrained_target_shares = constrained_target_qty,
+        min_allowed_shares = limit_min,
+        max_allowed_shares = limit_max,
+        limiting_rule = limiting_rule,
+        current_shares = sma_pre_qty,
+        final_shares = final_qty_rounded,
+        rule_limits = impacted_limits
+      )
     }
   )
 )

@@ -17,6 +17,7 @@ SMA Trade Constructor Class
 \item \href{#method-SMAConstructor-get_scale_qty}{\code{SMAConstructor$get_scale_qty()}}
 \item \href{#method-SMAConstructor-get_scale_ratio}{\code{SMAConstructor$get_scale_ratio()}}
 \item \href{#method-SMAConstructor-calc_target_quantities}{\code{SMAConstructor$calc_target_quantities()}}
+\item \href{#method-SMAConstructor-replicate_trade}{\code{SMAConstructor$replicate_trade()}}
 \item \href{#method-SMAConstructor-clone}{\code{SMAConstructor$clone()}}
 }
 }
@@ -85,6 +86,30 @@ Calculate target quantities for the SMA based on scaled base portfolio}
 \item{\code{sma}}{SMA object}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMAConstructor-replicate_trade"></a>}}
+\if{latex}{\out{\hypertarget{method-SMAConstructor-replicate_trade}{}}}
+\subsection{Method \code{replicate_trade()}}{
+Replicate a trade from the base portfolio to the SMA
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$replicate_trade(security_id, base_trade_qty, portfolio)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID of the traded security in the base portfolio}
+
+\item{\code{base_trade_qty}}{Trade quantity in the base portfolio}
+
+\item{\code{portfolio}}{SMA portfolio object}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list with trade details and calculations
 }
 }
 \if{html}{\out{<hr>}}

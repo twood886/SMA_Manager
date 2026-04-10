@@ -1,17 +1,18 @@
-test_that("SMARulePosition get_security_limits works with NAV divisor", {
-  rule <- SMARulePosition$new(
+test_that("SMARulePortfolio get_security_limits works with long GMV divisor", {
+  rule <- SMARulePortfolio$new(
     sma_name = "TestSMA",
-    name = "Test Position Rule NAV",
-    scope = "position",
+    name = "Test Portfolio Rule Long GMV",
+    scope = "portfolio",
     definition = function(ids, nav) rep(1, length(ids)),
-    max_threshold = 0.05,
-    min_threshold = -0.04
+    max_threshold = 1,
+    min_threshold = -Inf,
+    relative_to = "long_gmv"
   )
   security_id <- "CDE"
-  ids_all <- c("ABC", "XYZ", "CDE")
-  qty_all <- c(1000, 2000, 0)
-  nav <- 1000000
-  prices_all <- c(50, 100, 20)
+  ids_all <- c("ABC", "FGH", "XYZ", "CDE")
+  qty_all <- c(10, -20, 0, 0)
+  nav <- 1000
+  prices_all <- c(50, 100, 20, 10)
   f_all <- prices_all / nav
   limits <- rule$get_security_limits(
     security_id = security_id,

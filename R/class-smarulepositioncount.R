@@ -7,63 +7,7 @@
 SMARuleCount <- R6::R6Class( #nolint
   "SMARuleCount",
   inherit = SMARule,
-  private = list(
-    side_ = NULL
-  ),
   public = list(
-    #' @param sma_name Character
-    #' @param name Character
-    #' @param scope Character
-    #' @param bbfields Character vector
-    #' @param definition Formula
-    #' @param max_threshold numeric
-    #' @param min_threshold numeirc
-    #' @param swap_only logical
-    #' @param gross_exposure logical
-    #' @param relative_to Character
-    #' @param exclusions Character vector
-    #' @param divisor DivisorProvider object
-    #' @param side character
-    initialize = function(
-      sma_name = NULL,
-      name = NULL,
-      scope = "count",
-      bbfields = NULL,
-      definition = NULL,
-      max_threshold = NULL,
-      min_threshold = NULL,
-      swap_only = FALSE,
-      gross_exposure = FALSE,
-      relative_to = NULL,
-      exclusions = NULL,
-      divisor = NULL,
-      side = NULL
-    ) {
-      side <- tolower(side)
-      super$initialize(
-        sma_name = sma_name,
-        name = name,
-        scope = scope,
-        bbfields = bbfields,
-        definition = definition,
-        max_threshold = max_threshold,
-        min_threshold = min_threshold,
-        swap_only = swap_only,
-        gross_exposure = gross_exposure,
-        relative_to = relative_to,
-        exclusions = exclusions,
-        divisor = divisor
-      )
-      if (isTRUE(gross_exposure)) side <- "gross"
-      if (!side %in% c("long", "short", "gross")) {
-        stop("If not gross, side must be long or short")
-      }
-      private$side_ <- side
-    },
-
-    #' @description Get Side argument
-    get_side = function() private$side_,
-
     #' @description Check the rule against raw portfolio data
     #' @param ids Character vector of security IDs
     #' @param qty Numeric vector of quantities
@@ -74,13 +18,13 @@ SMARuleCount <- R6::R6Class( #nolint
     check_compliance = function(
       ids, qty, nav, prices = NULL, tolerance = 1e-6, ...
     ) {
-      side <- self$get_side()
+      side <- self$get_include()
 
       n <- if (!length(qty)) 0 else switch(
         side,
-        "gross" = sum(abs(qty) > tolerance),
-        "long" = sum(qty > tolerance),
-        "short" = sum(qty < -tolerance)
+        "all" = sum(abs(qty) > tolerance),
+        "long_only" = sum(qty > tolerance),
+        "short_only" = sum(qty < -tolerance)
       )
 
       max_t <- self$get_max_threshold()
@@ -109,10 +53,20 @@ SMARuleCount <- R6::R6Class( #nolint
       vapply(security_id, \(x) FALSE, logical(1))
     },
 
-    #' @description Get the Max and Min Value of the security based on the rule
-    #' @param security_id Security ID
-    #' @param sma SMA object
-    get_security_limits = function(security_id, sma) {
+    #' @description Get limits for securities based on raw portfolio data
+    #' @param security_id Vector of security IDs to calculate limits for
+    #' @param ids_all Character vector of all security IDs (must include
+    #'  security_id). For new securities not in portfolio, include with qty=0.
+    #' @param qty_all Numeric vector of quantities corresponding to ids_all
+    #' @param nav Numeric NAV value
+    #' @param prices_all Optional numeric vector of prices corresponding to
+    #'  ids_all. If NULL, fetched via .security().
+    #' @param f_all Optional numeric vector of rule values for ids_all.
+    #'  If NULL, computed via apply_rule_definition.
+    #' @return (Returns Inf/-Inf)
+    get_security_limits = function(
+      security_id, ids_all, qty_all, nav, prices_all = NULL, f_all = NULL
+    ) {
       out <- replicate(
         length(security_id),
         list(max = Inf, min = -Inf),
@@ -128,7 +82,7 @@ SMARuleCount <- R6::R6Class( #nolint
     build_constraints = function(ctx, nav) {
       w <- ctx$w
       n <- ctx$n
-      side <- self$get_side()
+      side <- self$get_include()
       min_t <- self$get_min_threshold()
       max_t <- self$get_max_threshold()
 
@@ -136,7 +90,7 @@ SMARuleCount <- R6::R6Class( #nolint
 
       cons <- list()
 
-      if (side == "long") {
+      if (side == "long_only") {
         z <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_long_", self$get_name())) #nolint
         p <- CVXR::Variable(n, name = paste0("p_long_", self$get_name()))
         cons <- c(cons,
@@ -149,7 +103,7 @@ SMARuleCount <- R6::R6Class( #nolint
         return(cons)
       }
 
-      if (side == "short") {
+      if (side == "short_only") {
         z <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_short_", self$get_name())) #nolint
         s <- CVXR::Variable(n, name = paste0("s_short_", self$get_name()))
         cons <- c(cons,
@@ -162,7 +116,7 @@ SMARuleCount <- R6::R6Class( #nolint
         return(cons)
       }
 
-      if (side == "gross") {
+      if (side == "all") {
         z_long <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_long_", self$get_name())) #nolint
         z_short <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_short_", self$get_name())) #nolint
         y <- CVXR::Variable(n, boolean = TRUE, name = paste0("y_gross_", self$get_name())) #nolint
