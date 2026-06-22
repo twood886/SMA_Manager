@@ -9,7 +9,24 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
-Collate: 
+Imports:
+    R6,
+    checkmate,
+    dplyr,
+    tidyr,
+    purrr,
+    tibble,
+    magrittr,
+    stringr,
+    readr,
+    httr,
+    yaml,
+    CVXR,
+    Rblpapi,
+    DBI,
+    RPostgres,
+    jsonlite
+Collate:
     'SMAManager-package.R'
     'api-functions.R'
     'class-divisorprovider.R'
@@ -31,6 +48,7 @@ Collate:
     'class-trade.R'
     'class-variablefactory.R'
     'create_trade.R'
+    'db-loading.R'
     'get_tracking_smas.R'
     'remove_all_portfolio_trades.R'
     'zzz.R'
