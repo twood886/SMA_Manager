@@ -7,7 +7,7 @@
 #' @include utils.R
 #' @include class-tradeconstructor.R
 #' @include class-orderconstructor.R
-#' @include enfusion_loading.R
+#' @include db-loading.R
 #' @export
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",
@@ -18,9 +18,6 @@ Portfolio <- R6::R6Class( #nolint
     positions_ = NULL,
     rules_ = list(),
     replacements_ = list(),
-    trade_constructor = NULL,
-    holdings_url_ = NULL,
-    trade_url_ = NULL,
     order_constructor_ = NULL
   ),
   public = list(
@@ -30,9 +27,8 @@ Portfolio <- R6::R6Class( #nolint
     #' @param short_name Portfolio Short Name
     #' @param nav NAV of portfolio
     #' @param positions list of position items
-    #' @param holdings_url URL to Enfusion Holdings Report
     initialize = function(
-      long_name, short_name, holdings_url, nav, positions
+      long_name, short_name, nav, positions
     ) {
       private$long_name_ <- long_name
       private$short_name_ <- short_name
@@ -41,7 +37,6 @@ Portfolio <- R6::R6Class( #nolint
       private$rules_ <- list()
       private$replacements_ <- list()
       private$trade_constructor <- TradeConstructor$new()
-      private$holdings_url_ <- holdings_url
     },
     # Getter Functions ---------------------------------------------------------
     #' @description Get Portfolio short name
@@ -179,20 +174,15 @@ Portfolio <- R6::R6Class( #nolint
       invisible(NULL)
     },
     # Updaters -----------------------------------------------------------------
-    #' Update Enfusion Data
-    #' @description Update Positions
-    update_enfusion = function() {
-      enfusion_report <- dplyr::filter(
-        get_enfusion_report(private$holdings_url_),
-        !is.na(.data$Description) & .data$`Instrument Type` != "Cash"
-      )
-      nav_all <- enfusion_report[["$ GL NAV"]]
-      nav_unq <- unique(nav_all)
-      if (length(nav_unq) > 1) warning("Portfolio Has More than 1 NAV")
-      nav <- as.numeric(sum(nav_unq))
-      if (is.na(nav)) nav <- 0
-      private$nav_ <- nav
-      .bulk_holding_positions(enfusion_report, private$short_name_)
+    #' @description Set NAV
+    #' @param nav Numeric NAV value
+    set_nav = function(nav) {
+      private$nav_ <- as.numeric(nav)
+      invisible(self)
+    },
+    #' @description Clear all positions
+    clear_positions = function() {
+      private$positions_ <- list()
       invisible(self)
     },
     # Calculators --------------------------------------------------------------

@@ -205,7 +205,6 @@
 #'   Must be unique within the portfolio registry.
 #' @param long_name A string representing the long name of the portfolio.
 #'   Required if creating a new portfolio.
-#' @param holdings_url A string representing the URL for holdings data.
 #' @param nav A numeric value representing the net asset value (NAV) of the
 #'   portfolio. Defaults to 0.
 #' @param positions A list of positions to initialize the portfolio with.
@@ -245,8 +244,12 @@
 #'
 #' @export
 .portfolio <- function(
-  short_name, long_name, holdings_url,
-  nav = 0, positions = list(), create = FALSE, assign_to_registry = TRUE
+  short_name,
+  long_name,
+  nav = 0,
+  positions = list(),
+  create = FALSE,
+  assign_to_registry = TRUE
 ) {
   checkmate::assert_character(short_name)
 
@@ -264,7 +267,6 @@
   portfolio <- Portfolio$new(
     long_name,
     short_name,
-    holdings_url,
     nav,
     positions
   )
@@ -278,36 +280,45 @@
 #' If the SMA already exists in the registry, it is returned. Otherwise, a new
 #' SMA object is created if the `create` parameter is set to `TRUE`.
 #'
-#' @param short_name A string representing the short name of the SMA. Must be unique.
+#' @param short_name A string representing the short name of the SMA.
+#'  Must be unique.
 #' @param long_name A string representing the long name of the SMA.
-#' @param holdings_url A string representing the URL for holdings data.
-#' @param nav A numeric value representing the net asset value (NAV) of the SMA. Defaults to 0.
-#' @param positions A list of `Position` objects representing the positions in the SMA. Defaults to an empty list.
-#' @param base_portfolio A string representing the name of the base portfolio associated with the SMA.
-#' @param create A boolean indicating whether to create the SMA if it does not exist. Defaults to `FALSE`.
-#' @param assign_to_registry A boolean indicating whether to assign the SMA object to the registry. Defaults to `TRUE`.
+#' @param nav A numeric value representing the net asset value (NAV) of the SMA.
+#'  Defaults to 0.
+#' @param positions A list of `Position` objects representing the positions in
+#'  the SMA. Defaults to an empty list.
+#' @param base_portfolio Either a single character string naming the base
+#'   portfolio, or a named numeric vector of blend weights that sum to 1
+#'   (e.g. \code{c(ccmf = 0.8, atom_core = 0.2)}).
+#' @param create A boolean indicating whether to create the SMA if it does
+#'   not exist. Defaults to `FALSE`.
+#' @param assign_to_registry A boolean indicating whether to assign the SMA
+#'   object to the registry. Defaults to `TRUE`.
 #'
 #' @return An SMA object.
-#' @details The function checks if the SMA with the given `short_name` exists in the 
-#' `registries$portfolios` environment. If it exists, the SMA is retrieved and returned. 
-#' If it does not exist and `create` is `TRUE`, a new SMA object is created using the 
-#' provided parameters and added to the registry. If `create` is `FALSE` and the SMA 
-#' does not exist, an error is raised.
+#' @details The function checks if the SMA with the given `short_name` exists
+#' in the `registries$portfolios` environment. If it exists, the SMA is
+#' retrieved and returned. If it does not exist and `create` is `TRUE`, a new
+#' SMA object is created using the provided parameters and added to the
+#' registry. If `create` is `FALSE` and the SMA does not exist, an error is
+#' raised.
 #'
 #' @examples
 #' # Retrieve an existing SMA
-#' existing_sma <- .sma("short_name", "long_name", base_portfolio = "base_portfolio")
+#' existing_sma <- .sma("short_name", "long_name",
+#'                      base_portfolio = "base_portfolio")
 #'
-#' # Create a new SMA
-#' new_sma <- .sma("new_short_name", "New Long Name", nav = 1000000, 
-#'                 positions = list(position1, position2), 
-#'                 base_portfolio = "base_portfolio", create = TRUE)
+#' # Create a new SMA with a blended base portfolio (80/20)
+#' new_sma <- .sma(
+#'   "new_short_name", "New Long Name", nav = 1000000,
+#'   base_portfolio = c(ccmf = 0.8, atom_core = 0.2), create = TRUE
+#' )
 #'
 #' @seealso \code{\link{Portfolio}}, \code{\link{SMA}}
 #' @import checkmate
 #' @export
 .sma <- function(
-  short_name, long_name, holdings_url,
+  short_name, long_name,
   nav = 0, positions = list(),
   base_portfolio, create = FALSE, assign_to_registry = TRUE
 ) {
@@ -322,12 +333,28 @@
     positions,
     function(position) checkmate::assert_r6(position, "Position")
   )
-  checkmate::assert_character(base_portfolio)
-  base_ptfl <- .portfolio(base_portfolio, create = FALSE)
+  base_ptfl <- if (
+    is.character(base_portfolio) && length(base_portfolio) == 1
+  ) {
+    .portfolio(base_portfolio, create = FALSE)
+  } else {
+    checkmate::assert_numeric(
+      base_portfolio, min.len = 2, any.missing = FALSE
+    )
+    checkmate::assert_names(names(base_portfolio), type = "unique")
+    if (abs(sum(base_portfolio) - 1) > 1e-6) {
+      stop("base_portfolio weights must sum to 1.")
+    }
+    lapply(names(base_portfolio), function(nm) {
+      list(
+        portfolio = .portfolio(nm, create = FALSE),
+        weight = base_portfolio[[nm]]
+      )
+    })
+  }
   sma <- SMA$new(
     long_name,
     short_name,
-    holdings_url,
     nav,
     positions,
     base_ptfl
@@ -399,7 +426,6 @@
   gross_exposure = FALSE,
   relative_to = "nav",
   divisor = NULL,
-  side = NULL,
   exclusions = NULL,
   include = NULL
 ) {
@@ -427,7 +453,7 @@
   if (!is.null(divisor)) checkmate::assert_r6(divisor, "DivisorProvider")
 
   if (scope == "count") {
-    checkmate::assert_choice(side, c("long", "short", "gross"))
+    checkmate::assert_choice(include, c("long_only", "short_only", "all"))
   }
 
 

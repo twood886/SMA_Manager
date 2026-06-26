@@ -129,7 +129,8 @@ SMARule <- R6::R6Class( #nolint
     apply_rule_definition = function(security_id, nav) {
       exp <- private$definition_(security_id, nav)
       names(exp) <- security_id
-      exp[self$get_exclusions()] <- 0
+      excl <- self$get_exclusions()
+      exp[excl[excl %in% names(exp)]] <- 0
       exp
     },
     #' Is Security Impacted

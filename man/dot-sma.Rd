@@ -7,7 +7,6 @@
 .sma(
   short_name,
   long_name,
-  holdings_url,
   nav = 0,
   positions = list(),
   base_portfolio,
@@ -16,21 +15,26 @@
 )
 }
 \arguments{
-\item{short_name}{A string representing the short name of the SMA. Must be unique.}
+\item{short_name}{A string representing the short name of the SMA.
+Must be unique.}
 
 \item{long_name}{A string representing the long name of the SMA.}
 
-\item{holdings_url}{A string representing the URL for holdings data.}
+\item{nav}{A numeric value representing the net asset value (NAV) of the SMA.
+Defaults to 0.}
 
-\item{nav}{A numeric value representing the net asset value (NAV) of the SMA. Defaults to 0.}
+\item{positions}{A list of `Position` objects representing the positions in
+the SMA. Defaults to an empty list.}
 
-\item{positions}{A list of `Position` objects representing the positions in the SMA. Defaults to an empty list.}
+\item{base_portfolio}{Either a single character string naming the base
+portfolio, or a named numeric vector of blend weights that sum to 1
+(e.g. \code{c(ccmf = 0.8, atom_core = 0.2)}).}
 
-\item{base_portfolio}{A string representing the name of the base portfolio associated with the SMA.}
+\item{create}{A boolean indicating whether to create the SMA if it does
+not exist. Defaults to `FALSE`.}
 
-\item{create}{A boolean indicating whether to create the SMA if it does not exist. Defaults to `FALSE`.}
-
-\item{assign_to_registry}{A boolean indicating whether to assign the SMA object to the registry. Defaults to `TRUE`.}
+\item{assign_to_registry}{A boolean indicating whether to assign the SMA
+object to the registry. Defaults to `TRUE`.}
 }
 \value{
 An SMA object.
@@ -41,20 +45,23 @@ If the SMA already exists in the registry, it is returned. Otherwise, a new
 SMA object is created if the `create` parameter is set to `TRUE`.
 }
 \details{
-The function checks if the SMA with the given `short_name` exists in the 
-`registries$portfolios` environment. If it exists, the SMA is retrieved and returned. 
-If it does not exist and `create` is `TRUE`, a new SMA object is created using the 
-provided parameters and added to the registry. If `create` is `FALSE` and the SMA 
-does not exist, an error is raised.
+The function checks if the SMA with the given `short_name` exists
+in the `registries$portfolios` environment. If it exists, the SMA is
+retrieved and returned. If it does not exist and `create` is `TRUE`, a new
+SMA object is created using the provided parameters and added to the
+registry. If `create` is `FALSE` and the SMA does not exist, an error is
+raised.
 }
 \examples{
 # Retrieve an existing SMA
-existing_sma <- .sma("short_name", "long_name", base_portfolio = "base_portfolio")
+existing_sma <- .sma("short_name", "long_name",
+                     base_portfolio = "base_portfolio")
 
-# Create a new SMA
-new_sma <- .sma("new_short_name", "New Long Name", nav = 1000000, 
-                positions = list(position1, position2), 
-                base_portfolio = "base_portfolio", create = TRUE)
+# Create a new SMA with a blended base portfolio (80/20)
+new_sma <- .sma(
+  "new_short_name", "New Long Name", nav = 1000000,
+  base_portfolio = c(ccmf = 0.8, atom_core = 0.2), create = TRUE
+)
 
 }
 \seealso{

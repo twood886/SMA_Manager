@@ -15,6 +15,7 @@ R6 Class representing a seperately managed account.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SMA-new}{\code{SMA$new()}}
+\item \href{#method-SMA-get_base_portfolios}{\code{SMA$get_base_portfolios()}}
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
 \item \href{#method-SMA-check_rule_compliance}{\code{SMA$check_rule_compliance()}}
@@ -30,6 +31,7 @@ R6 Class representing a seperately managed account.
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_replacement"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_replacement'><code>SMAManager::Portfolio$add_replacement()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_rule"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_rule'><code>SMAManager::Portfolio$add_rule()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="clear_positions"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-clear_positions'><code>SMAManager::Portfolio$clear_positions()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_order_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_order_constructor'><code>SMAManager::Portfolio$get_order_constructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
@@ -41,7 +43,7 @@ R6 Class representing a seperately managed account.
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_swap_flag_position_rules"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_swap_flag_position_rules'><code>SMAManager::Portfolio$get_swap_flag_position_rules()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_trade_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_trade_constructor'><code>SMAManager::Portfolio$get_trade_constructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="rebalance"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-rebalance'><code>SMAManager::Portfolio$rebalance()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="update_enfusion"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-update_enfusion'><code>SMAManager::Portfolio$update_enfusion()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="set_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-set_nav'><code>SMAManager::Portfolio$set_nav()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -51,14 +53,7 @@ R6 Class representing a seperately managed account.
 \subsection{Method \code{new()}}{
 Create a new SMA R6 object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$new(
-  long_name,
-  short_name,
-  holdings_url,
-  nav,
-  positions = NULL,
-  base_portfolio = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$new(long_name, short_name, nav, positions = NULL, base_portfolio = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -68,26 +63,39 @@ Create a new SMA R6 object.
 
 \item{\code{short_name}}{Character. SMA Short Name.}
 
-\item{\code{holdings_url}}{Character. URL to Enfusion Holdings Report.}
-
 \item{\code{nav}}{Numeric. SMA Net Asset Value.}
 
 \item{\code{positions}}{Optional. SMA Positions. Default is NULL.}
 
-\item{\code{base_portfolio}}{An object representing the base portfolio.}
+\item{\code{base_portfolio}}{A Portfolio object (weight = 1.0) or a list of
+\code{list(portfolio = <Portfolio>, weight = <numeric>)} for blended bases.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A new instance of the SMA class.
-Get Base Portfolio
+Get Base Portfolios
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMA-get_base_portfolios"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-get_base_portfolios}{}}}
+\subsection{Method \code{get_base_portfolios()}}{
+Get all base portfolios with their blend weights as a list
+  of \code{list(portfolio, weight)} pairs.
+Get Base Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMA$get_base_portfolios()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SMA-get_base_portfolio"></a>}}
 \if{latex}{\out{\hypertarget{method-SMA-get_base_portfolio}{}}}
 \subsection{Method \code{get_base_portfolio()}}{
-Get the tagret portfolio
+Get the primary (first) base portfolio. For single-base SMAs
+  this is the only base. For blended SMAs use \code{get_base_portfolios()}
+  to access all bases and weights.
 Get Base Portfolio Position
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMA$get_base_portfolio()}\if{html}{\out{</div>}}
@@ -98,7 +106,7 @@ Get Base Portfolio Position
 \if{html}{\out{<a id="method-SMA-get_base_portfolio_position"></a>}}
 \if{latex}{\out{\hypertarget{method-SMA-get_base_portfolio_position}{}}}
 \subsection{Method \code{get_base_portfolio_position()}}{
-Get a position in the Base portfolio
+Get a position in the primary base portfolio.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMA$get_base_portfolio_position(security_id = NULL)}\if{html}{\out{</div>}}
 }
@@ -144,7 +152,12 @@ Replicate a trade from the base portfolio
 Analyzes the effect of a trade in the base portfolio on the SMA,
 identifying the required trade.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$replicate_trade(security_id, base_trade_qty, update_bbfields = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$replicate_trade(
+  security_id,
+  base_trade_qty,
+  update_bbfields = TRUE,
+  base_portfolio_name = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -155,6 +168,10 @@ identifying the required trade.
 \item{\code{base_trade_qty}}{The quantity of the trade in the base portfolio.}
 
 \item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE).}
+
+\item{\code{base_portfolio_name}}{Character. Short name of the trading base
+portfolio. Required for blended SMAs; defaults to the primary base
+portfolio when NULL.}
 }
 \if{html}{\out{</div>}}
 }

@@ -2,10 +2,20 @@
 % Please edit documentation in R/db-loading.R
 \name{db_connect}
 \alias{db_connect}
-\title{Connect to Supabase PostgreSQL}
+\title{Connect to Postgres Database}
 \usage{
-db_connect()
+db_connect(pg_password = Sys.getenv("PG_PASSWORD"))
+}
+\arguments{
+\item{pg_password}{The password for the Postgres user.}
+}
+\value{
+The DBI connection object, invisibly.
 }
 \description{
-Connect to Supabase PostgreSQL
+Connects to a Postgres database using environment variables for
+connection parameters and caches the connection in the package environment so
+it does not need to be passed to subsequent functions. Call this once at
+startup (or at the top of an API handler) and all db functions will use it
+automatically via \code{get_db_connection()}.
 }

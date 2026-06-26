@@ -18,10 +18,10 @@ SMARuleCount <- R6::R6Class( #nolint
     check_compliance = function(
       ids, qty, nav, prices = NULL, tolerance = 1e-6, ...
     ) {
-      side <- self$get_include()
+      include <- self$get_include()
 
       n <- if (!length(qty)) 0 else switch(
-        side,
+        include,
         "all" = sum(abs(qty) > tolerance),
         "long_only" = sum(qty > tolerance),
         "short_only" = sum(qty < -tolerance)
@@ -82,7 +82,7 @@ SMARuleCount <- R6::R6Class( #nolint
     build_constraints = function(ctx, nav) {
       w <- ctx$w
       n <- ctx$n
-      side <- self$get_include()
+      include <- self$get_include()
       min_t <- self$get_min_threshold()
       max_t <- self$get_max_threshold()
 
@@ -90,7 +90,7 @@ SMARuleCount <- R6::R6Class( #nolint
 
       cons <- list()
 
-      if (side == "long_only") {
+      if (include == "long_only") {
         z <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_long_", self$get_name())) #nolint
         p <- CVXR::Variable(n, name = paste0("p_long_", self$get_name()))
         cons <- c(cons,
@@ -103,7 +103,7 @@ SMARuleCount <- R6::R6Class( #nolint
         return(cons)
       }
 
-      if (side == "short_only") {
+      if (include == "short_only") {
         z <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_short_", self$get_name())) #nolint
         s <- CVXR::Variable(n, name = paste0("s_short_", self$get_name()))
         cons <- c(cons,
@@ -116,7 +116,7 @@ SMARuleCount <- R6::R6Class( #nolint
         return(cons)
       }
 
-      if (side == "all") {
+      if (include == "all") {
         z_long <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_long_", self$get_name())) #nolint
         z_short <- CVXR::Variable(n, boolean = TRUE, name = paste0("z_short_", self$get_name())) #nolint
         y <- CVXR::Variable(n, boolean = TRUE, name = paste0("y_gross_", self$get_name())) #nolint
@@ -134,7 +134,7 @@ SMARuleCount <- R6::R6Class( #nolint
         if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(y) <= max_t)) #nolint
         return(cons)
       }
-      stop("Unrecognized side in SMARuleCount: ", side)
+      stop("Unrecognized include in SMARuleCount: ", include)
     }
   )
 )

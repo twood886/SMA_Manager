@@ -25,7 +25,8 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
 \item \href{#method-Portfolio-add_rule}{\code{Portfolio$add_rule()}}
 \item \href{#method-Portfolio-add_replacement}{\code{Portfolio$add_replacement()}}
-\item \href{#method-Portfolio-update_enfusion}{\code{Portfolio$update_enfusion()}}
+\item \href{#method-Portfolio-set_nav}{\code{Portfolio$set_nav()}}
+\item \href{#method-Portfolio-clear_positions}{\code{Portfolio$clear_positions()}}
 \item \href{#method-Portfolio-rebalance}{\code{Portfolio$rebalance()}}
 \item \href{#method-Portfolio-clone}{\code{Portfolio$clone()}}
 }
@@ -36,7 +37,7 @@ R6 Class representing a portfolio object.
 \subsection{Method \code{new()}}{
 Create New Portfolio R6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$new(long_name, short_name, holdings_url, nav, positions)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$new(long_name, short_name, nav, positions)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -45,8 +46,6 @@ Create New Portfolio R6 object
 \item{\code{long_name}}{Portfolio Long Name}
 
 \item{\code{short_name}}{Portfolio Short Name}
-
-\item{\code{holdings_url}}{URL to Enfusion Holdings Report}
 
 \item{\code{nav}}{NAV of portfolio}
 
@@ -305,20 +304,36 @@ Add replacement securitity
 \describe{
 \item{\code{original_security}}{The original Security id}
 
-\item{\code{replacement_security}}{The replacement Security id
-Update Enfusion Data}
+\item{\code{replacement_security}}{The replacement Security id}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Portfolio-update_enfusion"></a>}}
-\if{latex}{\out{\hypertarget{method-Portfolio-update_enfusion}{}}}
-\subsection{Method \code{update_enfusion()}}{
-Update Positions
+\if{html}{\out{<a id="method-Portfolio-set_nav"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-set_nav}{}}}
+\subsection{Method \code{set_nav()}}{
+Set NAV
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$set_nav(nav)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nav}}{Numeric NAV value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-clear_positions"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-clear_positions}{}}}
+\subsection{Method \code{clear_positions()}}{
+Clear all positions
 Rebalance Portfolio
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$update_enfusion()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$clear_positions()}\if{html}{\out{</div>}}
 }
 
 }

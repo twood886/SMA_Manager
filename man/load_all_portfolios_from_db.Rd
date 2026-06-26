@@ -4,7 +4,7 @@
 \alias{load_all_portfolios_from_db}
 \title{Load All Portfolios and SMAs from Database}
 \usage{
-load_all_portfolios_from_db(con, date = Sys.Date())
+load_all_portfolios_from_db(con = get_db_connection(), date = Sys.Date())
 }
 \arguments{
 \item{con}{DBI connection}
@@ -18,4 +18,25 @@ Named list of all Portfolio/SMA objects (invisibly)
 Clears the in-memory registries and repopulates them from Supabase.
 Base portfolios are loaded before SMAs. After all positions are loaded,
 Bloomberg rule fields are hydrated from \code{security_data}.
+}
+\details{
+Blended base portfolios are supported via the \code{sma_base_portfolio_weights}
+junction table. Run the following DDL once before using blended bases:
+\preformatted{
+CREATE TABLE IF NOT EXISTS sma_base_portfolio_weights (
+  sma_portfolio_id  INTEGER NOT NULL REFERENCES portfolios(portfolio_id),
+  base_portfolio_id INTEGER NOT NULL REFERENCES portfolios(portfolio_id),
+  weight            NUMERIC(8,6) NOT NULL CHECK (weight > 0 AND weight <= 1),
+  PRIMARY KEY (sma_portfolio_id, base_portfolio_id)
+);
+-- Migrate existing single-base SMAs
+INSERT INTO sma_base_portfolio_weights
+  (sma_portfolio_id, base_portfolio_id, weight)
+SELECT portfolio_id, base_portfolio_id, 1.0
+FROM portfolios
+WHERE type = 'sma' AND base_portfolio_id IS NOT NULL
+ON CONFLICT DO NOTHING;
+}
+SMAs with no rows in the junction table fall back to \code{base_portfolio_id}
+in the \code{portfolios} table for backward compatibility.
 }

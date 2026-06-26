@@ -4,19 +4,19 @@
 \alias{load_securities_from_db}
 \title{Load Securities into Registry from Database}
 \usage{
-load_securities_from_db(con, date = Sys.Date())
+load_securities_from_db(con = get_db_connection())
 }
 \arguments{
 \item{con}{DBI connection (from \code{db_connect()})}
-
-\item{date}{Date to load. Defaults to today.}
 }
 \value{
 \code{NULL} invisibly
 }
 \description{
 Populates \code{registries$securities} with \code{Security} objects for all
-instruments appearing in holdings on the given date. Non-option securities
-are registered first so that option underlyings are available when options
+instruments appearing in \code{holdings_target}. Securities are registered
+with placeholder price and delta of 1; call \code{update_bloomberg_fields()}
+after loading to hydrate prices, deltas, and rule fields from Bloomberg.
+Non-option securities are registered first so underlyings exist when options
 are created.
 }

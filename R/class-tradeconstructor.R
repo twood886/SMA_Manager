@@ -303,37 +303,67 @@ SMAConstructor <- R6::R6Class( #nolint
       if (base_nav == 0) return(0)
       sma_nav / base_nav
     },
-    #' Calculate target quantities for the SMA based on scaled base portfolio
+    #' Calculate target quantities for the SMA based on scaled base portfolio(s)
     #' @param sma SMA object
     calc_target_quantities = function(sma) {
-      base <- sma$get_base_portfolio()
-      scale_ratio <- self$get_scale_ratio(base, sma)
-      base_positions <- private$.extract_qty(base$get_position())
-      target_quantities <- base_positions * scale_ratio
-      if (any(!is.finite(target_quantities))) {
-        target_quantities[!is.finite(target_quantities)] <- 0
+      sma_nav <- sma$get_nav()
+      base_list <- sma$get_base_portfolios()
+      target_quantities <- numeric(0)
+
+      for (item in base_list) {
+        base_nav <- item$portfolio$get_nav()
+        if (base_nav == 0) next
+        scale_ratio <- sma_nav / base_nav
+        contrib <- item$weight * private$.extract_qty(item$portfolio$get_position()) * scale_ratio
+        new_ids <- setdiff(names(contrib), names(target_quantities))
+        if (length(new_ids) > 0) target_quantities[new_ids] <- 0
+        target_quantities[names(contrib)] <- target_quantities[names(contrib)] + contrib
       }
+
+      target_quantities[!is.finite(target_quantities)] <- 0
       target_quantities
     },
     #' @description Replicate a trade from the base portfolio to the SMA
     #' @param security_id Security ID of the traded security in the base portfolio
     #' @param base_trade_qty Trade quantity in the base portfolio
     #' @param portfolio SMA portfolio object
+    #' @param base_portfolio_name Short name of the trading base portfolio. Required
+    #'   for blended SMAs; defaults to the primary base portfolio when NULL.
     #' @return A list with trade details and calculations
-    replicate_trade = function(security_id, base_trade_qty, portfolio) {
+    replicate_trade = function(security_id, base_trade_qty, portfolio,
+                               base_portfolio_name = NULL) {
       checkmate::assert_character(security_id, len = 1)
       checkmate::assert_numeric(base_trade_qty, len = 1)
       checkmate::assert_r6(portfolio, "SMA")
 
       # --- 1. Calculate Unconstrained Target ---
-      base <- portfolio$get_base_portfolio()
-      scale_ratio <- self$get_scale_ratio(base, portfolio)
-      base_pre_qty <- tryCatch(
-        {base$get_position(security_id)$get_qty()},
-        error = function(e) 0
-      )
-      base_post_qty <- base_pre_qty + base_trade_qty
-      unconstrained_target_qty <- base_post_qty * scale_ratio
+      base_list <- portfolio$get_base_portfolios()
+      if (!is.null(base_portfolio_name)) {
+        trading_idx <- which(
+          vapply(base_list, \(x) x$portfolio$get_short_name(), character(1)) == base_portfolio_name
+        )
+        if (length(trading_idx) == 0) {
+          stop(sprintf("Base portfolio '%s' not found in this SMA's blend.", base_portfolio_name))
+        }
+      } else {
+        trading_idx <- 1L
+      }
+
+      sma_nav <- portfolio$get_nav()
+      unconstrained_target_qty <- 0
+
+      for (i in seq_along(base_list)) {
+        item <- base_list[[i]]
+        base_nav <- item$portfolio$get_nav()
+        if (base_nav == 0) next
+        base_qty <- tryCatch(
+          {item$portfolio$get_position(security_id)$get_qty()},
+          error = function(e) 0
+        )
+        if (i == trading_idx) base_qty <- base_qty + base_trade_qty
+        unconstrained_target_qty <- unconstrained_target_qty +
+          item$weight * base_qty * sma_nav / base_nav
+      }
 
       # --- 2. Get Rule-Based Limits for the SMA ---
       # get_security_position_limits returns limits in SHARES

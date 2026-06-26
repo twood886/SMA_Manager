@@ -11,48 +11,60 @@
 #' @include utils.R
 #' @include api-functions.R
 #' @include class-tradeconstructor.R
-#' @include enfusion_loading.R
 #' @export
 SMA <- R6::R6Class(   #nolint
   "SMA",
   inherit = Portfolio,
   private = list(
-    base_portfolio_ = NULL
+    base_portfolio_ = NULL  # list of list(portfolio = <Portfolio>, weight = <numeric>)
   ),
   public = list(
     #' @description
     #' Create a new SMA R6 object.
     #' @param long_name Character. SMA Long Name.
     #' @param short_name Character. SMA Short Name.
-    #' @param holdings_url Character. URL to Enfusion Holdings Report.
     #' @param nav Numeric. SMA Net Asset Value.
     #' @param positions Optional. SMA Positions. Default is NULL.
-    #' @param base_portfolio An object representing the base portfolio.
+    #' @param base_portfolio A Portfolio object (weight = 1.0) or a list of
+    #'   \code{list(portfolio = <Portfolio>, weight = <numeric>)} for blended bases.
     #' @return A new instance of the SMA class.
     initialize = function(
       long_name,
       short_name,
-      holdings_url,
       nav,
       positions = NULL,
       base_portfolio = NULL
     ) {
       private$long_name_ <- long_name
       private$short_name_ <- short_name
-      private$holdings_url_ <- holdings_url
       private$nav_ <- nav
-      private$base_portfolio_ <- base_portfolio
+      private$base_portfolio_ <- if (is.null(base_portfolio)) {
+        NULL
+      } else if (inherits(base_portfolio, "Portfolio")) {
+        list(list(portfolio = base_portfolio, weight = 1.0))
+      } else {
+        base_portfolio  # already a list of (portfolio, weight) pairs
+      }
       private$positions_ <- positions
       private$rules_ <- list()
       private$replacements_ <- list()
       private$trade_constructor <- SMAConstructor$new()
     },
     # Getters ------------------------------------------------------------------
+    #' Get Base Portfolios
+    #' @description Get all base portfolios with their blend weights as a list
+    #'   of \code{list(portfolio, weight)} pairs.
+    get_base_portfolios = function() private$base_portfolio_,
     #' Get Base Portfolio
-    #' @description Get the tagret portfolio
-    get_base_portfolio = function() private$base_portfolio_,
+    #' @description Get the primary (first) base portfolio. For single-base SMAs
+    #'   this is the only base. For blended SMAs use \code{get_base_portfolios()}
+    #'   to access all bases and weights.
+    get_base_portfolio = function() {
+      if (is.null(private$base_portfolio_)) return(NULL)
+      private$base_portfolio_[[1]]$portfolio
+    },
     #' Get Base Portfolio Position
-    #' @description Get a position in the Base portfolio
+    #' @description Get a position in the primary base portfolio.
     #' @param security_id Security ID
     get_base_portfolio_position = function(security_id = NULL) {
       self$get_base_portfolio()$get_position(security_id)
@@ -105,8 +117,12 @@ SMA <- R6::R6Class(   #nolint
     #' @param security_id The ID of the security traded in the base portfolio.
     #' @param base_trade_qty The quantity of the trade in the base portfolio.
     #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE).
+    #' @param base_portfolio_name Character. Short name of the trading base
+    #'   portfolio. Required for blended SMAs; defaults to the primary base
+    #'   portfolio when NULL.
     replicate_trade = function(
-      security_id, base_trade_qty, update_bbfields = TRUE
+      security_id, base_trade_qty, update_bbfields = TRUE,
+      base_portfolio_name = NULL
     ) {
       checkmate::assert_character(security_id, len = 1)
       checkmate::assert_numeric(base_trade_qty, len = 1)
@@ -115,7 +131,8 @@ SMA <- R6::R6Class(   #nolint
       self$get_trade_constructor()$replicate_trade(
         security_id = security_id,
         base_trade_qty = base_trade_qty,
-        portfolio = self
+        portfolio = self,
+        base_portfolio_name = base_portfolio_name
       )
     }
   )

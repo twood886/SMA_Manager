@@ -67,7 +67,7 @@ Get the scale ratio for the SMA
 \item{\code{base_portfolio}}{Base portfolio object}
 
 \item{\code{sma_portfolio}}{SMA portfolio object
-Calculate target quantities for the SMA based on scaled base portfolio}
+Calculate target quantities for the SMA based on scaled base portfolio(s)}
 }
 \if{html}{\out{</div>}}
 }
@@ -94,7 +94,12 @@ Calculate target quantities for the SMA based on scaled base portfolio}
 \subsection{Method \code{replicate_trade()}}{
 Replicate a trade from the base portfolio to the SMA
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$replicate_trade(security_id, base_trade_qty, portfolio)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$replicate_trade(
+  security_id,
+  base_trade_qty,
+  portfolio,
+  base_portfolio_name = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -105,6 +110,9 @@ Replicate a trade from the base portfolio to the SMA
 \item{\code{base_trade_qty}}{Trade quantity in the base portfolio}
 
 \item{\code{portfolio}}{SMA portfolio object}
+
+\item{\code{base_portfolio_name}}{Short name of the trading base portfolio. Required
+for blended SMAs; defaults to the primary base portfolio when NULL.}
 }
 \if{html}{\out{</div>}}
 }

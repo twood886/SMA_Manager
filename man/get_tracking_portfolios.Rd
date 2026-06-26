@@ -7,12 +7,12 @@
 get_tracking_portfolios(base_portfolio)
 }
 \arguments{
-\item{base_portfolio}{Character of base portfolio short name or Portfolio 
-object}
+\item{base_portfolio}{Character short name or Portfolio object}
 }
 \value{
-list of portfolios
+list of SMA portfolios
 }
 \description{
-Get all portfolios that have a specified base portfolio
+Get all SMAs that have a specified portfolio as any part of
+  their base (including blended bases).
 }

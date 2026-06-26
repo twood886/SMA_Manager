@@ -4,11 +4,16 @@
 #' @export
 registries <- NULL
 
+# Package-level mutable state (connection cache, etc.) — not exported.
+.pkg_state <- NULL
+
 .onLoad <- function(libname, pkgname) {
-  # Assign the environment to the package namespace
-  registries <<- new.env(parent = emptyenv())
+  registries  <<- new.env(parent = emptyenv())
   registries$portfolios <<- new.env(parent = emptyenv())
   registries$securities <<- new.env(parent = emptyenv())
-  registries$smarules <<- new.env(parent = emptyenv())
-  registries$trades <<- new.env(parent = emptyenv())
+  registries$smarules   <<- new.env(parent = emptyenv())
+  registries$trades     <<- new.env(parent = emptyenv())
+
+  .pkg_state      <<- new.env(parent = emptyenv())
+  .pkg_state$con  <<- NULL
 }

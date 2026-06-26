@@ -108,10 +108,10 @@ bbid_to_security_id <- function(id) {
 
 
 #' @title Get Tracking Portfolios
-#' @description Get all portfolios that have a specified base portfolio
-#' @param base_portfolio Character of base portfolio short name or Portfolio 
-#'  object
-#' @returns list of portfolios
+#' @description Get all SMAs that have a specified portfolio as any part of
+#'   their base (including blended bases).
+#' @param base_portfolio Character short name or Portfolio object
+#' @returns list of SMA portfolios
 get_tracking_portfolios <- function(base_portfolio) {
   port_env <- tryCatch(
     registries$portfolios,
@@ -119,9 +119,9 @@ get_tracking_portfolios <- function(base_portfolio) {
       stop("Failed to access portfolio registry: ", conditionMessage(e))
     }
   )
-  
+
   if (is.null(port_env)) return(NULL)
-  
+
   if (checkmate::test_r6(base_portfolio, "Portfolio")) {
     base_portfolio_name <- base_portfolio$get_short_name()
   } else if (checkmate::test_character(base_portfolio, len = 1)) {
@@ -134,21 +134,26 @@ get_tracking_portfolios <- function(base_portfolio) {
 
   portfolio_names <- ls(port_env)
   portfolios <- sapply(
-    portfolio_names, 
+    portfolio_names,
     function(p) get(p, envir = port_env),
     simplify = FALSE,
     USE.NAMES = TRUE
   )
-  portfolio_base <- vapply(
+
+  is_tracking <- vapply(
     portfolios,
     function(p) {
-      tryCatch(
-        p$get_base_portfolio()$get_short_name(),
-        error = function(e) NA_character_
-      )
+      tryCatch({
+        base_list <- p$get_base_portfolios()
+        if (is.null(base_list)) return(FALSE)
+        base_names <- vapply(
+          base_list, \(x) x$portfolio$get_short_name(), character(1)
+        )
+        base_portfolio_name %in% base_names
+      }, error = function(e) FALSE)
     },
-    character(1)
+    logical(1)
   )
 
-  portfolios[portfolio_base %in% base_portfolio_name]
+  portfolios[is_tracking]
 }
