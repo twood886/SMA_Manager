@@ -18,7 +18,8 @@ Portfolio <- R6::R6Class( #nolint
     positions_ = NULL,
     rules_ = list(),
     replacements_ = list(),
-    order_constructor_ = NULL
+    order_constructor_ = NULL,
+    trade_constructor = NULL
   ),
   public = list(
     #' @description
@@ -147,7 +148,16 @@ Portfolio <- R6::R6Class( #nolint
       } else {
         private$positions_ <- c(private$positions_, position)
       }
-      invisible(NULL)
+      invisible(TRUE)
+    },
+    #' @description Add Holding Object to Portfolio
+    #' @param holding Holding S6 Object
+    add_holding = function(holding) {
+      checkmate::assert_r6(holding, "Holding")
+      sec_id <- holding$get_security_id()
+      position <- .position(self$get_short_name(), sec_id, TRUE, TRUE)
+      position$add_holding(holding)
+      invisible(TRUE)
     },
     #' Add Rule
     #' @description Create Rule and Add to Portfolio

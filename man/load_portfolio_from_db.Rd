@@ -5,23 +5,26 @@
 \title{Load a Single Portfolio or SMA from Database}
 \usage{
 load_portfolio_from_db(
-  short_name,
-  con = get_db_connection(),
-  date = Sys.Date()
+  portfolio_short_name,
+  load_securities = FALSE,
+  con = get_db_connection()
 )
 }
 \arguments{
-\item{short_name}{Character. The portfolio short name.}
+\item{portfolio_short_name}{Character. The portfolio short name.}
+
+\item{load_securities}{Logical. If \code{TRUE}, calls
+\code{load_securities_from_db()} before loading holdings. Defaults to
+\code{FALSE}.}
 
 \item{con}{DBI connection (from \code{db_connect()})}
-
-\item{date}{Date to load holdings for. Defaults to today.}
 }
 \value{
 The Portfolio or SMA object invisibly.
 }
 \description{
 Creates or replaces a single portfolio in the in-memory registry, loading
-its NAV, positions, and (for SMAs) rules. Prefer \code{load_all_portfolios_from_db()}
+its NAV, positions, and (for SMAs) rules.
+Prefer \code{load_all_portfolios_from_db()}
 when you need everything; use this for targeted single-portfolio loads.
 }

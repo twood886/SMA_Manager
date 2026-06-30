@@ -23,6 +23,7 @@ R6 Class representing a portfolio object.
 \item \href{#method-Portfolio-add_orderconstructor}{\code{Portfolio$add_orderconstructor()}}
 \item \href{#method-Portfolio-add_flow}{\code{Portfolio$add_flow()}}
 \item \href{#method-Portfolio-add_position}{\code{Portfolio$add_position()}}
+\item \href{#method-Portfolio-add_holding}{\code{Portfolio$add_holding()}}
 \item \href{#method-Portfolio-add_rule}{\code{Portfolio$add_rule()}}
 \item \href{#method-Portfolio-add_replacement}{\code{Portfolio$add_replacement()}}
 \item \href{#method-Portfolio-set_nav}{\code{Portfolio$set_nav()}}
@@ -263,7 +264,24 @@ Add Position to Portfolio
 \describe{
 \item{\code{position}}{Position S6 Object}
 
-\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE
+\item{\code{overwrite}}{Logical. Overwrite existing position if TRUE}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Portfolio-add_holding"></a>}}
+\if{latex}{\out{\hypertarget{method-Portfolio-add_holding}{}}}
+\subsection{Method \code{add_holding()}}{
+Add Holding Object to Portfolio
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_holding(holding)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{holding}}{Holding S6 Object
 Add Rule}
 }
 \if{html}{\out{</div>}}

@@ -61,85 +61,33 @@
   invisible(security)
 }
 
-#' Create or Retrieve a Holding Object
+#' Create a Holding Object
 #'
-#' This function creates or retrieves a holding object associated with a
-#' specific portfolio and security. If the holding already exists, it is
-#' returned. If not, a new holding is created and added to the corresponding
-#' position in the portfolio.
+#' Constructs a new \code{\link{Holding}} object for a given security and
+#' quantity. Validates inputs and delegates to \code{Holding$new()}.
 #'
-#' @param portfolio_name A string representing the name of the portfolio.
-#' Must be a valid portfolio name.
 #' @param sec_id A string representing the security ID (ticker).
-#' Must be a valid security ID.
 #' @param qty A numeric value representing the quantity of the holding.
-#' Must be a valid numeric value.
 #' @param swap A logical value indicating whether the holding is a swap.
-#' Defaults to `FALSE`.
-#' @param custodian (Optional) A string representing the custodian name.
-#' @param broker_custodian (Optional) A string representing the broker custodian name. #nolint
-#' @param custodian_acct_id (Optional) A string representing the custodian account ID. #nolint
-#' @param custodian_acct (Optional) A string representing the custodian account name. #nolint
-#' @param trs_custodian_id (Optional) A string representing the TRS custodian ID. #nolint
-#' @param trs_custodian_name (Optional) A string representing the TRS custodian name. #nolint
-#' @param assign_to_portfolio A logical value indicating whether to add the holding. #nolint
+#'   Defaults to \code{FALSE}.
+#' @param custodian_acct_id (Optional) A string representing the custodian account ID.
+#' @param trs_custodian_id (Optional) A string representing the TRS custodian ID.
 #'
-#' @return An object of class `Holding` representing the created or retrieved holding. #nolint
-#'
-#' @details The function first validates the input parameters to ensure they are
-#' of the correct type. It then constructs a unique ID for the holding based on
-#' the security ID and custodian account ID. The function checks if the holding
-#' already exists in the position associated with the portfolio. If it exists,
-#' the existing holding is returned. If not, a new `Holding` object is created
-#' and added to the position.
+#' @return An object of class \code{Holding}.
 #'
 #' @seealso \code{\link{Holding}} for the Holding class.
 #' @import checkmate
 #' @export
 .holding <- function(
-  portfolio_name, sec_id, qty, swap = FALSE,
-  custodian = NULL, broker_custodian = NULL,
-  custodian_acct_id = NULL, custodian_acct = NULL,
-  trs_custodian_id = NULL, trs_custodian_name = NULL,
-  create = FALSE, assign_to_portfolio = TRUE
+  sec_id, qty, swap = FALSE, custodian_acct_id = NULL, trs_custodian_id = NULL
 ) {
   checkmate::assert_character(sec_id)
   sec_id <- tolower(sec_id)
   checkmate::assert_numeric(qty)
   checkmate::assert_flag(swap)
-  checkmate::assert_character(custodian, null.ok = TRUE)
-  checkmate::assert_character(broker_custodian, null.ok = TRUE)
   checkmate::assert_character(custodian_acct_id, null.ok = TRUE)
-  checkmate::assert_character(custodian_acct, null.ok = TRUE)
   checkmate::assert_character(trs_custodian_id, null.ok = TRUE)
-  checkmate::assert_character(trs_custodian_name, null.ok = TRUE)
-  id <- paste(sec_id, custodian_acct_id, sep = "|")
-
-  portfolio <- .portfolio(portfolio_name, create = FALSE)
-  position <- .position(portfolio_name, sec_id, TRUE, assign_to_portfolio)
-  holdings <- position$get_holdings()
-  holdings_id <- vapply(holdings, \(x) x$get_id(), character(1))
-
-  holding <- tryCatch(
-    holdings[[which(holdings_id == id)]],
-    error = function(e) NULL
-  )
-  if (!is.null(holding) && create) holding$set_qty(qty)
-  if (!is.null(holding)) return(invisible(holding))
-  if (!create) stop("Holding does not exist and create is set to FALSE")
-
-  holding <- Holding$new(
-    portfolio_name, sec_id, qty, swap,
-    custodian, broker_custodian,
-    custodian_acct_id, custodian_acct,
-    trs_custodian_id, trs_custodian_name
-  )
-  position$add_holding(holding)
-
-  if (assign_to_portfolio) {
-    portfolio$add_position(position, overwrite = TRUE)
-  }
-  return(invisible(holding))
+  Holding$new(sec_id, qty, swap, custodian_acct_id, trs_custodian_id)
 }
 
 #' Create or Retrieve a Position Object
@@ -455,7 +403,6 @@
   if (scope == "count") {
     checkmate::assert_choice(include, c("long_only", "short_only", "all"))
   }
-
 
   if (scope == "position") {
     smarule <- SMARulePosition$new(

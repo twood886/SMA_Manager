@@ -1,3 +1,57 @@
+#' @title Check connection to Enfusion
+#' @description Checks connection to Enfusion based on whether a users is logged
+#'  into Enfusion or not. Returns TRUE if logged in, FALSE if not.
+#' @importFrom httr GET
+#' @returns Bool
+#' @export
+check_enfusion_connection <- function() {
+  tryCatch(
+    {
+      httr::GET("http://127.0.0.1:18443/exportReport")
+      TRUE
+    },
+    error = function(cond) FALSE
+  )
+}
+
+#' @title Download Enfusion Report Using API from Excel Add-In
+#' @description This function downloads Enfusion reports using the same API as
+#'  the Enfusion Excel Add-In. This cicumvents the need to use the REST API
+#'  which is an additional cost the Enfusion License. It requires logging into
+#'  the enfusion application which can be accomplished using the launch
+#'  enfusion function.
+#' @param reportWebServiceURL The Enfusion Report URL.
+#'  Same as the one used when downloading reports in Excel.
+#' @param trim Logical. If \code{TRUE} (default), rows where \code{Description}
+#'  is \code{NA} are removed from the result.
+#' @importFrom httr GET
+#' @importFrom readr read_csv
+#' @importFrom dplyr if_all
+#' @importFrom dplyr everything
+#' @export
+get_enfusion_report <- function(reportWebServiceURL, trim = TRUE) { #nolint
+  if (!check_enfusion_connection()) stop("Enfusion is not Running")
+  # Change Web Service URL from rest API to app
+  report_url <- gsub(
+    "https://webservices.enfusionsystems.com/mobile/rest/reportservice/",
+    "http://127.0.0.1:18443/",
+    reportWebServiceURL
+  )
+  tryCatch({
+    suppressMessages(
+      raw_data <- readr::read_csv(report_url, show_col_types = FALSE)
+    )
+  }, error = function(e) {
+    stop("No Response from Enfusion")
+  })
+  if (trim) {
+    raw_data <- raw_data[!is.na(raw_data$Description), ]
+  }
+  raw_data
+}
+
+
+
 #' @title Connect to Postgres Database
 #' @description Connects to a Postgres database using environment variables for
 #' connection parameters and caches the connection in the package environment so
@@ -22,7 +76,9 @@ db_connect <- function(pg_password = Sys.getenv("PG_PASSWORD")) {
     password = pg_password,
     sslmode  = Sys.getenv("PGSSLMODE", "require")
   )
-  if (!DBI::dbIsValid(con)) stop("db_connect: connection is not valid after opening.")
+  if (!DBI::dbIsValid(con)) {
+    stop("db_connect: connection is not valid after opening.")
+  }
   .pkg_state$con <- con
   invisible(con)
 }
@@ -340,7 +396,7 @@ update_db_data <- function(con = get_db_connection()) {
 #' @param con A valid DBI connection object to the Postgres database.
 #' @return Returns the portfolio_id as an integer if found, otherwise throws an
 #' error.
-.fetch_portfolio_id_by_short_name <- function(
+.fetch_portfolio_id_by_short_name <- function( #nolint
   short_name,
   con = get_db_connection()
 ) {
@@ -467,18 +523,23 @@ load_securities_from_db <- function(con = get_db_connection()) {
   opts    <- sec_rows[sec_rows$instrument_type == "Option", ]
 
   for (i in seq_len(nrow(non_opt))) {
-    register_sec(non_opt$bbid[i], non_opt$instrument_type[i], non_opt$description[i])
+    register_sec(
+      non_opt$bbid[i],
+      non_opt$instrument_type[i],
+      non_opt$description[i]
+    )
   }
   for (i in seq_len(nrow(opts))) {
     register_sec(opts$bbid[i], opts$instrument_type[i], opts$description[i])
   }
-
   invisible(NULL)
 }
 
 
-
-.load_holdings_from_db <- function(portfolio_id, con = get_db_connection()) {
+#' @title Load Holdings from DB
+#' @param portfolio_id Portfolio Id
+#' @param con connection
+.fetch_holdings_from_db <- function(portfolio_id, con = get_db_connection()) {
   if (!checkmate::test_class(con, "DBIConnection")) {
     stop("Invalid db connection. Please provide a valid DBIConnection object.")
   }
@@ -514,40 +575,37 @@ load_securities_from_db <- function(con = get_db_connection()) {
   ", params = list(portfolio_db_id))
 
   if (nrow(holdings_data) == 0) return(invisible(NULL))
+  holdings <- list()
 
   for (i in seq_len(nrow(holdings_data))) {
     r <- holdings_data[i, ]
     qty <- NA
     custodian_acct_id <- NULL
     trs_custodian_id <- NULL
-
     qty <- if (identical(r$instrument_type, "Listed Option")) {
       as.numeric(r$quantity_option)
     } else {
       as.numeric(r$quantity_stock)
     }
-
     if (is.na(qty)) next
-
     if (!is.na(r$custodian_acct_id)) {
       custodian_acct_id <- as.character(r$custodian_acct_id)
     }
-
     if (!is.na(r$trs_custodian_id)) {
       trs_custodian_id <- as.character(r$trs_custodian_id)
     }
 
     tryCatch(
-      .holding(
-        portfolio_name      = portfolio_short_name,
-        sec_id              = r$bbid,
-        qty                 = qty,
-        swap                = isTRUE(r$is_financed),
-        custodian_acct_id   = custodian_acct_id,
-        trs_custodian_id    = trs_custodian_id,
-        create              = TRUE,
-        assign_to_portfolio = TRUE
-      ),
+      {
+        holding <- .holding(
+          sec_id              = r$bbid,
+          qty                 = qty,
+          swap                = isTRUE(r$is_financed),
+          custodian_acct_id   = custodian_acct_id,
+          trs_custodian_id    = trs_custodian_id
+        )
+        holdings <- c(holdings, holding)
+      },
       error = function(e) {
         warning(
           "Skipped holding ", r$bbid, " in ", portfolio_short_name,
@@ -556,14 +614,16 @@ load_securities_from_db <- function(con = get_db_connection()) {
       }
     )
   }
-  invisible(NULL)
+  holdings
 }
 
 
-#' @title Load SMA Rules from DB 
-#' @param porfolios_id Portfolio_id
+
+
+#' @title Load SMA Rules from DB
+#' @param portfolio_id Portfolio Id (integer or short name string)
 #' @param con connection
-.load_sma_rules_from_db <- function(portfolio_id, con = get_db_connection()) {
+.fetch_sma_rules_from_db <- function(portfolio_id, con = get_db_connection()) {
   if (!checkmate::test_class(con, "DBIConnection")) {
     stop("Invalid db connection. Please provide a valid DBIConnection object.")
   }
@@ -582,8 +642,6 @@ load_securities_from_db <- function(con = get_db_connection()) {
     portfolio_short_name <- .fetch_portfolio_short_name_by_id(portfolio_db_id, con) #nolint
   }
 
-  sma <- .sma(portfolio_short_name, create = FALSE)
-
   rules_db <- DBI::dbGetQuery(con, "
     SELECT l.*, d.*
     FROM sma_rule_link l
@@ -593,6 +651,7 @@ load_securities_from_db <- function(con = get_db_connection()) {
   ", params = list(portfolio_db_id))
 
   if (nrow(rules_db) == 0) return(invisible(NULL))
+  rules <- list()
   for (i in seq_len(nrow(rules_db))) {
     r <- rules_db[i, ]
     bbfields <- NULL
@@ -616,12 +675,58 @@ load_securities_from_db <- function(con = get_db_connection()) {
         exclusions     = exclusions,
         include        = r$include %||% "all"
       )
-      sma$add_rule(rule)
+      rules <- c(rules, rule)
     }, error = function(e) {
       warning("Failed to load rule '", r$rule_name, "': ", conditionMessage(e))
     })
   }
-  invisible(NULL)
+  invisible(rules)
+}
+
+#' @title Load Order Constructor data
+#' @param portfolio_id Portfolio Id
+#' @param con connection
+.fetch_ordcon_from_db <- function(portfolio_id, con = get_db_connection()) {
+
+  portfolio_db_id <- NULL
+  if (checkmate::test_character(portfolio_id, min.len = 1)) {
+    portfolio_db_id <- .fetch_portfolio_id_by_short_name(portfolio_id, con)
+  }
+
+  if (checkmate::test_number(portfolio_id, lower = 1)) {
+    if (!.check_portfolio_db_id(portfolio_id, con)) {
+      stop("No portfolio found with portfolio_id = ", portfolio_id)
+    }
+    portfolio_db_id <- portfolio_id
+    portfolio_short_name <- .fetch_portfolio_short_name_by_id(portfolio_db_id, con) #nolint
+  }
+
+  pb_act <- DBI::dbGetQuery(
+    con,
+    "SELECT pb_name as name, pb_act_number as act, 'pb' as act_type
+    FROM portfolio_pb_act
+    WHERE portfolio_id = $1
+    UNION ALL
+    SELECT isda_name as name, isda_act_number as act, 'isda' as act_type
+    FROM portfolio_isda_act
+    WHERE portfolio_id = $1",
+    params = list(portfolio_db_id)
+  )
+
+  selection_formulas <- DBI::dbGetQuery(
+    con,
+    "SELECT * FROM portfolio_act_selection WHERE portfolio_id = $1",
+    params = list(portfolio_db_id)
+  )
+
+  list(
+    pb_act_num =  lapply(
+      split(pb_act, pb_act$name),
+      \(x) setNames(as.list(x$act), toupper(x$act_type))
+    ),
+    pb_act_sel = eval(parse(text = selection_formulas$pb_act_sel[1])),
+    isda_act_sel = eval(parse(text = selection_formulas$isda_act_sel[1]))
+  )
 }
 
 
@@ -633,15 +738,10 @@ load_securities_from_db <- function(con = get_db_connection()) {
 #'
 #' @param portfolio A Portfolio or SMA R6 object, or a character short name.
 #' @param con DBI connection (from \code{db_connect()})
-#' @param date Date to load holdings for. Defaults to today.
 #' @return The portfolio object invisibly.
 #' @importFrom DBI dbGetQuery
 #' @export
-reload_portfolio <- function(
-  portfolio,
-  con = get_db_connection(),
-  date = Sys.Date()
-) {
+reload_portfolio <- function(portfolio, con = get_db_connection()) {
   if (is.character(portfolio)) {
     portfolio <- .portfolio(portfolio, create = FALSE)
   }
@@ -651,7 +751,9 @@ reload_portfolio <- function(
     "SELECT portfolio_id FROM portfolios WHERE name_short = $1",
     params = list(short_name)
   )
-  if (nrow(id_row) == 0) stop("Portfolio '", short_name, "' not found in database.")
+  if (nrow(id_row) == 0) {
+    stop("Portfolio '", short_name, "' not found in database.")
+  }
   db_id <- id_row$portfolio_id[[1]]
 
   nav_row <- DBI::dbGetQuery(
@@ -662,8 +764,8 @@ reload_portfolio <- function(
   if (nrow(nav_row) == 1) portfolio$set_nav(as.numeric(nav_row$nav[[1]]))
 
   portfolio$clear_positions()
-  .load_holdings_from_db(con, short_name, db_id, date)
-
+  load_portfolio_from_db(short_name, TRUE, con)
+  update_bloomberg_fields()
   invisible(portfolio)
 }
 
@@ -671,238 +773,90 @@ reload_portfolio <- function(
 #' Load a Single Portfolio or SMA from Database
 #'
 #' Creates or replaces a single portfolio in the in-memory registry, loading
-#' its NAV, positions, and (for SMAs) rules. Prefer \code{load_all_portfolios_from_db()}
+#' its NAV, positions, and (for SMAs) rules.
+#' Prefer \code{load_all_portfolios_from_db()}
 #' when you need everything; use this for targeted single-portfolio loads.
 #'
-#' @param short_name Character. The portfolio short name.
+#' @param portfolio_short_name Character. The portfolio short name.
+#' @param load_securities Logical. If \code{TRUE}, calls
+#'  \code{load_securities_from_db()} before loading holdings. Defaults to
+#'  \code{FALSE}.
 #' @param con DBI connection (from \code{db_connect()})
-#' @param date Date to load holdings for. Defaults to today.
 #' @return The Portfolio or SMA object invisibly.
 #' @importFrom DBI dbGetQuery
 #' @export
 load_portfolio_from_db <- function(
-  short_name,
-  con = get_db_connection(),
-  date = Sys.Date()
+  portfolio_short_name,
+  load_securities = FALSE,
+  con = get_db_connection()
 ) {
-  port_row <- DBI::dbGetQuery(
+
+  port_id <- .fetch_portfolio_id_by_short_name(portfolio_short_name, con)
+  p_row <- DBI::dbGetQuery(
     con,
-    "SELECT portfolio_id, name_long, name_short, type, base_portfolio_id
-     FROM portfolios WHERE name_short = $1",
-    params = list(short_name)
+    "SELECT p.*, n.nav
+     FROM portfolios p
+     JOIN portfolio_nav_latest n ON p.portfolio_id = n.portfolio_id 
+     WHERE p.portfolio_id = $1",
+    params = list(port_id)
   )
-  if (nrow(port_row) == 0) stop("No portfolio '", short_name, "' found in database.")
 
-  load_securities_from_db(con, date)
-
-  db_id <- port_row$portfolio_id[[1]]
-  nav_row <- DBI::dbGetQuery(
-    con,
-    "SELECT nav
-     FROM portfolio_nav 
-     WHERE portfolio_id = $1
-      AND \"update\" = (
-        SELECT MAX(\"update\") 
-        FROM portfolio_nav 
-        WHERE portfolio_id = $1
-      )",
-    params = list(db_id)
-  )
-  nav <- if (nrow(nav_row) == 1) as.numeric(nav_row$nav[[1]]) else 0
-
-  if (port_row$type == "base") {
-    .portfolio(
-      short_name   = short_name,
-      long_name    = port_row$name_long,
-      holdings_url = "",
-      nav          = nav,
-      positions    = list(),
-      create       = TRUE
-    )
-    .load_holdings_from_db(con, short_name, db_id, date)
-    return(invisible(.portfolio(short_name, create = FALSE)))
+  if (nrow(p_row) == 0) {
+    stop("No portfolio '", portfolio_short_name, "' found in database.")
   }
 
-  # SMA — resolve base portfolio(s)
-  sma_wts <- tryCatch(
-    DBI::dbGetQuery(con, "
-      SELECT p_base.name_short AS base_name_short, w.weight
-      FROM sma_base_portfolio_weights w
-      JOIN portfolios p_base ON w.base_portfolio_id = p_base.portfolio_id
-      JOIN portfolios p_sma  ON w.sma_portfolio_id  = p_sma.portfolio_id
-      WHERE p_sma.name_short = $1
-    ", params = list(short_name)),
-    error = function(e) data.frame(base_name_short = character(0), weight = numeric(0))
-  )
+  if (load_securities) load_securities_from_db(con)
 
-  base_portfolio_arg <- if (nrow(sma_wts) == 0) {
-    base_row <- DBI::dbGetQuery(
-      con,
-      "SELECT name_short FROM portfolios WHERE portfolio_id = $1",
-      params = list(port_row$base_portfolio_id[[1]])
+  if (p_row$type == "base") {
+    port <- .portfolio(
+      short_name          = portfolio_short_name,
+      long_name           = p_row$name_long,
+      nav                 = p_row$nav,
+      positions           = list(),
+      create              = TRUE,
+      assign_to_registry  = TRUE
     )
-    if (nrow(base_row) == 0) stop("No base portfolio found for SMA '", short_name, "'.")
-    base_row$name_short
-  } else if (nrow(sma_wts) == 1) {
-    sma_wts$base_name_short
-  } else {
-    setNames(sma_wts$weight, sma_wts$base_name_short)
   }
 
-  .sma(
-    short_name     = short_name,
-    long_name      = port_row$name_long,
-    holdings_url   = "",
-    nav            = nav,
-    positions      = list(),
-    base_portfolio = base_portfolio_arg,
-    create         = TRUE
-  )
-  .load_holdings_from_db(con, short_name, db_id, date)
-  .load_rules_from_db(con, short_name, db_id)
+  if (p_row$type == "sma") {
+    base <- .fetch_portfolio_short_name_by_id(p_row$base_portfolio_id)
+    port <- .sma(
+      short_name          = portfolio_short_name,
+      long_name           = p_row$name_long,
+      nav                 = p_row$nav,
+      positions           = list(),
+      base_portfolio      = base,
+      create              = TRUE,
+      assign_to_registry  = TRUE
+    )
 
-  invisible(.sma(short_name, create = FALSE))
+    rules <- .fetch_sma_rules_from_db(port_id, con)
+    for (r in rules) port$add_rule(r)
+  }
+  holdings <- .fetch_holdings_from_db(port_id, con)
+  for (h in holdings) port$add_holding(h)
+
+  oc <- .fetch_ordcon_from_db(port_id, con)
+  port$add_orderconstructor(oc$pb_act_num, oc$pb_act_sel, oc$isda_act_sel)
+
+  invisible(port)
 }
 
 
 #' Load All Portfolios and SMAs from Database
-#'
-#' Clears the in-memory registries and repopulates them from Supabase.
-#' Base portfolios are loaded before SMAs. After all positions are loaded,
-#' Bloomberg rule fields are hydrated from \code{security_data}.
-#'
-#' Blended base portfolios are supported via the \code{sma_base_portfolio_weights}
-#' junction table. Run the following DDL once before using blended bases:
-#' \preformatted{
-#' CREATE TABLE IF NOT EXISTS sma_base_portfolio_weights (
-#'   sma_portfolio_id  INTEGER NOT NULL REFERENCES portfolios(portfolio_id),
-#'   base_portfolio_id INTEGER NOT NULL REFERENCES portfolios(portfolio_id),
-#'   weight            NUMERIC(8,6) NOT NULL CHECK (weight > 0 AND weight <= 1),
-#'   PRIMARY KEY (sma_portfolio_id, base_portfolio_id)
-#' );
-#' -- Migrate existing single-base SMAs
-#' INSERT INTO sma_base_portfolio_weights
-#'   (sma_portfolio_id, base_portfolio_id, weight)
-#' SELECT portfolio_id, base_portfolio_id, 1.0
-#' FROM portfolios
-#' WHERE type = 'sma' AND base_portfolio_id IS NOT NULL
-#' ON CONFLICT DO NOTHING;
-#' }
-#' SMAs with no rows in the junction table fall back to \code{base_portfolio_id}
-#' in the \code{portfolios} table for backward compatibility.
-#'
 #' @param con DBI connection
-#' @param date Date to load holdings for. Defaults to today.
 #' @return Named list of all Portfolio/SMA objects (invisibly)
 #' @importFrom DBI dbGetQuery
 #' @export
-load_all_portfolios_from_db <- function(con = get_db_connection(), date = Sys.Date()) {
+load_all_portfolios_from_db <- function(con = get_db_connection()) {
   all_ports <- DBI::dbGetQuery(con, "
     SELECT portfolio_id, name_long, name_short, type, base_portfolio_id
     FROM portfolios
     ORDER BY CASE WHEN type = 'base' THEN 0 ELSE 1 END
   ")
-
   if (nrow(all_ports) == 0) stop("No portfolios found in database")
-
-  load_securities_from_db(con, date)
-
-  nav_all <- DBI::dbGetQuery(con, "
-    SELECT portfolio_id, nav
-    FROM portfolio_nav
-    WHERE date = $1
-  ", params = list(date))
-
-  nav_map <- setNames(
-    as.numeric(nav_all$nav), as.character(nav_all$portfolio_id)
-  )
-
-  # Load blend weights from junction table (empty if table doesn't exist yet)
-  base_weights <- tryCatch(
-    DBI::dbGetQuery(con, "
-      SELECT
-        p_sma.name_short  AS sma_name_short,
-        p_base.name_short AS base_name_short,
-        w.weight
-      FROM sma_base_portfolio_weights w
-      JOIN portfolios p_sma  ON w.sma_portfolio_id  = p_sma.portfolio_id
-      JOIN portfolios p_base ON w.base_portfolio_id = p_base.portfolio_id
-    "),
-    error = function(e) {
-      warning(
-        "sma_base_portfolio_weights table not found — ",
-        "falling back to base_portfolio_id. ",
-        "See load_all_portfolios_from_db() docs for migration DDL."
-      )
-      data.frame(
-        sma_name_short  = character(0),
-        base_name_short = character(0),
-        weight          = numeric(0)
-      )
-    }
-  )
-
-  # Base portfolios
-  bases <- all_ports[all_ports$type == "base", ]
-  for (i in seq_len(nrow(bases))) {
-    b   <- bases[i, ]
-    nav <- nav_map[as.character(b$portfolio_id)]
-    nav <- if (length(nav) == 1 && !is.na(nav)) as.numeric(nav) else 0
-    .portfolio(
-      short_name   = b$name_short,
-      long_name    = b$name_long,
-      holdings_url = "",
-      nav          = nav,
-      positions    = list(),
-      create       = TRUE
-    )
-    .load_holdings_from_db(con, b$name_short, b$portfolio_id, date)
-  }
-
-  # SMAs
-  smas <- all_ports[all_ports$type == "sma", ]
-  for (i in seq_len(nrow(smas))) {
-    s <- smas[i, ]
-    nav <- nav_map[as.character(s$portfolio_id)]
-    nav <- if (length(nav) == 1 && !is.na(nav)) as.numeric(nav) else 0
-
-    # Resolve base portfolio(s) — junction table first, legacy FK as fallback
-    sma_wts <- base_weights[base_weights$sma_name_short == s$name_short, ]
-    base_portfolio_arg <- if (nrow(sma_wts) == 0) {
-      base_row <- all_ports[all_ports$portfolio_id == s$base_portfolio_id, ]
-      if (nrow(base_row) == 0) {
-        warning(
-          "No base portfolio found for SMA '", s$name_short, "' — skipping."
-        )
-        next
-      }
-      base_row$name_short
-    } else if (nrow(sma_wts) == 1) {
-      sma_wts$base_name_short
-    } else {
-      setNames(sma_wts$weight, sma_wts$base_name_short)
-    }
-
-    .sma(
-      short_name     = s$name_short,
-      long_name      = s$name_long,
-      holdings_url   = "",
-      nav            = nav,
-      positions      = list(),
-      base_portfolio = base_portfolio_arg,
-      create         = TRUE
-    )
-    .load_holdings_from_db(con, s$name_short, s$portfolio_id, date)
-    .load_rules_from_db(con, s$name_short, s$portfolio_id)
-  }
-
+  load_securities_from_db(con)
+  portfolios <- lapply(all_ports$name_short, load_portfolio_from_db)
   update_bloomberg_fields()
-
-  invisible(
-    mget(
-      all_ports$name_short,
-      envir    = get_registries()$portfolios,
-      inherits = FALSE
-    )
-  )
+  invisible(portfolios)
 }

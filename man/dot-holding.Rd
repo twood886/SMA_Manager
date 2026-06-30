@@ -2,66 +2,34 @@
 % Please edit documentation in R/api-functions.R
 \name{.holding}
 \alias{.holding}
-\title{Create or Retrieve a Holding Object}
+\title{Create a Holding Object}
 \usage{
 .holding(
-  portfolio_name,
   sec_id,
   qty,
   swap = FALSE,
-  custodian = NULL,
-  broker_custodian = NULL,
   custodian_acct_id = NULL,
-  custodian_acct = NULL,
-  trs_custodian_id = NULL,
-  trs_custodian_name = NULL,
-  create = FALSE,
-  assign_to_portfolio = TRUE
+  trs_custodian_id = NULL
 )
 }
 \arguments{
-\item{portfolio_name}{A string representing the name of the portfolio.
-Must be a valid portfolio name.}
+\item{sec_id}{A string representing the security ID (ticker).}
 
-\item{sec_id}{A string representing the security ID (ticker).
-Must be a valid security ID.}
-
-\item{qty}{A numeric value representing the quantity of the holding.
-Must be a valid numeric value.}
+\item{qty}{A numeric value representing the quantity of the holding.}
 
 \item{swap}{A logical value indicating whether the holding is a swap.
-Defaults to `FALSE`.}
+Defaults to \code{FALSE}.}
 
-\item{custodian}{(Optional) A string representing the custodian name.}
+\item{custodian_acct_id}{(Optional) A string representing the custodian account ID.}
 
-\item{broker_custodian}{(Optional) A string representing the broker custodian name. #nolint}
-
-\item{custodian_acct_id}{(Optional) A string representing the custodian account ID. #nolint}
-
-\item{custodian_acct}{(Optional) A string representing the custodian account name. #nolint}
-
-\item{trs_custodian_id}{(Optional) A string representing the TRS custodian ID. #nolint}
-
-\item{trs_custodian_name}{(Optional) A string representing the TRS custodian name. #nolint}
-
-\item{assign_to_portfolio}{A logical value indicating whether to add the holding. #nolint}
+\item{trs_custodian_id}{(Optional) A string representing the TRS custodian ID.}
 }
 \value{
-An object of class `Holding` representing the created or retrieved holding. #nolint
+An object of class \code{Holding}.
 }
 \description{
-This function creates or retrieves a holding object associated with a
-specific portfolio and security. If the holding already exists, it is
-returned. If not, a new holding is created and added to the corresponding
-position in the portfolio.
-}
-\details{
-The function first validates the input parameters to ensure they are
-of the correct type. It then constructs a unique ID for the holding based on
-the security ID and custodian account ID. The function checks if the holding
-already exists in the position associated with the portfolio. If it exists,
-the existing holding is returned. If not, a new `Holding` object is created
-and added to the position.
+Constructs a new \code{\link{Holding}} object for a given security and
+quantity. Validates inputs and delegates to \code{Holding$new()}.
 }
 \seealso{
 \code{\link{Holding}} for the Holding class.

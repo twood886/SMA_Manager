@@ -27,6 +27,7 @@ R6 Class representing a seperately managed account.
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_flow"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_flow'><code>SMAManager::Portfolio$add_flow()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_holding"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_holding'><code>SMAManager::Portfolio$add_holding()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_orderconstructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_orderconstructor'><code>SMAManager::Portfolio$add_orderconstructor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_replacement"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_replacement'><code>SMAManager::Portfolio$add_replacement()</code></a></span></li>

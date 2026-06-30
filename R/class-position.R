@@ -95,7 +95,14 @@ Position <- R6::R6Class(  #nolint
       if (holding$get_security_id() != self$get_id()) {
         stop("Holding ID does not match Position ID")
       }
-      private$holdings_[[length(private$holdings_) + 1]] <- holding
+      holding_ids <- vapply(self$get_holdings(), \(x) x$get_id(), character(1))
+      if (holding$get_id() %in% holding_ids) {
+        hpos <- which(holdings_ids %in% holding$get_id())
+        private$holdings_[[hpos]] <- holding
+      } else {
+        private$holdings_[[length(self$get_holdings()) + 1]] <- holding
+      }
+      invisible(TRUE)
     }
   )
 )

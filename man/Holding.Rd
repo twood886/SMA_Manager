@@ -13,12 +13,8 @@ R6 Class representing a holding object.
 \item \href{#method-Holding-get_id}{\code{Holding$get_id()}}
 \item \href{#method-Holding-get_qty}{\code{Holding$get_qty()}}
 \item \href{#method-Holding-get_swap}{\code{Holding$get_swap()}}
-\item \href{#method-Holding-get_custodian}{\code{Holding$get_custodian()}}
-\item \href{#method-Holding-get_broker_custodian}{\code{Holding$get_broker_custodian()}}
 \item \href{#method-Holding-get_custodian_acct_id}{\code{Holding$get_custodian_acct_id()}}
-\item \href{#method-Holding-get_custodian_acct}{\code{Holding$get_custodian_acct()}}
 \item \href{#method-Holding-get_trs_custodian_id}{\code{Holding$get_trs_custodian_id()}}
-\item \href{#method-Holding-get_trs_custodian_name}{\code{Holding$get_trs_custodian_name()}}
 \item \href{#method-Holding-get_security_id}{\code{Holding$get_security_id()}}
 \item \href{#method-Holding-set_qty}{\code{Holding$set_qty()}}
 \item \href{#method-Holding-clone}{\code{Holding$clone()}}
@@ -31,41 +27,26 @@ R6 Class representing a holding object.
 Create New Holding R6 object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Holding$new(
-  portfolio_short_name,
   sec_id,
   qty,
   swap = FALSE,
-  custodian = NULL,
-  broker_custodian = NULL,
   custodian_acct_id = NULL,
-  custodian_acct = NULL,
-  trs_custodian_id = NULL,
-  trs_custodian_name = NULL
+  trs_custodian_id = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{portfolio_short_name}}{Portfolio_Short_name}
-
 \item{\code{sec_id}}{Security ID (Ticker)}
 
 \item{\code{qty}}{Stock Quantity}
 
 \item{\code{swap}}{Swap Flag}
 
-\item{\code{custodian}}{Custodian Name}
-
-\item{\code{broker_custodian}}{Broker Custodian Name}
-
 \item{\code{custodian_acct_id}}{Custodian Account ID}
 
-\item{\code{custodian_acct}}{Custodian Account Name}
-
 \item{\code{trs_custodian_id}}{TRS Custodian ID}
-
-\item{\code{trs_custodian_name}}{TRS Custodian Name}
 }
 \if{html}{\out{</div>}}
 }
@@ -101,26 +82,6 @@ Get Swap flag
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Holding-get_custodian"></a>}}
-\if{latex}{\out{\hypertarget{method-Holding-get_custodian}{}}}
-\subsection{Method \code{get_custodian()}}{
-Get Custodian Name
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Holding$get_custodian()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Holding-get_broker_custodian"></a>}}
-\if{latex}{\out{\hypertarget{method-Holding-get_broker_custodian}{}}}
-\subsection{Method \code{get_broker_custodian()}}{
-Get Broker Custodian Name
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Holding$get_broker_custodian()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Holding-get_custodian_acct_id"></a>}}
 \if{latex}{\out{\hypertarget{method-Holding-get_custodian_acct_id}{}}}
 \subsection{Method \code{get_custodian_acct_id()}}{
@@ -131,32 +92,12 @@ Get Custodian Account ID
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Holding-get_custodian_acct"></a>}}
-\if{latex}{\out{\hypertarget{method-Holding-get_custodian_acct}{}}}
-\subsection{Method \code{get_custodian_acct()}}{
-Get Custodian Account Name
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Holding$get_custodian_acct()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Holding-get_trs_custodian_id"></a>}}
 \if{latex}{\out{\hypertarget{method-Holding-get_trs_custodian_id}{}}}
 \subsection{Method \code{get_trs_custodian_id()}}{
 Get TRS Custodian ID
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Holding$get_trs_custodian_id()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Holding-get_trs_custodian_name"></a>}}
-\if{latex}{\out{\hypertarget{method-Holding-get_trs_custodian_name}{}}}
-\subsection{Method \code{get_trs_custodian_name()}}{
-Get TRS Custodian Name
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Holding$get_trs_custodian_name()}\if{html}{\out{</div>}}
 }
 
 }

@@ -4,14 +4,12 @@
 \alias{reload_portfolio}
 \title{Reload NAV and Positions for an Existing Portfolio from Database}
 \usage{
-reload_portfolio(portfolio, con = get_db_connection(), date = Sys.Date())
+reload_portfolio(portfolio, con = get_db_connection())
 }
 \arguments{
 \item{portfolio}{A Portfolio or SMA R6 object, or a character short name.}
 
 \item{con}{DBI connection (from \code{db_connect()})}
-
-\item{date}{Date to load holdings for. Defaults to today.}
 }
 \value{
 The portfolio object invisibly.
