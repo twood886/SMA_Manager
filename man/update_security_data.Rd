@@ -2,10 +2,21 @@
 % Please edit documentation in R/utils.R
 \name{update_security_data}
 \alias{update_security_data}
-\title{Update Data in all Security Object}
+\title{Update Data in all Security Objects}
 \usage{
-update_security_data()
+update_security_data(update_fields = TRUE)
+}
+\arguments{
+\item{update_fields}{Logical. If \code{TRUE} (default), rule fields are
+fetched in the same provider request and updated too. Set to \code{FALSE}
+when rule fields were just loaded (e.g. right after
+\code{load_all_portfolios_from_db()}, which already updates them).}
 }
 \description{
-Update Data in all Security Object
+Refreshes price and delta for every security in the registry — and, by
+default, the rule fields declared by registered SMA rules — using a single
+batched request to the active security data provider. Prices and deltas
+follow the same instrument-type rules as \code{Security$update_price()} and
+\code{Security$update_delta()}: FixedIncome prices are 1 and non-Option
+deltas are 1.
 }

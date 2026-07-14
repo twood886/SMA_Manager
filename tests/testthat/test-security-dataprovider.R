@@ -80,6 +80,47 @@ test_that("update_price pulls the latest price from the provider", {
   expect_equal(sec$get_price(), 210)
 })
 
+test_that("update_security_data refreshes prices and option deltas together", {
+  provider <- with_static_provider()
+  eq <- .security("aapl us equity")
+  opt <- .security("aapl 12/18/26 c210 equity")
+  expect_equal(eq$get_price(), 200)
+  expect_equal(opt$get_delta(), 0.55)
+
+  # Move the market: new prices and a new option delta
+  provider$add_security(
+    "aapl us equity",
+    description = "Apple Inc", instrument_type = "Equity", price = 210
+  )
+  provider$add_security(
+    "aapl 12/18/26 c210 equity",
+    description = "AAPL Call Dec26 210", instrument_type = "Option",
+    price = 14, delta = 0.60, underlying_id = "AAPL US"
+  )
+
+  update_security_data()
+
+  expect_equal(eq$get_price(), 210)
+  expect_equal(eq$get_delta(), 1) # non-options stay at delta 1
+  expect_equal(opt$get_price(), 14)
+  expect_equal(opt$get_delta(), 0.60) # option delta must NOT be reset to 1
+  expect_equal(opt$get_underlying_price(), 210)
+  expect_equal(opt$get_delta_price(), 0.60 * 210)
+})
+
+test_that("StaticDataProvider serves PX_LAST and OP006 through get_fields", {
+  provider <- make_static_provider()
+  fields <- provider$get_fields(
+    c("aapl us equity", "aapl 12/18/26 c210 equity"),
+    c("PX_LAST", "OP006", "GICS_SECTOR_NAME")
+  )
+  expect_equal(fields[["aapl us equity", "PX_LAST"]], 200)
+  expect_equal(fields[["aapl 12/18/26 c210 equity", "OP006"]], 0.55)
+  expect_equal(
+    fields[["aapl us equity", "GICS_SECTOR_NAME"]], "Information Technology"
+  )
+})
+
 test_that("StaticDataProvider vectorized accessors match the bdp contract", {
   provider <- make_static_provider()
   ids <- c("aapl us equity", "aapl 12/18/26 c210 equity")

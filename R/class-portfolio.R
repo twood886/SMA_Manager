@@ -7,7 +7,6 @@
 #' @include utils.R
 #' @include class-tradeconstructor.R
 #' @include class-orderconstructor.R
-#' @include db-loading.R
 #' @export
 Portfolio <- R6::R6Class( #nolint
   "Portfolio",

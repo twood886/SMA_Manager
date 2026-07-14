@@ -220,6 +220,9 @@ Get deltas for a vector of securities.
 \if{latex}{\out{\hypertarget{method-StaticDataProvider-get_fields}{}}}
 \subsection{Method \code{get_fields()}}{
 Get registered field values for a vector of securities.
+The canonical price and delta mnemonics (PX_LAST, OP006) are served
+from the registered price and delta, matching how a Bloomberg-backed
+provider responds to those fields.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{StaticDataProvider$get_fields(sec_ids, fields)}\if{html}{\out{</div>}}
 }

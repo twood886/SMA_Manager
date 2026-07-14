@@ -25,26 +25,61 @@ get_registries <- function() {
   asNamespace("SMAManager")$registries
 }
 
-#' Update Data in all Security Object
-#' @export
-update_security_data <- function() {
-  security_ids <- ls(get_registries()$securities)
-  type <- vapply(security_ids, function(id) .security(id)$get_instrument_type(), character(1)) #nolint
-  provider <- get_security_data_provider()
-  price <- provider$get_prices(security_ids)
-  price[type == "Bond"] <- price[type == "Bond"] / 100
-  delta <- provider$get_deltas(security_ids)
-  delta[type != "Listed Option"] <- 1
-  lapply(
-    security_ids,
-    function(id) {
-      security <- .security(id)
-      security$set_price(price[[id]])
-      security$set_delta(delta[[id]])
-      security$update_underlying_price()
-    }
+#' Get Data Fields Required by Registered SMA Rules
+#'
+#' Collects the unique Bloomberg field mnemonics declared by all rules in the
+#' SMA rule registry.
+#' @return Character vector of field mnemonics (NULL if no rules declare any).
+.rule_bbfields <- function() {
+  rule_names <- ls(get_registries()$smarules)
+  rules <- mget(
+    rule_names,
+    envir = get_registries()$smarules,
+    inherits = TRUE
   )
-  update_bloomberg_fields()
+  rules_bbfields_all <- sapply(rules, \(r) r$get_bbfields(), simplify = TRUE)
+  unique(unlist(rules_bbfields_all, use.names = FALSE))
+}
+
+#' Update Data in all Security Objects
+#'
+#' Refreshes price and delta for every security in the registry — and, by
+#' default, the rule fields declared by registered SMA rules — using a single
+#' batched request to the active security data provider. Prices and deltas
+#' follow the same instrument-type rules as \code{Security$update_price()} and
+#' \code{Security$update_delta()}: FixedIncome prices are 1 and non-Option
+#' deltas are 1.
+#'
+#' @param update_fields Logical. If \code{TRUE} (default), rule fields are
+#'  fetched in the same provider request and updated too. Set to \code{FALSE}
+#'  when rule fields were just loaded (e.g. right after
+#'  \code{load_all_portfolios_from_db()}, which already updates them).
+#' @export
+update_security_data <- function(update_fields = TRUE) {
+  security_ids <- ls(get_registries()$securities)
+  if (length(security_ids) == 0) return(invisible(NULL))
+
+  rule_fields <- if (isTRUE(update_fields)) .rule_bbfields() else NULL
+  bbdata <- get_security_data_provider()$get_fields(
+    security_ids, c("PX_LAST", "OP006", rule_fields)
+  )
+
+  # Underlying securities are registry members, so options pick up fresh
+  # underlying prices through their shared Security objects.
+  for (id in security_ids) {
+    security <- .security(id)
+    type <- security$get_instrument_type()
+
+    price <- if (identical(type, "FixedIncome")) 1 else bbdata[id, "PX_LAST"]
+    delta <- if (identical(type, "Option")) bbdata[id, "OP006"] else 1
+    if (!is.finite(delta)) delta <- 1
+
+    security$set_price(price)
+    security$set_delta(delta)
+    for (f in rule_fields) {
+      security$set_rule_data(f, bbdata[id, f])
+    }
+  }
   invisible(NULL)
 }
 
@@ -56,16 +91,7 @@ update_security_data <- function() {
 #' @include api-functions.R
 #' @include class-security.R
 update_bloomberg_fields <- function(sec_id = NULL) {
-  rule_names <- ls(get_registries()$smarules)
-  rules <- mget(
-    rule_names,
-    envir = get_registries()$smarules,
-    inherits = TRUE
-  )
-  rules_bbfields_all <- sapply(rules, \(r) r$get_bbfields(), simplify = TRUE)
-  rules_bbfields <- unique(unlist(rules_bbfields_all, use.names = FALSE))
-
-
+  rules_bbfields <- .rule_bbfields()
   if (is.null(rules_bbfields) || length(rules_bbfields) == 0) {
     return(invisible(TRUE))
   }

@@ -266,12 +266,18 @@ StaticDataProvider <- R6::R6Class( #nolint
       out
     },
     #' @description Get registered field values for a vector of securities.
+    #' The canonical price and delta mnemonics (PX_LAST, OP006) are served
+    #' from the registered price and delta, matching how a Bloomberg-backed
+    #' provider responds to those fields.
     #' @param sec_ids Character vector of security identifiers.
     #' @param fields Character vector of field mnemonics.
     get_fields = function(sec_ids, fields) {
       cols <- lapply(fields, function(f) {
         sapply(sec_ids, function(id) {
-          value <- private$get_record(id)$fields[[f]]
+          rec <- private$get_record(id)
+          if (identical(f, "PX_LAST")) return(rec$price)
+          if (identical(f, "OP006")) return(rec$delta)
+          value <- rec$fields[[f]]
           if (is.null(value)) NA else value
         })
       })
