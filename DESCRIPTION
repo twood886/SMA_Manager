@@ -18,14 +18,9 @@ Imports:
     tibble,
     magrittr,
     stringr,
-    readr,
-    httr,
     yaml,
     CVXR,
-    Rblpapi,
-    DBI,
-    RPostgres,
-    jsonlite
+    Rblpapi
 Collate:
     'SMAManager-package.R'
     'api-functions.R'
@@ -34,7 +29,6 @@ Collate:
     'class-modelcontext.R'
     'class-orderconstructor.R'
     'class-overflowrule.R'
-    'db-loading.R'
     'class-security.R'
     'utils.R'
     'class-position.R'
