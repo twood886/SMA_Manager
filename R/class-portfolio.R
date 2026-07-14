@@ -203,7 +203,7 @@ Portfolio <- R6::R6Class( #nolint
     rebalance = function(update_bbfields = TRUE, as.df = TRUE) {
       checkmate::assert_flag(update_bbfields)
       checkmate::assert_flag(as.df)
-      if (update_bbfields) update_bloomberg_fields()
+      if (update_bbfields) update_security_data()
       rebal <- self$get_trade_constructor()$optimize_sma(self)
       current_sh <- vapply(self$get_position(), \(p) p$get_qty(), numeric(1))
       current_ids <- vapply(self$get_position(), \(p) p$get_id(), character(1))

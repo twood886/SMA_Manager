@@ -11,6 +11,7 @@ R6 Class that encapsultes rules for SMAs.
 \itemize{
 \item \href{#method-SMARule-new}{\code{SMARule$new()}}
 \item \href{#method-SMARule-get_sma_name}{\code{SMARule$get_sma_name()}}
+\item \href{#method-SMARule-get_rule_id}{\code{SMARule$get_rule_id()}}
 \item \href{#method-SMARule-get_id}{\code{SMARule$get_id()}}
 \item \href{#method-SMARule-get_name}{\code{SMARule$get_name()}}
 \item \href{#method-SMARule-get_scope}{\code{SMARule$get_scope()}}
@@ -39,6 +40,7 @@ R6 Class that encapsultes rules for SMAs.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARule$new(
   sma_name = NULL,
+  rule_id = NULL,
   name = NULL,
   scope = NULL,
   bbfields = NULL,
@@ -58,6 +60,8 @@ R6 Class that encapsultes rules for SMAs.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{sma_name}}{Character}
+
+\item{\code{rule_id}}{Integer}
 
 \item{\code{name}}{Character}
 
@@ -92,9 +96,20 @@ Get SMA Name}
 \if{latex}{\out{\hypertarget{method-SMARule-get_sma_name}{}}}
 \subsection{Method \code{get_sma_name()}}{
 Get the name of the SMA
-Get Id
+Get Rule Id
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SMARule$get_sma_name()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARule-get_rule_id"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARule-get_rule_id}{}}}
+\subsection{Method \code{get_rule_id()}}{
+Get the rule id of the SMA Rule
+Get Id
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARule$get_rule_id()}\if{html}{\out{</div>}}
 }
 
 }

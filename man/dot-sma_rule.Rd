@@ -6,6 +6,7 @@
 \usage{
 .sma_rule(
   sma_name,
+  rule_id,
   rule_name,
   scope,
   definition = NULL,

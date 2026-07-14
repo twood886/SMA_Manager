@@ -212,12 +212,12 @@ TradeConstructor <- R6::R6Class( #nolint
       prob <- CVXR::Problem(objective, cons)
       # --- Solve --------------------------------------------------------------
       if (any(vapply(rules, \(r) r$get_scope(), character(1)) %in% c("count"))) { #nolint
-        res <- CVXR::solve(prob, solver = "ECOS_BB")
+        res <- solve(prob, solver = "ECOS_BB")
       } else {
         res <- tryCatch({
-          CVXR::solve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 50000, polish = TRUE) #nolint
+          solve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 50000, polish = TRUE) #nolint
         }, error = function(e) {
-          CVXR::solve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
+          solve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
         })
       }
       if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved"))) {

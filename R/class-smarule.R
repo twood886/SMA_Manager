@@ -10,6 +10,7 @@ SMARule <- R6::R6Class( #nolint
   "SMARule",
   private = list(
     sma_name_ = NULL,
+    rule_id_ = NULL,
     name_ = NULL,
     scope_ = NULL,
     bbfields_ = NULL,
@@ -25,6 +26,7 @@ SMARule <- R6::R6Class( #nolint
   ),
   public = list(
     #' @param sma_name Character
+    #' @param rule_id Integer
     #' @param name Character
     #' @param scope Character
     #' @param bbfields Character vector
@@ -39,6 +41,7 @@ SMARule <- R6::R6Class( #nolint
     #' @param include Character: "all", "long_only", or "short_only"
     initialize = function(
       sma_name = NULL,
+      rule_id = NULL,
       name = NULL,
       scope = NULL,
       bbfields = NULL,
@@ -53,6 +56,7 @@ SMARule <- R6::R6Class( #nolint
       include = "all"
     ) {
       private$sma_name_ <- sma_name
+      private$rule_id_ <- rule_id
       private$name_ <- name
       private$scope_ <- scope
       private$bbfields_ <- bbfields
@@ -80,9 +84,12 @@ SMARule <- R6::R6Class( #nolint
     #' Get SMA Name
     #' @description Get the name of the SMA
     get_sma_name = function() private$sma_name_,
+    #' Get Rule Id
+    #' @description Get the rule id of the SMA Rule
+    get_rule_id = function() private$rule_id_,
     #' Get Id
     #' @description Get Id of SMA Rule
-    get_id = function() paste0(private$sma_name_, "::", private$name_),
+    get_id = function() paste0(private$sma_name_, "::", private$rule_id_),
     #' Get Name
     #' @description Get name of SMA Rule
     get_name = function() private$name_,

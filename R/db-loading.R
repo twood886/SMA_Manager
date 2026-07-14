@@ -664,6 +664,7 @@ load_securities_from_db <- function(con = get_db_connection()) {
       rule <- .sma_rule(
         sma_name       = portfolio_short_name,
         rule_name      = r$rule_name,
+        rule_id        = r$rule_id,
         scope          = r$scope,
         definition     = eval(parse(text = r$definition)),
         bbfields       = bbfields,
@@ -857,6 +858,7 @@ load_all_portfolios_from_db <- function(con = get_db_connection()) {
   if (nrow(all_ports) == 0) stop("No portfolios found in database")
   load_securities_from_db(con)
   portfolios <- lapply(all_ports$name_short, load_portfolio_from_db)
+  names(portfolios) <- all_ports$name_short
   update_bloomberg_fields()
   invisible(portfolios)
 }

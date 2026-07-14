@@ -364,6 +364,7 @@
 #' @export
 .sma_rule <- function(
   sma_name,
+  rule_id,
   rule_name,
   scope,
   definition = NULL,
@@ -381,11 +382,12 @@
   sma <- .sma(sma_name, create = FALSE)
   checkmate::assert_r6(sma, "SMA")
 
-  checkmate::assert_character(rule_name, len = 1)
-  key_name <- paste0(sma_name, "::", rule_name)
+  checkmate::assert_integer(rule_id, len = 1)
+  key_name <- paste0(sma_name, "::", rule_id)
   env <- registries$smarules
   if (exists(key_name, envir = env)) return(get(key_name, envir = env))
 
+  checkmate::assert_character(rule_name, len = 1)
   scope_types <- c("position", "portfolio", "count")
   checkmate::assert_choice(scope, scope_types)
 
@@ -407,6 +409,7 @@
   if (scope == "position") {
     smarule <- SMARulePosition$new(
       sma_name = sma_name,
+      rule_id = rule_id,
       name = rule_name,
       scope = scope,
       bbfields = bbfields,
@@ -424,6 +427,7 @@
   if (scope == "portfolio") {
     smarule <- SMARulePortfolio$new(
       sma_name = sma_name,
+      rule_id = rule_id,
       name = rule_name,
       scope = scope,
       bbfields = bbfields,
@@ -441,6 +445,7 @@
   if (scope == "count") {
     smarule <- SMARuleCount$new(
       sma_name = sma_name,
+      rule_id = rule_id,
       name = rule_name,
       scope = scope,
       bbfields = bbfields,
