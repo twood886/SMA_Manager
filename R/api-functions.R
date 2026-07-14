@@ -320,6 +320,8 @@
 #'
 #' @param sma_name A string representing the name of the SMA.
 #'  Must be a valid SMA name.
+#' @param rule_id An integer representing the unique identifier for the rule.
+#'  Must be a positive integer.
 #' @param rule_name A string representing the name of the rule.
 #' @param scope One of "position", "portfolio", or "count" indicating the scope
 #'  of the rule.

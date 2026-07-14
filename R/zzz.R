@@ -4,7 +4,7 @@
 #' @export
 registries <- NULL
 
-# Package-level mutable state (connection cache, etc.) — not exported.
+# Package-level mutable state (security data provider, etc.) — not exported.
 .pkg_state <- NULL
 
 .onLoad <- function(libname, pkgname) {
@@ -15,6 +15,5 @@ registries <- NULL
   registries$trades     <<- new.env(parent = emptyenv())
 
   .pkg_state      <<- new.env(parent = emptyenv())
-  .pkg_state$con  <<- NULL
   .pkg_state$security_data_provider <<- NULL
 }

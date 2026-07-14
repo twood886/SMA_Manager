@@ -25,6 +25,9 @@
 \item{sma_name}{A string representing the name of the SMA.
 Must be a valid SMA name.}
 
+\item{rule_id}{An integer representing the unique identifier for the rule.
+Must be a positive integer.}
+
 \item{rule_name}{A string representing the name of the rule.}
 
 \item{scope}{One of "position", "portfolio", or "count" indicating the scope
