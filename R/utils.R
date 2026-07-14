@@ -30,16 +30,17 @@ get_registries <- function() {
 update_security_data <- function() {
   security_ids <- ls(get_registries()$securities)
   type <- vapply(security_ids, function(id) .security(id)$get_instrument_type(), character(1)) #nolint
-  price <- Rblpapi::bdp(security_ids, "PX_LAST")
-  price[type == "Bond", "PX_LAST"] <- price[type == "Bond", "PX_LAST"] / 100
-  delta <- Rblpapi::bdp(security_ids, "OP006")
-  delta[type != "Listed Option", "OP006"] <- 1
+  provider <- get_security_data_provider()
+  price <- provider$get_prices(security_ids)
+  price[type == "Bond"] <- price[type == "Bond"] / 100
+  delta <- provider$get_deltas(security_ids)
+  delta[type != "Listed Option"] <- 1
   lapply(
     security_ids,
     function(id) {
       security <- .security(id)
-      security$set_price(price[id, "PX_LAST"])
-      security$set_delta(delta[id, "OP006"])
+      security$set_price(price[[id]])
+      security$set_delta(delta[[id]])
       security$update_underlying_price()
     }
   )
@@ -72,7 +73,7 @@ update_bloomberg_fields <- function(sec_id = NULL) {
     sec_id <- ls(get_registries()$securities)
   }
   invisible(lapply(sec_id, function(id) .security(id)))
-  bbdata <- Rblpapi::bdp(sec_id, fields = rules_bbfields)
+  bbdata <- get_security_data_provider()$get_fields(sec_id, rules_bbfields)
 
 
   for (col in seq_len(ncol(bbdata))) {

@@ -43,6 +43,7 @@ Collate:
     'class-smaruleposition.R'
     'class-tradeconstructor.R'
     'class-portfolio.R'
+    'class-securitydataprovider.R'
     'class-smaruleportfolio.R'
     'class-smarulepositioncount.R'
     'class-trade.R'

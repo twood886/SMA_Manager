@@ -16,4 +16,5 @@ registries <- NULL
 
   .pkg_state      <<- new.env(parent = emptyenv())
   .pkg_state$con  <<- NULL
+  .pkg_state$security_data_provider <<- NULL
 }

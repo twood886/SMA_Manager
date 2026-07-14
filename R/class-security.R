@@ -3,12 +3,15 @@
 #' @description
 #' R6 class for a security with time-series and non-time-series data.
 #'
+#' All external security data is fetched through the active
+#' \code{\link{SecurityDataProvider}} (see
+#' \code{\link{set_security_data_provider}}), never from a vendor directly.
+#'
 #' @name Security
 #' @rdname Security
 #' @docType class
 #'
 #' @importFrom R6 R6Class
-#' @import Rblpapi
 #' @import checkmate
 #' @export
 Security <- R6::R6Class( #nolint
@@ -40,13 +43,15 @@ Security <- R6::R6Class( #nolint
       if (!is.null(description)) {
         private$description_ <- description
       } else {
-        private$description_ <- Rblpapi::bdp(bbid, "DX615")$DX615
+        private$description_ <-
+          get_security_data_provider()$get_description(bbid)
       }
 
       if (!is.null(instrument_type)) {
         private$instrument_type_ <- instrument_type
       } else {
-        private$instrument_type_ <- Rblpapi::bdp(bbid, "EX028")$EX028
+        private$instrument_type_ <-
+          get_security_data_provider()$get_instrument_type(bbid)
       }
 
       if (!is.null(price)) {
@@ -66,7 +71,7 @@ Security <- R6::R6Class( #nolint
           checkmate::assert_r6(underlying_security, "Security")
           private$underlying_security_ <- underlying_security
         } else {
-          underlying_id <- Rblpapi::bdp(bbid, "DS492")$DS492
+          underlying_id <- get_security_data_provider()$get_underlying_id(bbid)
           underlying_sec <- .security(paste0(underlying_id, " Equity"))
           checkmate::assert_r6(underlying_sec, "Security")
           private$underlying_security_ <- underlying_sec
@@ -86,13 +91,13 @@ Security <- R6::R6Class( #nolint
     get_price = function() private$price_,
     #' @description Get Underlying Security
     get_underlying_security = function() {
-       if (is.null(private$underlying_security_)) return(self)
-       private$underlying_security_
+      if (is.null(private$underlying_security_)) return(self)
+      private$underlying_security_
     },
     #' @description Get Underlying Price
     get_underlying_price = function() {
       if (is.null(private$underlying_security_)) return(self$get_price())
-      return(private$underlying_security_$get_price())
+      private$underlying_security_$get_price()
     },
     #' @description Get Delta
     get_delta = function() private$delta_,
@@ -128,7 +133,7 @@ Security <- R6::R6Class( #nolint
       if (private$instrument_type_ == "FixedIncome") {
         price <- 1
       } else {
-        price <- Rblpapi::bdp(private$bbid_, "PX_LAST")$PX_LAST
+        price <- get_security_data_provider()$get_price(private$bbid_)
       }
       private$price_ <- price
       invisible(price)
@@ -137,7 +142,7 @@ Security <- R6::R6Class( #nolint
     update_delta = function() {
       delta <- NULL
       if (private$instrument_type_ == "Option") {
-        delta <- (Rblpapi::bdp(private$bbid_, "OP006")$OP006)
+        delta <- get_security_data_provider()$get_delta(private$bbid_)
       }
       if (is.null(delta) || !is.finite(delta)) delta <- 1
       private$delta_ <- delta

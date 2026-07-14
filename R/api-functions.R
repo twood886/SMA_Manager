@@ -21,10 +21,10 @@
 #' @details The function first validates the `bbid` parameter to ensure it is a
 #'  valid string. It then checks if the security exists in the
 #'  `registries$securities` environment. If the security does not exist and
-#'  `create` is `TRUE`, it queries Bloomberg for the security's data using the
-#'  `Rblpapi::bpd` function. If the Bloomberg data indicates the security is not
-#'  found, an error is raised. Otherwise, a new `Security` object is created and
-#'  added to the registry.
+#'  `create` is `TRUE`, it queries the active security data provider (see
+#'  \code{\link{set_security_data_provider}}) for the security's data. If the
+#'  provider indicates the security is not found, an error is raised.
+#'  Otherwise, a new `Security` object is created and added to the registry.
 #'
 #' @examples
 #' # Retrieve an existing security
@@ -38,7 +38,6 @@
 #'
 #' @seealso \code{\link{Security}} for the Security class.
 #'
-#' @importFrom Rblpapi bdp
 #' @import checkmate
 #' @export
 .security <- function(sec_id, create = TRUE, assign_to_registry = TRUE) {
@@ -51,8 +50,8 @@
     return(get(sec_id, envir = env))
   }
   if (!create) return(NULL)
-  if (Rblpapi::bdp(sec_id, "DX194")$DX194 == "") {
-    stop("Security not found in Bloomberg")
+  if (!get_security_data_provider()$security_exists(sec_id)) {
+    stop("Security not found: ", sec_id)
   }
   security <- Security$new(sec_id)
   if (assign_to_registry) {

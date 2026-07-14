@@ -6,6 +6,10 @@
 \title{Security (R6 Class)}
 \description{
 R6 class for a security with time-series and non-time-series data.
+
+All external security data is fetched through the active
+\code{\link{SecurityDataProvider}} (see
+\code{\link{set_security_data_provider}}), never from a vendor directly.
 }
 \section{Methods}{
 \subsection{Public methods}{
