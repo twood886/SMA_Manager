@@ -211,21 +211,22 @@ TradeConstructor <- R6::R6Class( #nolint
 
       prob <- CVXR::Problem(objective, cons)
       # --- Solve --------------------------------------------------------------
-      if (any(vapply(rules, \(r) r$get_scope(), character(1)) %in% c("count"))) { #nolint
-        res <- solve(prob, solver = "ECOS_BB")
+      opt_value <- if (any(vapply(rules, \(r) r$get_scope(), character(1)) %in% c("count"))) { #nolint
+        CVXR::psolve(prob, solver = "ECOS_BB")
       } else {
-        res <- tryCatch({
-          solve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 50000, polish = TRUE) #nolint
+        tryCatch({
+          CVXR::psolve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 50000, polish = TRUE) #nolint
         }, error = function(e) {
-          solve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
+          CVXR::psolve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
         })
       }
-      if (!(res$status %in% c("optimal", "optimal_inaccurate", "solved"))) {
-        stop(sprintf("Optimization failed with status: %s", res$status))
+      prob_status <- CVXR::status(prob)
+      if (!(prob_status %in% c("optimal", "optimal_inaccurate", "solved"))) {
+        stop(sprintf("Optimization failed with status: %s", prob_status))
       }
 
-      w_hat     <- setNames(as.numeric(res$getValue(w)), sec_ids)
-      alpha_hat <- as.numeric(res$getValue(alpha))
+      w_hat     <- setNames(as.numeric(CVXR::value(w)), sec_ids)
+      alpha_hat <- as.numeric(CVXR::value(alpha))
       sh        <- setNames((w_hat * nav) / price_vec,  sec_ids)
       sh_final  <- sh
       sh_final[sh > 0] <- floor(sh[sh > 0])
@@ -242,8 +243,8 @@ TradeConstructor <- R6::R6Class( #nolint
         target_weights  = t_w,
         alpha_hat       = alpha_hat,
         scaling_factors = sf,
-        objective_value = res$value,
-        status          = res$status
+        objective_value = opt_value,
+        status          = prob_status
       )
     }
 

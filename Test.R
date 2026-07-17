@@ -1,10 +1,24 @@
 library(SMAManager)
-files <- yaml::yaml.load_file("portfolios/portfolios.yml", eval.expr = TRUE)
-portfolios <- lapply(files, \(file) read_yml_portfolio(file))
-names(portfolios) <- vapply(portfolios, \(p) p$get_short_name(), character(1))
+library(SMAManagerData)
+db_connect()
+Rblpapi::blpConnect()
+set_security_data_provider(BloombergDataProvider$new())
+update_db_data()
 
-update_bloomberg_fields()
+t1 <- Sys.time()
+portfolios <- load_all_portfolios_from_db()
+t2 <- Sys.time()
+print(t2 - t1)
 
+
+fmap <- .portfolio("fmap")
+test <- fmap$rebalance()
+
+
+portfolios <- sapply(
+  ls(registries$portfolios),
+  function(p) .portfolio(p)
+)
 
 compliance <- sapply(
   portfolios,
@@ -16,6 +30,7 @@ compliance <- sapply(
   },
   simplify = FALSE
 )
+
 
 compliance_table <- function(portfolios) {
   compliance <- suppressWarnings(sapply(
@@ -29,10 +44,15 @@ compliance_table <- function(portfolios) {
     simplify = FALSE
   ))
 
+  max_name_length <- max(nchar(names(compliance)))
+
   for (i in 1:length(compliance)) {
     cat(rep("_", 80), sep = ""); cat("\n")
     name <- names(compliance)[[i]]
-    cat(name); cat(" : ")
+    space_padding <- paste(
+      rep(" ", max_name_length - nchar(name)), collapse = ""
+    )
+    cat(name); cat(" : "); cat(space_padding)
     compliant <- compliance[[i]]$pass
     if (isTRUE(compliant)) {
       cat("All Compliant\n")
@@ -46,6 +66,7 @@ compliance_table <- function(portfolios) {
     }
   }
 }
+
 
 compliance_table(portfolios)
 
