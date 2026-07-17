@@ -180,8 +180,19 @@ SMARulePortfolio <- R6::R6Class( #nolint
             denom_excl <- denom_current - denom_sec
           }
 
-          max_limit <- (max_t * denom_excl - num_excl) / (f_sec - max_t * gamma_pos) #nolint
-          min_limit <- (min_t * denom_excl - num_excl) / (f_sec - min_t * gamma_neg) #nolint
+          # Non-finite thresholds mean that side is unconstrained; the
+          # formula below would produce NaN via Inf * 0 (e.g. gamma_neg = 0
+          # for a long_gmv divisor).
+          max_limit <- if (!is.finite(max_t)) {
+            Inf
+          } else {
+            (max_t * denom_excl - num_excl) / (f_sec - max_t * gamma_pos)
+          }
+          min_limit <- if (!is.finite(min_t)) {
+            -Inf
+          } else {
+            (min_t * denom_excl - num_excl) / (f_sec - min_t * gamma_neg)
+          }
 
           # Apply directional constraints based on include filter
           if (include_filter == "long_only") {
