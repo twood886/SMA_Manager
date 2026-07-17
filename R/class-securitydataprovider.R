@@ -68,6 +68,25 @@ SecurityDataProvider <- R6::R6Class( #nolint
     get_fields = function(sec_ids, fields) {
       stop("get_fields() not implemented for this provider.")
     },
+    #' @description Get the full reference record for a single security in
+    #'  as few provider requests as the backend allows. Used by
+    #'  \code{Security$new()} so creating a security does not cost one
+    #'  round trip per field. The default implementation composes the
+    #'  individual getters; backends with request latency should override
+    #'  it with a single batched request.
+    #' @param sec_id Character string. Security identifier.
+    #' @return Named list with description, instrument_type, price, delta,
+    #'  and underlying_id (underlying_id may be NULL/empty for
+    #'  non-derivatives).
+    get_security_profile = function(sec_id) {
+      list(
+        description     = self$get_description(sec_id),
+        instrument_type = self$get_instrument_type(sec_id),
+        price           = self$get_price(sec_id),
+        delta           = self$get_delta(sec_id),
+        underlying_id   = self$get_underlying_id(sec_id)
+      )
+    },
     #' @description Get the last price for a single security.
     #' @param sec_id Character string. Security identifier.
     #' @return Numeric.
@@ -142,6 +161,21 @@ BloombergDataProvider <- R6::R6Class( #nolint
     #' @param fields Character vector of Bloomberg field mnemonics.
     get_fields = function(sec_ids, fields) {
       Rblpapi::bdp(sec_ids, fields = fields)
+    },
+    #' @description Get the full reference record for a single security with
+    #'  one Bloomberg request instead of one per field.
+    #' @param sec_id Character string. Security identifier.
+    get_security_profile = function(sec_id) {
+      d <- Rblpapi::bdp(
+        sec_id, c("DX615", "EX028", "PX_LAST", "OP006", "DS492")
+      )
+      list(
+        description     = d$DX615,
+        instrument_type = d$EX028,
+        price           = d$PX_LAST,
+        delta           = d$OP006,
+        underlying_id   = d$DS492
+      )
     }
   )
 )

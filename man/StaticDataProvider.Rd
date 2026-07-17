@@ -37,6 +37,7 @@ done by \code{\link{.security}}.
 <ul>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_delta"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_delta'><code>SMAManager::SecurityDataProvider$get_delta()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_price"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_price'><code>SMAManager::SecurityDataProvider$get_price()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_security_profile"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_security_profile'><code>SMAManager::SecurityDataProvider$get_security_profile()</code></a></span></li>
 </ul>
 </details>
 }}

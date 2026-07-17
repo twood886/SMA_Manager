@@ -40,30 +40,36 @@ Security <- R6::R6Class( #nolint
       checkmate::assert_character(bbid)
       private$bbid_ <- bbid
 
-      if (!is.null(description)) {
-        private$description_ <- description
-      } else {
-        private$description_ <-
-          get_security_data_provider()$get_description(bbid)
+      # Anything not supplied comes from the provider. Fetch it all in one
+      # request (get_security_profile) rather than one round trip per field.
+      profile <- if (
+        is.null(description) || is.null(instrument_type) ||
+          is.null(price) || is.null(delta)
+      ) {
+        get_security_data_provider()$get_security_profile(bbid)
       }
 
-      if (!is.null(instrument_type)) {
-        private$instrument_type_ <- instrument_type
-      } else {
-        private$instrument_type_ <-
-          get_security_data_provider()$get_instrument_type(bbid)
-      }
+      private$description_ <- description %||% profile$description
+      private$instrument_type_ <- instrument_type %||% profile$instrument_type
 
       if (!is.null(price)) {
         private$price_ <- price
+      } else if (identical(private$instrument_type_, "FixedIncome")) {
+        private$price_ <- 1
       } else {
-        private$price_ <- self$update_price()
+        private$price_ <- profile$price
       }
 
       if (!is.null(delta)) {
         private$delta_ <- delta
       } else {
-        private$delta_ <- self$update_delta()
+        d <- if (.is_option_type(private$instrument_type_)) {
+          profile$delta
+        } else {
+          1
+        }
+        if (is.null(d) || length(d) == 0 || !is.finite(d)) d <- 1
+        private$delta_ <- d
       }
 
       if (.is_option_type(private$instrument_type_)) {
@@ -71,7 +77,10 @@ Security <- R6::R6Class( #nolint
           checkmate::assert_r6(underlying_security, "Security")
           private$underlying_security_ <- underlying_security
         } else {
-          underlying_id <- get_security_data_provider()$get_underlying_id(bbid)
+          # profile is NULL when all fields were supplied; fall back to the
+          # single-field provider lookup for the underlying id.
+          underlying_id <- profile$underlying_id %||%
+            get_security_data_provider()$get_underlying_id(bbid)
           underlying_sec <- .security(paste0(underlying_id, " Equity"))
           checkmate::assert_r6(underlying_sec, "Security")
           private$underlying_security_ <- underlying_sec

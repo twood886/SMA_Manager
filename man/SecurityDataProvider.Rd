@@ -26,6 +26,7 @@ on their vectorized counterparts.
 \item \href{#method-SecurityDataProvider-get_prices}{\code{SecurityDataProvider$get_prices()}}
 \item \href{#method-SecurityDataProvider-get_deltas}{\code{SecurityDataProvider$get_deltas()}}
 \item \href{#method-SecurityDataProvider-get_fields}{\code{SecurityDataProvider$get_fields()}}
+\item \href{#method-SecurityDataProvider-get_security_profile}{\code{SecurityDataProvider$get_security_profile()}}
 \item \href{#method-SecurityDataProvider-get_price}{\code{SecurityDataProvider$get_price()}}
 \item \href{#method-SecurityDataProvider-get_delta}{\code{SecurityDataProvider$get_delta()}}
 \item \href{#method-SecurityDataProvider-clone}{\code{SecurityDataProvider$clone()}}
@@ -175,6 +176,33 @@ mnemonics).}
 \subsection{Returns}{
 data.frame with one row per security (rownames are
  \code{sec_ids}) and one column per field.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SecurityDataProvider-get_security_profile"></a>}}
+\if{latex}{\out{\hypertarget{method-SecurityDataProvider-get_security_profile}{}}}
+\subsection{Method \code{get_security_profile()}}{
+Get the full reference record for a single security in
+ as few provider requests as the backend allows. Used by
+ \code{Security$new()} so creating a security does not cost one
+ round trip per field. The default implementation composes the
+ individual getters; backends with request latency should override
+ it with a single batched request.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SecurityDataProvider$get_security_profile(sec_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{sec_id}}{Character string. Security identifier.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Named list with description, instrument_type, price, delta,
+ and underlying_id (underlying_id may be NULL/empty for
+ non-derivatives).
 }
 }
 \if{html}{\out{<hr>}}

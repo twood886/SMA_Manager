@@ -116,18 +116,23 @@ SMA <- R6::R6Class(   #nolint
     #' identifying the required trade.
     #' @param security_id The ID of the security traded in the base portfolio.
     #' @param base_trade_qty The quantity of the trade in the base portfolio.
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE).
+    #' @param update_bbfields Logical. Refresh Bloomberg rule fields for the
+    #'   traded security before computing limits (default: FALSE). Rule
+    #'   fields are static intraday and already loaded by the portfolio
+    #'   loaders, and a brand-new security gets its fields fetched
+    #'   automatically, so the refresh is only needed if fields may have
+    #'   changed since load.
     #' @param base_portfolio_name Character. Short name of the trading base
     #'   portfolio. Required for blended SMAs; defaults to the primary base
     #'   portfolio when NULL.
     replicate_trade = function(
-      security_id, base_trade_qty, update_bbfields = TRUE,
+      security_id, base_trade_qty, update_bbfields = FALSE,
       base_portfolio_name = NULL
     ) {
       checkmate::assert_character(security_id, len = 1)
       checkmate::assert_numeric(base_trade_qty, len = 1)
       checkmate::assert_flag(update_bbfields)
-      if (update_bbfields) SMAManager::update_bloomberg_fields()
+      if (update_bbfields) SMAManager::update_bloomberg_fields(security_id)
       self$get_trade_constructor()$replicate_trade(
         security_id = security_id,
         base_trade_qty = base_trade_qty,

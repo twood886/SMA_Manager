@@ -132,3 +132,17 @@ test_that("StaticDataProvider vectorized accessors match the bdp contract", {
   expect_equal(fields["aapl us equity", "GICS_SECTOR_NAME"], "Information Technology")
   expect_true(is.na(fields["aapl 12/18/26 c210 equity", "GICS_SECTOR_NAME"]))
 })
+
+test_that("get_security_profile returns the full reference record", {
+  provider <- make_static_provider()
+  p <- provider$get_security_profile("aapl 12/18/26 c210 equity")
+  expect_equal(p$description, "AAPL Call Dec26 210")
+  expect_equal(p$instrument_type, "Option")
+  expect_equal(p$price, 12.5)
+  expect_equal(p$delta, 0.55)
+  expect_equal(p$underlying_id, "AAPL US")
+
+  eq <- provider$get_security_profile("aapl us equity")
+  expect_equal(eq$instrument_type, "Equity")
+  expect_null(eq$underlying_id)
+})

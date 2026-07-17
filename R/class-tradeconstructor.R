@@ -28,7 +28,12 @@ TradeConstructor <- R6::R6Class( #nolint
         rules <- Filter(\(r) r$get_scope() == "position", rules)
       }
 
-      new_securities <- setdiff(security_id, ls(get_registries()$securities))
+      # Registry keys are lowercase (.security lowercases on registration),
+      # so compare in lowercase or already-registered ids passed in mixed
+      # case get needlessly re-fetched from the provider.
+      new_securities <- setdiff(
+        tolower(security_id), ls(get_registries()$securities)
+      )
       if (length(new_securities) > 0) {
         lapply(new_securities, .security)
         # Assuming update_bloomberg_fields can take a vector of securities

@@ -22,6 +22,7 @@ connection established with \code{Rblpapi::blpConnect()}.
 \item \href{#method-BloombergDataProvider-get_prices}{\code{BloombergDataProvider$get_prices()}}
 \item \href{#method-BloombergDataProvider-get_deltas}{\code{BloombergDataProvider$get_deltas()}}
 \item \href{#method-BloombergDataProvider-get_fields}{\code{BloombergDataProvider$get_fields()}}
+\item \href{#method-BloombergDataProvider-get_security_profile}{\code{BloombergDataProvider$get_security_profile()}}
 \item \href{#method-BloombergDataProvider-clone}{\code{BloombergDataProvider$clone()}}
 }
 }
@@ -150,6 +151,24 @@ Get arbitrary Bloomberg fields for a vector of securities.
 \item{\code{sec_ids}}{Character vector of security identifiers.}
 
 \item{\code{fields}}{Character vector of Bloomberg field mnemonics.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BloombergDataProvider-get_security_profile"></a>}}
+\if{latex}{\out{\hypertarget{method-BloombergDataProvider-get_security_profile}{}}}
+\subsection{Method \code{get_security_profile()}}{
+Get the full reference record for a single security with
+ one Bloomberg request instead of one per field.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BloombergDataProvider$get_security_profile(sec_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{sec_id}}{Character string. Security identifier.}
 }
 \if{html}{\out{</div>}}
 }

@@ -156,7 +156,7 @@ identifying the required trade.
 \if{html}{\out{<div class="r">}}\preformatted{SMA$replicate_trade(
   security_id,
   base_trade_qty,
-  update_bbfields = TRUE,
+  update_bbfields = FALSE,
   base_portfolio_name = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -168,7 +168,12 @@ identifying the required trade.
 
 \item{\code{base_trade_qty}}{The quantity of the trade in the base portfolio.}
 
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE).}
+\item{\code{update_bbfields}}{Logical. Refresh Bloomberg rule fields for the
+traded security before computing limits (default: FALSE). Rule
+fields are static intraday and already loaded by the portfolio
+loaders, and a brand-new security gets its fields fetched
+automatically, so the refresh is only needed if fields may have
+changed since load.}
 
 \item{\code{base_portfolio_name}}{Character. Short name of the trading base
 portfolio. Required for blended SMAs; defaults to the primary base
