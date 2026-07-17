@@ -1,10 +1,12 @@
-Package: SMAManager
+Package: replikit
 Type: Package
-Title: SMA Manager
+Title: Rule-Constrained SMA Replication Engine
 Version: 0.2.0
 Author: Taylor Wood
 Maintainer: Taylor Wood <twood@callodine.com>
-Description: SMA Managaer
+Description: Replicates base portfolio trades and targets into separately
+    managed accounts subject to each account's compliance rules, with
+    rule-based position limits and CVXR-based rebalance optimization.
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -22,7 +24,6 @@ Imports:
     CVXR,
     Rblpapi
 Collate:
-    'SMAManager-package.R'
     'api-functions.R'
     'class-divisorprovider.R'
     'class-holding.R'
@@ -45,4 +46,5 @@ Collate:
     'create_trade.R'
     'get_tracking_smas.R'
     'remove_all_portfolio_trades.R'
+    'replikit-package.R'
     'zzz.R'

@@ -1,5 +1,5 @@
-library(SMAManager)
-library(SMAManagerData)
+library(replikit)
+library(replikitdata)
 
 compliance_table <- function(portfolios) {
   compliance <- suppressWarnings(sapply(

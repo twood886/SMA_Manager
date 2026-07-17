@@ -9,7 +9,7 @@ R6 Class representing a seperately managed account.
  Rules.
 }
 \section{Super class}{
-\code{\link[SMAManager:Portfolio]{SMAManager::Portfolio}} -> \code{SMA}
+\code{\link[replikit:Portfolio]{replikit::Portfolio}} -> \code{SMA}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -26,25 +26,25 @@ R6 Class representing a seperately managed account.
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_flow"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_flow'><code>SMAManager::Portfolio$add_flow()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_holding"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_holding'><code>SMAManager::Portfolio$add_holding()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_orderconstructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_orderconstructor'><code>SMAManager::Portfolio$add_orderconstructor()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_position'><code>SMAManager::Portfolio$add_position()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_replacement"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_replacement'><code>SMAManager::Portfolio$add_replacement()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="add_rule"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-add_rule'><code>SMAManager::Portfolio$add_rule()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="clear_positions"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-clear_positions'><code>SMAManager::Portfolio$clear_positions()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_nav'><code>SMAManager::Portfolio$get_nav()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_order_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_order_constructor'><code>SMAManager::Portfolio$get_order_constructor()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_position"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_position'><code>SMAManager::Portfolio$get_position()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replaced_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replaced_security'><code>SMAManager::Portfolio$get_replaced_security()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_replacement_security"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_replacement_security'><code>SMAManager::Portfolio$get_replacement_security()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_rules"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_rules'><code>SMAManager::Portfolio$get_rules()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_security_position_limits"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_security_position_limits'><code>SMAManager::Portfolio$get_security_position_limits()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_short_name"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_short_name'><code>SMAManager::Portfolio$get_short_name()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_swap_flag_position_rules"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_swap_flag_position_rules'><code>SMAManager::Portfolio$get_swap_flag_position_rules()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="get_trade_constructor"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-get_trade_constructor'><code>SMAManager::Portfolio$get_trade_constructor()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="rebalance"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-rebalance'><code>SMAManager::Portfolio$rebalance()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="Portfolio" data-id="set_nav"><a href='../../SMAManager/html/Portfolio.html#method-Portfolio-set_nav'><code>SMAManager::Portfolio$set_nav()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="add_flow"><a href='../../replikit/html/Portfolio.html#method-Portfolio-add_flow'><code>replikit::Portfolio$add_flow()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="add_holding"><a href='../../replikit/html/Portfolio.html#method-Portfolio-add_holding'><code>replikit::Portfolio$add_holding()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="add_orderconstructor"><a href='../../replikit/html/Portfolio.html#method-Portfolio-add_orderconstructor'><code>replikit::Portfolio$add_orderconstructor()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="add_position"><a href='../../replikit/html/Portfolio.html#method-Portfolio-add_position'><code>replikit::Portfolio$add_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="add_replacement"><a href='../../replikit/html/Portfolio.html#method-Portfolio-add_replacement'><code>replikit::Portfolio$add_replacement()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="add_rule"><a href='../../replikit/html/Portfolio.html#method-Portfolio-add_rule'><code>replikit::Portfolio$add_rule()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="clear_positions"><a href='../../replikit/html/Portfolio.html#method-Portfolio-clear_positions'><code>replikit::Portfolio$clear_positions()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_nav"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_nav'><code>replikit::Portfolio$get_nav()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_order_constructor"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_order_constructor'><code>replikit::Portfolio$get_order_constructor()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_position"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_position'><code>replikit::Portfolio$get_position()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_replaced_security"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_replaced_security'><code>replikit::Portfolio$get_replaced_security()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_replacement_security"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_replacement_security'><code>replikit::Portfolio$get_replacement_security()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_rules"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_rules'><code>replikit::Portfolio$get_rules()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_security_position_limits"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_security_position_limits'><code>replikit::Portfolio$get_security_position_limits()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_short_name"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_short_name'><code>replikit::Portfolio$get_short_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_swap_flag_position_rules"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_swap_flag_position_rules'><code>replikit::Portfolio$get_swap_flag_position_rules()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="get_trade_constructor"><a href='../../replikit/html/Portfolio.html#method-Portfolio-get_trade_constructor'><code>replikit::Portfolio$get_trade_constructor()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="rebalance"><a href='../../replikit/html/Portfolio.html#method-Portfolio-rebalance'><code>replikit::Portfolio$rebalance()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="Portfolio" data-id="set_nav"><a href='../../replikit/html/Portfolio.html#method-Portfolio-set_nav'><code>replikit::Portfolio$set_nav()</code></a></span></li>
 </ul>
 </details>
 }}

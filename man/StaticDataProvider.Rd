@@ -14,7 +14,7 @@ Identifiers are matched case-insensitively, consistent with the lowercasing
 done by \code{\link{.security}}.
 }
 \section{Super class}{
-\code{\link[SMAManager:SecurityDataProvider]{SMAManager::SecurityDataProvider}} -> \code{StaticDataProvider}
+\code{\link[replikit:SecurityDataProvider]{replikit::SecurityDataProvider}} -> \code{StaticDataProvider}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -35,9 +35,9 @@ done by \code{\link{.security}}.
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_delta"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_delta'><code>SMAManager::SecurityDataProvider$get_delta()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_price"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_price'><code>SMAManager::SecurityDataProvider$get_price()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_security_profile"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_security_profile'><code>SMAManager::SecurityDataProvider$get_security_profile()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SecurityDataProvider" data-id="get_delta"><a href='../../replikit/html/SecurityDataProvider.html#method-SecurityDataProvider-get_delta'><code>replikit::SecurityDataProvider$get_delta()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SecurityDataProvider" data-id="get_price"><a href='../../replikit/html/SecurityDataProvider.html#method-SecurityDataProvider-get_price'><code>replikit::SecurityDataProvider$get_price()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SecurityDataProvider" data-id="get_security_profile"><a href='../../replikit/html/SecurityDataProvider.html#method-SecurityDataProvider-get_security_profile'><code>replikit::SecurityDataProvider$get_security_profile()</code></a></span></li>
 </ul>
 </details>
 }}

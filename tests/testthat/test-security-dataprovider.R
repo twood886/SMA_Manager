@@ -21,7 +21,7 @@ make_static_provider <- function() {
 # Installs the static provider and empties the securities registry for the
 # duration of the calling test.
 with_static_provider <- function(env = parent.frame()) {
-  pkg_state <- asNamespace("SMAManager")$.pkg_state
+  pkg_state <- asNamespace("replikit")$.pkg_state
   old_provider <- pkg_state$security_data_provider
   provider <- make_static_provider()
   set_security_data_provider(provider)

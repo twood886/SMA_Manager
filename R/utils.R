@@ -34,7 +34,7 @@
 #' 
 #' @export
 get_registries <- function() {
-  asNamespace("SMAManager")$registries
+  asNamespace("replikit")$registries
 }
 
 #' Get Data Fields Required by Registered SMA Rules

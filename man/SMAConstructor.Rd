@@ -9,7 +9,7 @@ SMA Trade Constructor Class
 SMA Trade Constructor Class
 }
 \section{Super class}{
-\code{\link[SMAManager:TradeConstructor]{SMAManager::TradeConstructor}} -> \code{SMAConstructor}
+\code{\link[replikit:TradeConstructor]{replikit::TradeConstructor}} -> \code{SMAConstructor}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -24,10 +24,10 @@ SMA Trade Constructor Class
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="get_security_position_limits"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-get_security_position_limits'><code>SMAManager::TradeConstructor$get_security_position_limits()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="get_swap_flag_position_rules"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-get_swap_flag_position_rules'><code>SMAManager::TradeConstructor$get_swap_flag_position_rules()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="make_model_context"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-make_model_context'><code>SMAManager::TradeConstructor$make_model_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="TradeConstructor" data-id="optimize_sma"><a href='../../SMAManager/html/TradeConstructor.html#method-TradeConstructor-optimize_sma'><code>SMAManager::TradeConstructor$optimize_sma()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="TradeConstructor" data-id="get_security_position_limits"><a href='../../replikit/html/TradeConstructor.html#method-TradeConstructor-get_security_position_limits'><code>replikit::TradeConstructor$get_security_position_limits()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="TradeConstructor" data-id="get_swap_flag_position_rules"><a href='../../replikit/html/TradeConstructor.html#method-TradeConstructor-get_swap_flag_position_rules'><code>replikit::TradeConstructor$get_swap_flag_position_rules()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="TradeConstructor" data-id="make_model_context"><a href='../../replikit/html/TradeConstructor.html#method-TradeConstructor-make_model_context'><code>replikit::TradeConstructor$make_model_context()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="TradeConstructor" data-id="optimize_sma"><a href='../../replikit/html/TradeConstructor.html#method-TradeConstructor-optimize_sma'><code>replikit::TradeConstructor$optimize_sma()</code></a></span></li>
 </ul>
 </details>
 }}

@@ -10,7 +10,7 @@ Desktop API via \pkg{Rblpapi}. Requires a running Bloomberg terminal and a
 connection established with \code{Rblpapi::blpConnect()}.
 }
 \section{Super class}{
-\code{\link[SMAManager:SecurityDataProvider]{SMAManager::SecurityDataProvider}} -> \code{BloombergDataProvider}
+\code{\link[replikit:SecurityDataProvider]{replikit::SecurityDataProvider}} -> \code{BloombergDataProvider}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -29,8 +29,8 @@ connection established with \code{Rblpapi::blpConnect()}.
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_delta"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_delta'><code>SMAManager::SecurityDataProvider$get_delta()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SecurityDataProvider" data-id="get_price"><a href='../../SMAManager/html/SecurityDataProvider.html#method-SecurityDataProvider-get_price'><code>SMAManager::SecurityDataProvider$get_price()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SecurityDataProvider" data-id="get_delta"><a href='../../replikit/html/SecurityDataProvider.html#method-SecurityDataProvider-get_delta'><code>replikit::SecurityDataProvider$get_delta()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SecurityDataProvider" data-id="get_price"><a href='../../replikit/html/SecurityDataProvider.html#method-SecurityDataProvider-get_price'><code>replikit::SecurityDataProvider$get_price()</code></a></span></li>
 </ul>
 </details>
 }}

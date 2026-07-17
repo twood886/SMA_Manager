@@ -31,7 +31,7 @@ make_enfusion_provider <- function() {
 }
 
 with_enfusion_provider <- function(env = parent.frame()) {
-  pkg_state <- asNamespace("SMAManager")$.pkg_state
+  pkg_state <- asNamespace("replikit")$.pkg_state
   old_provider <- pkg_state$security_data_provider
   provider <- make_enfusion_provider()
   set_security_data_provider(provider)
@@ -50,13 +50,13 @@ with_enfusion_provider <- function(env = parent.frame()) {
 }
 
 test_that(".is_option_type accepts every option vocabulary", {
-  expect_true(SMAManager:::.is_option_type("Option"))
-  expect_true(SMAManager:::.is_option_type("Listed Option"))
-  expect_true(SMAManager:::.is_option_type("OTC Option"))
-  expect_false(SMAManager:::.is_option_type("Equity"))
-  expect_false(SMAManager:::.is_option_type("Bond"))
-  expect_false(SMAManager:::.is_option_type(NULL))
-  expect_false(SMAManager:::.is_option_type(NA_character_))
+  expect_true(replikit:::.is_option_type("Option"))
+  expect_true(replikit:::.is_option_type("Listed Option"))
+  expect_true(replikit:::.is_option_type("OTC Option"))
+  expect_false(replikit:::.is_option_type("Equity"))
+  expect_false(replikit:::.is_option_type("Bond"))
+  expect_false(replikit:::.is_option_type(NULL))
+  expect_false(replikit:::.is_option_type(NA_character_))
 })
 
 test_that("'Listed Option' securities keep a supplied underlying", {

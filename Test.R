@@ -1,5 +1,5 @@
-library(SMAManager)
-library(SMAManagerData)
+library(replikit)
+library(replikitdata)
 db_connect()
 Rblpapi::blpConnect()
 set_security_data_provider(BloombergDataProvider$new())

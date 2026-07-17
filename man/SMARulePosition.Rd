@@ -7,7 +7,7 @@
 R6 Class that encapsulates rule for SMAs
 }
 \section{Super class}{
-\code{\link[SMAManager:SMARule]{SMAManager::SMARule}} -> \code{SMARulePosition}
+\code{\link[replikit:SMARule]{replikit::SMARule}} -> \code{SMARulePosition}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -22,26 +22,26 @@ R6 Class that encapsulates rule for SMAs
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="apply_rule_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-apply_rule_definition'><code>SMAManager::SMARule$apply_rule_definition()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="capacity"><a href='../../SMAManager/html/SMARule.html#method-SMARule-capacity'><code>SMAManager::SMARule$capacity()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_bbfields"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_bbfields'><code>SMAManager::SMARule$get_bbfields()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_definition"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_definition'><code>SMAManager::SMARule$get_definition()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_divisor"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_divisor'><code>SMAManager::SMARule$get_divisor()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_exclusions"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_exclusions'><code>SMAManager::SMARule$get_exclusions()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_gross_exposure"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_gross_exposure'><code>SMAManager::SMARule$get_gross_exposure()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_id'><code>SMAManager::SMARule$get_id()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_include"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_include'><code>SMAManager::SMARule$get_include()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_max_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_max_threshold'><code>SMAManager::SMARule$get_max_threshold()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_min_threshold"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_min_threshold'><code>SMAManager::SMARule$get_min_threshold()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_name'><code>SMAManager::SMARule$get_name()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_relative_to"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_relative_to'><code>SMAManager::SMARule$get_relative_to()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_rule_id"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_rule_id'><code>SMAManager::SMARule$get_rule_id()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_scope"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_scope'><code>SMAManager::SMARule$get_scope()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_sma_name"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_sma_name'><code>SMAManager::SMARule$get_sma_name()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="get_swap_only"><a href='../../SMAManager/html/SMARule.html#method-SMARule-get_swap_only'><code>SMAManager::SMARule$get_swap_only()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="initialize"><a href='../../SMAManager/html/SMARule.html#method-SMARule-initialize'><code>SMAManager::SMARule$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="objective_terms"><a href='../../SMAManager/html/SMARule.html#method-SMARule-objective_terms'><code>SMAManager::SMARule$objective_terms()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="SMAManager" data-topic="SMARule" data-id="security_impacted"><a href='../../SMAManager/html/SMARule.html#method-SMARule-security_impacted'><code>SMAManager::SMARule$security_impacted()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="apply_rule_definition"><a href='../../replikit/html/SMARule.html#method-SMARule-apply_rule_definition'><code>replikit::SMARule$apply_rule_definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="capacity"><a href='../../replikit/html/SMARule.html#method-SMARule-capacity'><code>replikit::SMARule$capacity()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_bbfields"><a href='../../replikit/html/SMARule.html#method-SMARule-get_bbfields'><code>replikit::SMARule$get_bbfields()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_definition"><a href='../../replikit/html/SMARule.html#method-SMARule-get_definition'><code>replikit::SMARule$get_definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_divisor"><a href='../../replikit/html/SMARule.html#method-SMARule-get_divisor'><code>replikit::SMARule$get_divisor()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_exclusions"><a href='../../replikit/html/SMARule.html#method-SMARule-get_exclusions'><code>replikit::SMARule$get_exclusions()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_gross_exposure"><a href='../../replikit/html/SMARule.html#method-SMARule-get_gross_exposure'><code>replikit::SMARule$get_gross_exposure()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_id"><a href='../../replikit/html/SMARule.html#method-SMARule-get_id'><code>replikit::SMARule$get_id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_include"><a href='../../replikit/html/SMARule.html#method-SMARule-get_include'><code>replikit::SMARule$get_include()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_max_threshold"><a href='../../replikit/html/SMARule.html#method-SMARule-get_max_threshold'><code>replikit::SMARule$get_max_threshold()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_min_threshold"><a href='../../replikit/html/SMARule.html#method-SMARule-get_min_threshold'><code>replikit::SMARule$get_min_threshold()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_name"><a href='../../replikit/html/SMARule.html#method-SMARule-get_name'><code>replikit::SMARule$get_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_relative_to"><a href='../../replikit/html/SMARule.html#method-SMARule-get_relative_to'><code>replikit::SMARule$get_relative_to()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_rule_id"><a href='../../replikit/html/SMARule.html#method-SMARule-get_rule_id'><code>replikit::SMARule$get_rule_id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_scope"><a href='../../replikit/html/SMARule.html#method-SMARule-get_scope'><code>replikit::SMARule$get_scope()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_sma_name"><a href='../../replikit/html/SMARule.html#method-SMARule-get_sma_name'><code>replikit::SMARule$get_sma_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="get_swap_only"><a href='../../replikit/html/SMARule.html#method-SMARule-get_swap_only'><code>replikit::SMARule$get_swap_only()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="initialize"><a href='../../replikit/html/SMARule.html#method-SMARule-initialize'><code>replikit::SMARule$initialize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="objective_terms"><a href='../../replikit/html/SMARule.html#method-SMARule-objective_terms'><code>replikit::SMARule$objective_terms()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="replikit" data-topic="SMARule" data-id="security_impacted"><a href='../../replikit/html/SMARule.html#method-SMARule-security_impacted'><code>replikit::SMARule$security_impacted()</code></a></span></li>
 </ul>
 </details>
 }}

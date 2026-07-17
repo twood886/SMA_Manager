@@ -1,4 +1,4 @@
 library(testthat)
-library(SMAManager)
+library(replikit)
 
-test_check("SMAManager")
+test_check("replikit")

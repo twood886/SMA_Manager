@@ -83,7 +83,7 @@ SMA <- R6::R6Class(   #nolint
       checkmate::assert_logical(verbose)
       rules <- self$get_rules()
       if (length(rules) == 0) return(list())
-      if (update_bbfields) SMAManager::update_bloomberg_fields()
+      if (update_bbfields) replikit::update_bloomberg_fields()
       positions <- self$get_position()
 
       ids <- vapply(positions, \(p) p$get_id(), character(1))
@@ -132,7 +132,7 @@ SMA <- R6::R6Class(   #nolint
       checkmate::assert_character(security_id, len = 1)
       checkmate::assert_numeric(base_trade_qty, len = 1)
       checkmate::assert_flag(update_bbfields)
-      if (update_bbfields) SMAManager::update_bloomberg_fields(security_id)
+      if (update_bbfields) replikit::update_bloomberg_fields(security_id)
       self$get_trade_constructor()$replicate_trade(
         security_id = security_id,
         base_trade_qty = base_trade_qty,
