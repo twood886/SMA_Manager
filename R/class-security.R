@@ -66,7 +66,7 @@ Security <- R6::R6Class( #nolint
         private$delta_ <- self$update_delta()
       }
 
-      if (private$instrument_type_ == "Option") {
+      if (.is_option_type(private$instrument_type_)) {
         if(!is.null(underlying_security)) {
           checkmate::assert_r6(underlying_security, "Security")
           private$underlying_security_ <- underlying_security
@@ -111,7 +111,7 @@ Security <- R6::R6Class( #nolint
     #'  data from the underlying security. Defaults to FALSE.
     get_rule_data = function(bbfield, underlying = FALSE) {
       checkmate::assert_character(bbfield)
-      if (isTRUE(underlying) & private$instrument_type_ == "Option") {
+      if (isTRUE(underlying) && .is_option_type(private$instrument_type_)) {
         return(private$underlying_security_$get_rule_data(bbfield))
       }
       if (bbfield %in% names(private$rule_data_)) {
@@ -141,7 +141,7 @@ Security <- R6::R6Class( #nolint
     #' @description Update Delta
     update_delta = function() {
       delta <- NULL
-      if (private$instrument_type_ == "Option") {
+      if (.is_option_type(private$instrument_type_)) {
         delta <- get_security_data_provider()$get_delta(private$bbid_)
       }
       if (is.null(delta) || !is.finite(delta)) delta <- 1
@@ -151,7 +151,7 @@ Security <- R6::R6Class( #nolint
     #' @description Update Underlying Price
     update_underlying_price = function() {
       underlying_price <- NULL
-      if (self$get_instrument_type() == "Option") {
+      if (.is_option_type(self$get_instrument_type())) {
         if (!is.null(self$get_underlying_security())) {
           underlying_price <- private$underlying_security_$update_price()
         }

@@ -8,6 +8,18 @@
 }
 
 
+#' Test Whether an Instrument Type is an Option
+#'
+#' Securities carry instrument types from two vocabularies: the security data
+#' provider (e.g. Bloomberg EX028, "Option") and the Enfusion-sourced
+#' securities table ("Listed Option", "OTC Option"). Every option check must
+#' accept both, so this predicate is the only place option types are listed.
+#' @param type Character. Instrument type of a security.
+#' @return Logical.
+.is_option_type <- function(type) {
+  isTRUE(type %in% c("Option", "Listed Option", "OTC Option"))
+}
+
 #' Retrieve Registries from Package Namespace
 #'
 #' This function accesses the `registries` object from the namespace of the 
@@ -71,7 +83,7 @@ update_security_data <- function(update_fields = TRUE) {
     type <- security$get_instrument_type()
 
     price <- if (identical(type, "FixedIncome")) 1 else bbdata[id, "PX_LAST"]
-    delta <- if (identical(type, "Option")) bbdata[id, "OP006"] else 1
+    delta <- if (.is_option_type(type)) bbdata[id, "OP006"] else 1
     if (!is.finite(delta)) delta <- 1
 
     security$set_price(price)
