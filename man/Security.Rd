@@ -23,6 +23,7 @@ All external security data is fetched through the active
 \item \href{#method-Security-get_underlying_price}{\code{Security$get_underlying_price()}}
 \item \href{#method-Security-get_delta}{\code{Security$get_delta()}}
 \item \href{#method-Security-get_delta_price}{\code{Security$get_delta_price()}}
+\item \href{#method-Security-get_replication_price}{\code{Security$get_replication_price()}}
 \item \href{#method-Security-get_rule_data}{\code{Security$get_rule_data()}}
 \item \href{#method-Security-update_prices_delta}{\code{Security$update_prices_delta()}}
 \item \href{#method-Security-update_price}{\code{Security$update_price()}}
@@ -145,6 +146,23 @@ Get Delta
 Get Delta-Adjusted Price (Delta * Underlying Price)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Security$get_delta_price()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Security-get_replication_price"></a>}}
+\if{latex}{\out{\hypertarget{method-Security-get_replication_price}{}}}
+\subsection{Method \code{get_replication_price()}}{
+Get Replication Price (positive delta-notional).
+ The valuation used to weight securities for replication and rule
+ limits: \code{|delta| * underlying_price}. This equals
+ \code{get_price()} for equity/FixedIncome (delta 1, underlying is self)
+ and \code{|delta| * underlying_price} for options, so replacing an
+ option with its underlying (or another option) preserves underlying
+ exposure. \code{abs()} keeps puts positive so the price<=0 cleanup and
+ position-driven weight signs stay correct.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Security$get_replication_price()}\if{html}{\out{</div>}}
 }
 
 }

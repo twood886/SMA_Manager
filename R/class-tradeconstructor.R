@@ -48,7 +48,9 @@ TradeConstructor <- R6::R6Class( #nolint
       new_ids <- setdiff(security_id, ids_pos)
       ids_all <- c(ids_pos, new_ids)
       qty_all <- c(qty_pos, rep(0, length(new_ids)))
-      prices_all <- vapply(ids_all, \(id) .security(id)$get_price(), numeric(1))
+      prices_all <- vapply(
+        ids_all, \(id) .security(id)$get_replication_price(), numeric(1)
+      )
       prices_all[!is.finite(prices_all) | prices_all <= 0] <- 1
 
       limits_all <- list()
@@ -137,7 +139,7 @@ TradeConstructor <- R6::R6Class( #nolint
       replacements <- portfolio$get_replacement_security()
       s_ids <- names(replacements)
       t_ids <- if (length(replacements)) {
-        unique(unlist(replacements, use.names = FALSE))
+        unique(unlist(lapply(replacements, `[[`, "security"), use.names = FALSE)) #nolint
       } else {
         character(0)
       }
@@ -145,7 +147,9 @@ TradeConstructor <- R6::R6Class( #nolint
       sec_ids <- unique(c(names(tgt_qty), names(current_pos), t_ids))
       n <- length(sec_ids)
 
-      price_vec <- vapply(sec_ids, \(s) .security(s)$get_price(), numeric(1))
+      price_vec <- vapply(
+        sec_ids, \(s) .security(s)$get_replication_price(), numeric(1)
+      )
       price_vec[!is.finite(price_vec) | price_vec <= 0] <- 1
       nav <- portfolio$get_nav()
 
@@ -180,11 +184,20 @@ TradeConstructor <- R6::R6Class( #nolint
       if (length(replacements) > 0) {
         rules <- c(rules, list(OverflowRule$new(replacements)))
       }
-      rule_cons  <- unlist(
-        lapply(rules, \(r) r$build_constraints(ctx, nav)),
+      # Position-count rules add boolean selection variables. Combined with
+      # this problem's quadratic tracking-error objective below, solving them
+      # jointly is a mixed-integer QP that none of our available solvers
+      # (ECOS_BB, HIGHS) support - only commercial solvers (GUROBI/XPRESS/
+      # CPLEX) do. So their constraints are built and solved separately, in
+      # a phase-1 MILP selection step below.
+      count_rules <- Filter(\(r) r$get_scope() == "count", rules)
+      other_rules <- Filter(\(r) r$get_scope() != "count", rules)
+
+      other_cons <- unlist(
+        lapply(other_rules, \(r) r$build_constraints(ctx, nav)),
         recursive = FALSE
       )
-      cons <- c(cons, rule_cons)
+      cons <- c(cons, other_cons)
 
       # --- Objective ----------------------------------------------------------
       denom <- pmax(abs(t_w), tau_rel)
@@ -214,16 +227,80 @@ TradeConstructor <- R6::R6Class( #nolint
         #+ 10 * CVXR::square(CVXR::sum_entries(w) - net_tgt)
       )
 
+      # --- Phase 1: resolve position-count selection (MILP) --------------------
+      if (length(count_rules) > 0) {
+        count_cons <- unlist(
+          lapply(count_rules, \(r) r$build_constraints(ctx, nav)),
+          recursive = FALSE
+        )
+        l1_objective <- CVXR::Minimize(CVXR::sum_entries(abs(base_err)))
+        prob1 <- CVXR::Problem(l1_objective, c(cons, count_cons))
+        CVXR::psolve(prob1, solver = "HIGHS")
+        status1 <- CVXR::status(prob1)
+        if (!(status1 %in% c("optimal", "optimal_inaccurate", "solved"))) {
+          stop(sprintf(
+            "Position-count selection (phase 1) failed with status: %s",
+            status1
+          ))
+        }
+
+        # Translate the solved selection into fixed continuous bounds on w,
+        # instead of re-imposing the boolean constraints themselves - phase 2
+        # below must stay a pure continuous QP (no integer variables) to be
+        # solvable by OSQP/CLARABEL.
+        fix_cons <- list()
+        for (r in count_rules) {
+          sel <- r$get_last_selection()
+          idx <- match(sel$ids, sec_ids)
+          if (!is.null(sel$z_long)) {
+            z_val <- round(as.numeric(CVXR::value(sel$z_long)))
+            excl <- idx[z_val < 0.5]
+            if (length(excl)) fix_cons <- c(fix_cons, list(w[excl] <= 0))
+          }
+          if (!is.null(sel$z_short)) {
+            z_val <- round(as.numeric(CVXR::value(sel$z_short)))
+            excl <- idx[z_val < 0.5]
+            if (length(excl)) fix_cons <- c(fix_cons, list(w[excl] >= 0))
+          }
+        }
+        cons <- c(cons, fix_cons)
+      }
+
+      # --- Phase 2 (or only phase, when there's no count rule): continuous QP -
       prob <- CVXR::Problem(objective, cons)
       # --- Solve --------------------------------------------------------------
-      opt_value <- if (any(vapply(rules, \(r) r$get_scope(), character(1)) %in% c("count"))) { #nolint
-        CVXR::psolve(prob, solver = "ECOS_BB")
-      } else {
-        tryCatch({
-          CVXR::psolve(prob, solver = "OSQP", eps_abs = 1e-8, eps_rel = 1e-8, max_iter = 50000, polish = TRUE) #nolint
-        }, error = function(e) {
-          CVXR::psolve(prob, solver = "ECOS", abstol = 1e-8, reltol = 1e-8, feastol = 1e-8) #nolint
-        })
+      opt_value <- {
+        osqp_value <- tryCatch(
+          CVXR::psolve(
+            prob,
+            solver = "OSQP",
+            eps_abs = 1e-8,
+            eps_rel = 1e-8,
+            max_iter = 100000000,
+            polish = TRUE
+          ),
+          error = function(e) NULL
+        )
+        # OSQP doesn't raise an R error when it merely fails to converge
+        # (e.g. status "user_limit") - it just leaves prob's status set to
+        # that outcome - so the fallback below must be status-driven, not
+        # tryCatch-driven.
+        # ECOS only supports LP/SOC cones; portfolios with enough rules can
+        # produce a problem that also needs PowCone3D (e.g. rule-heavy GMV
+        # divisor constraints combined with the scalar alpha penalty), which
+        # ECOS rejects outright. CLARABEL supports SOC and power cones.
+        if (is.null(osqp_value) ||
+              !(CVXR::status(prob) %in% c("optimal", "optimal_inaccurate", "solved"))) { #nolint
+          CVXR::psolve(
+            prob,
+            solver = "CLARABEL",
+            tol_feas = 1e-8,
+            tol_gap_abs = 1e-8,
+            tol_gap_rel = 1e-8
+          ) #nolint
+        } else {
+          osqp_value
+        }
       }
       prob_status <- CVXR::status(prob)
       if (!(prob_status %in% c("optimal", "optimal_inaccurate", "solved"))) {
@@ -320,7 +397,9 @@ SMAConstructor <- R6::R6Class( #nolint
         base_nav <- item$portfolio$get_nav()
         if (base_nav == 0) next
         scale_ratio <- sma_nav / base_nav
-        contrib <- item$weight * private$.extract_qty(item$portfolio$get_position()) * scale_ratio
+        contrib <- item$weight * 
+          private$.extract_qty(item$portfolio$get_position()) * 
+          scale_ratio
         new_ids <- setdiff(names(contrib), names(target_quantities))
         if (length(new_ids) > 0) target_quantities[new_ids] <- 0
         target_quantities[names(contrib)] <- target_quantities[names(contrib)] + contrib
@@ -330,34 +409,30 @@ SMAConstructor <- R6::R6Class( #nolint
       target_quantities
     },
     #' @description Replicate a trade from the base portfolio to the SMA
-    #' @param security_id Security ID of the traded security in the base portfolio
+    #' based on trade quantity
+    #' @param security_id Security ID of the traded security in the base
+    #'  portfolio
     #' @param base_trade_qty Trade quantity in the base portfolio
     #' @param portfolio SMA portfolio object
-    #' @param base_portfolio_name Short name of the trading base portfolio. Required
-    #'   for blended SMAs; defaults to the primary base portfolio when NULL.
+    #' @param base_portfolio_name Short name of the trading base portfolio.
+    #'  Required for SMAs with blended bases; defaults to the primary base
+    #'  portfolio when NULL.
     #' @return A list with trade details and calculations
-    replicate_trade = function(security_id, base_trade_qty, portfolio,
-                               base_portfolio_name = NULL) {
+    replicate_trade_qty = function(
+      security_id,
+      base_trade_qty,
+      portfolio,
+      base_portfolio_name = NULL
+    ) {
       checkmate::assert_character(security_id, len = 1)
       checkmate::assert_numeric(base_trade_qty, len = 1)
       checkmate::assert_r6(portfolio, "SMA")
 
-      # --- 1. Calculate Unconstrained Target ---
       base_list <- portfolio$get_base_portfolios()
-      if (!is.null(base_portfolio_name)) {
-        trading_idx <- which(
-          vapply(base_list, \(x) x$portfolio$get_short_name(), character(1)) == base_portfolio_name
-        )
-        if (length(trading_idx) == 0) {
-          stop(sprintf("Base portfolio '%s' not found in this SMA's blend.", base_portfolio_name))
-        }
-      } else {
-        trading_idx <- 1L
-      }
+      trading_idx <- private$.get_base_idx(base_list, base_portfolio_name)
 
       sma_nav <- portfolio$get_nav()
       unconstrained_target_qty <- 0
-
       for (i in seq_along(base_list)) {
         item <- base_list[[i]]
         base_nav <- item$portfolio$get_nav()
@@ -370,9 +445,86 @@ SMAConstructor <- R6::R6Class( #nolint
         unconstrained_target_qty <- unconstrained_target_qty +
           item$weight * base_qty * sma_nav / base_nav
       }
+      private$.unconst_to_const_shares(
+        portfolio,
+        security_id,
+        unconstrained_target_qty
+      )
+    },
 
-      # --- 2. Get Rule-Based Limits for the SMA ---
-      # get_security_position_limits returns limits in SHARES
+    #' @description Replicate a trade from the base portfolio to the SMA
+    #' based on trade as percentage of base portfolio NAV
+    #' @param security_id Security ID of the traded security in the base
+    #'  portfolio
+    #' @param base_trade_pct Trade percentage in the base portfolio
+    #' @param portfolio SMA portfolio object
+    #' @param base_portfolio_name Short name of the trading base portfolio.
+    #'  Required for SMAs with blended bases; defaults to the primary base
+    #'  portfolio when NULL.
+    #' @return A list with trade details and calculations
+    replicate_trade_pct = function(
+      security_id,
+      base_trade_pct,
+      portfolio,
+      base_portfolio_name = NULL
+    ) {
+      checkmate::assert_character(security_id, len = 1)
+      checkmate::assert_numeric(base_trade_pct, len = 1)
+      checkmate::assert_r6(portfolio, "SMA")
+      security <- .security(security_id, create = TRUE)
+
+      base_list <- portfolio$get_base_portfolios()
+      trading_idx <- private$.get_base_idx(base_list, base_portfolio_name)
+
+      sma_nav <- portfolio$get_nav()
+      unconstrained_target_qty <- 0
+      for (i in seq_along(base_list)) {
+        item <- base_list[[i]]
+        base_nav <- item$portfolio$get_nav()
+        if (base_nav == 0) next
+        base_qty <- tryCatch(
+          {item$portfolio$get_position(security_id)$get_qty()},
+          error = function(e) 0
+        )
+        if (i == trading_idx) {
+          base_qty <- base_qty +
+            base_trade_pct * base_nav / security$get_price()
+        }
+        unconstrained_target_qty <- unconstrained_target_qty +
+          item$weight * base_qty * sma_nav / base_nav
+      }
+      private$.unconst_to_const_shares(
+        portfolio,
+        security_id,
+        unconstrained_target_qty
+      )
+    }
+  ),
+  private = list(
+    .get_base_idx = function(base_list, base_portfolio_name) {
+      if (!is.null(base_portfolio_name)) {
+        trading_idx <- which(
+          vapply(base_list,
+            \(x) x$portfolio$get_short_name(),
+            character(1)
+          ) == base_portfolio_name
+        )
+        if (length(trading_idx) == 0) {
+          stop(sprintf(
+            "Base portfolio '%s' not found in this SMA's blend.",
+            base_portfolio_name
+          ))
+        }
+      } else {
+        trading_idx <- 1L
+      }
+      trading_idx
+    },
+    .unconst_to_const_shares = function(
+      portfolio,
+      security_id,
+      unconstrained_target_qty
+    ) {
       limits_as_shares <- self$get_security_position_limits(
         portfolio = portfolio,
         security_id = security_id,
@@ -394,11 +546,18 @@ SMAConstructor <- R6::R6Class( #nolint
       limits_max <- unlist(sapply(impacted_limits, \(l) l$max))
       limits_min <- unlist(sapply(impacted_limits, \(l) l$min))
 
-      limit_max <- if (length(limits_max) == 0) Inf else min(limits_max, na.rm = TRUE) #nolint
-      limit_min <- if (length(limits_min) == 0) -Inf else max(limits_min, na.rm = TRUE) #nolint
+      limit_max <- if (length(limits_max) == 0) {
+        Inf
+      } else {
+        min(limits_max, na.rm = TRUE)
+      }
 
-      # --- 3. Constrain Target and Calculate Final Trade ---
-      # Clamp the target quantity (shares) to the feasible range (shares)
+      limit_min <- if (length(limits_min) == 0) {
+        -Inf
+      } else {
+        max(limits_min, na.rm = TRUE)
+      }
+
       constrained_target_qty <- pmin(pmax(
         unconstrained_target_qty, limit_min
       ), limit_max)
@@ -411,7 +570,7 @@ SMAConstructor <- R6::R6Class( #nolint
 
 
       if (constrained_target_qty == unconstrained_target_qty) {
-        limiting_rule <- NULL
+        limiting_rule <- NA_character_
       } else if (constrained_target_qty == limit_min) {
         limiting_rule <- limits_min[which(limits_min == limit_min)]
       } else if (constrained_target_qty == limit_max) {
@@ -424,7 +583,6 @@ SMAConstructor <- R6::R6Class( #nolint
       )
       trade_qty <- final_qty_rounded - sma_pre_qty
 
-      # --- 4. Return a descriptive list ---
       list(
         security_id = security_id,
         trade_shares = trade_qty,

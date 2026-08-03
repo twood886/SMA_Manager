@@ -1,7 +1,6 @@
 #' @title Trade (R6 Object)
 #' @description
 #' R6 Class representing a trade object.
-#' 
 #' @import R6
 #' @export
 Trade <- R6::R6Class(  #nolint

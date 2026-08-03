@@ -16,6 +16,7 @@
 #' accept both, so this predicate is the only place option types are listed.
 #' @param type Character. Instrument type of a security.
 #' @return Logical.
+#' @export
 .is_option_type <- function(type) {
   isTRUE(type %in% c("Option", "Listed Option", "OTC Option"))
 }
@@ -156,6 +157,7 @@ bbid_to_security_id <- function(id) {
 #'   their base (including blended bases).
 #' @param base_portfolio Character short name or Portfolio object
 #' @returns list of SMA portfolios
+#' @export
 get_tracking_portfolios <- function(base_portfolio) {
   port_env <- tryCatch(
     registries$portfolios,

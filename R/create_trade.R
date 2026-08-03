@@ -204,7 +204,7 @@ proposed_to_trade <- function(proposed_trade_df) {
   checkmate::assert_flag(proposed_trade_df$'Swap')
 
   for (i in seq_len(nrow(proposed_trade_df))) {
-    .trade(
+    replikit::.trade(
       security_id = proposed_trade_df$Security[i],
       portfolio_id = proposed_trade_df$Portfolio[i],
       qty = proposed_trade_df[i, "Trade Quantity"],
@@ -212,5 +212,5 @@ proposed_to_trade <- function(proposed_trade_df) {
       create = TRUE
     )
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }

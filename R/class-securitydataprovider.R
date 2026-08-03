@@ -324,6 +324,221 @@ StaticDataProvider <- R6::R6Class( #nolint
 )
 
 
+#' @title CompositeDataProvider (R6 Class)
+#'
+#' @description
+#' \code{\link{SecurityDataProvider}} that serves a small set of manually
+#' registered "override" securities itself and delegates every other security
+#' to a \code{primary} provider (typically \code{\link{BloombergDataProvider}}).
+#'
+#' The motivating case is an OTC option that has no tradeable identifier in the
+#' primary data source: its delta is supplied out of band (e.g. from Enfusion)
+#' and its price is derived from the live price of its underlying, which the
+#' primary provider \emph{can} price. Every other security passes straight
+#' through, so a single batched request (e.g. from
+#' \code{\link{update_security_data}}) that mixes override and primary ids is
+#' split, served from both sources, and recombined.
+#'
+#' @name CompositeDataProvider
+#' @rdname CompositeDataProvider
+#' @docType class
+#'
+#' @importFrom R6 R6Class
+#' @importFrom stats setNames
+#' @import checkmate
+#' @export
+CompositeDataProvider <- R6::R6Class( #nolint
+  "CompositeDataProvider",
+  inherit = SecurityDataProvider,
+  private = list(
+    primary_ = NULL,
+    overrides_ = NULL,
+    get_override = function(sec_id) private$overrides_[[tolower(sec_id)]],
+    is_override = function(sec_id) {
+      tolower(sec_id) %in% names(private$overrides_)
+    },
+    # Price for one override, derived from its underlying's primary price.
+    derive_override_price = function(ov) {
+      u_px <- private$primary_$get_prices(ov$underlying_id)[[1]]
+      ov$derive_price(u_px, ov$delta)
+    }
+  ),
+  public = list(
+    #' @description Create a new CompositeDataProvider.
+    #' @param primary A \code{\link{SecurityDataProvider}} to delegate to for
+    #'  any security not registered as an override.
+    initialize = function(primary) {
+      checkmate::assert_r6(primary, "SecurityDataProvider")
+      private$primary_ <- primary
+      private$overrides_ <- list()
+    },
+    #' @description The primary (delegated-to) provider.
+    get_primary = function() private$primary_,
+    #' @description Register (or replace) an override security served locally
+    #'  instead of by \code{primary}.
+    #' @param sec_id Character. Security identifier (matched case-insensitively).
+    #' @param underlying_id Character. Underlying identifier, priced via
+    #'  \code{primary}.
+    #' @param delta Numeric. Signed delta (puts negative).
+    #' @param instrument_type Character. Defaults to "OTC Option".
+    #' @param description Character. Defaults to \code{sec_id}.
+    #' @param derive_price Function \code{(underlying_price, delta)} returning
+    #'  the override's price. Defaults to \code{abs(delta) * underlying_price}.
+    #' @param fields Named list of extra field values keyed by mnemonic.
+    #' @return The provider, invisibly (allows chaining).
+    register_otc_option = function(
+      sec_id, underlying_id, delta,
+      instrument_type = "OTC Option", description = sec_id,
+      derive_price = NULL, fields = list()
+    ) {
+      checkmate::assert_string(sec_id)
+      checkmate::assert_string(underlying_id)
+      checkmate::assert_number(delta)
+      checkmate::assert_string(instrument_type)
+      checkmate::assert_string(description)
+      checkmate::assert_list(fields, names = "unique")
+      if (is.null(derive_price)) {
+        derive_price <- function(underlying_price, delta) {
+          abs(delta) * underlying_price
+        }
+      }
+      checkmate::assert_function(derive_price)
+      private$overrides_[[tolower(sec_id)]] <- list(
+        description = description,
+        instrument_type = instrument_type,
+        delta = delta,
+        underlying_id = tolower(underlying_id),
+        derive_price = derive_price,
+        fields = fields
+      )
+      invisible(self)
+    },
+    #' @description Registered override ids (lowercase).
+    override_ids = function() names(private$overrides_),
+    #' @description Whether a security is served as an override.
+    #' @param sec_id Character. Security identifier.
+    is_registered = function(sec_id) private$is_override(sec_id),
+
+    # SecurityDataProvider interface -----------------------------------------
+    #' @description Check existence (override or primary).
+    #' @param sec_id Character. Security identifier.
+    security_exists = function(sec_id) {
+      if (private$is_override(sec_id)) return(TRUE)
+      private$primary_$security_exists(sec_id)
+    },
+    #' @description Description (override or primary).
+    #' @param sec_id Character. Security identifier.
+    get_description = function(sec_id) {
+      ov <- private$get_override(sec_id)
+      if (!is.null(ov)) return(ov$description)
+      private$primary_$get_description(sec_id)
+    },
+    #' @description Instrument type (override or primary).
+    #' @param sec_id Character. Security identifier.
+    get_instrument_type = function(sec_id) {
+      ov <- private$get_override(sec_id)
+      if (!is.null(ov)) return(ov$instrument_type)
+      private$primary_$get_instrument_type(sec_id)
+    },
+    #' @description Underlying id (override or primary).
+    #' @param sec_id Character. Security identifier.
+    get_underlying_id = function(sec_id) {
+      ov <- private$get_override(sec_id)
+      if (!is.null(ov)) return(ov$underlying_id)
+      private$primary_$get_underlying_id(sec_id)
+    },
+    #' @description Prices for a vector of securities: overrides derived from
+    #'  their underlying's primary price, the rest served by \code{primary}.
+    #' @param sec_ids Character vector of security identifiers.
+    get_prices = function(sec_ids) {
+      out <- setNames(rep(NA_real_, length(sec_ids)), sec_ids)
+      is_ov <- vapply(sec_ids, private$is_override, logical(1))
+      if (any(!is_ov)) {
+        prim <- private$primary_$get_prices(sec_ids[!is_ov])
+        out[!is_ov] <- prim[sec_ids[!is_ov]]
+      }
+      for (id in sec_ids[is_ov]) {
+        out[[id]] <- private$derive_override_price(private$get_override(id))
+      }
+      out
+    },
+    #' @description Deltas for a vector of securities: signed override delta or
+    #'  \code{primary}.
+    #' @param sec_ids Character vector of security identifiers.
+    get_deltas = function(sec_ids) {
+      out <- setNames(rep(NA_real_, length(sec_ids)), sec_ids)
+      is_ov <- vapply(sec_ids, private$is_override, logical(1))
+      if (any(!is_ov)) {
+        prim <- private$primary_$get_deltas(sec_ids[!is_ov])
+        out[!is_ov] <- prim[sec_ids[!is_ov]]
+      }
+      for (id in sec_ids[is_ov]) {
+        out[[id]] <- private$get_override(id)$delta
+      }
+      out
+    },
+    #' @description Arbitrary fields for a vector of securities. Override rows
+    #'  are built locally (PX_LAST = derived price, OP006 = signed delta, other
+    #'  fields = registered value or NA); the rest come from one
+    #'  \code{primary$get_fields()} call. Rows returned in \code{sec_ids} order.
+    #' @param sec_ids Character vector of security identifiers.
+    #' @param fields Character vector of field mnemonics.
+    get_fields = function(sec_ids, fields) {
+      is_ov <- vapply(sec_ids, private$is_override, logical(1))
+      prim_ids <- sec_ids[!is_ov]
+      ov_ids <- sec_ids[is_ov]
+
+      prim_df <- if (length(prim_ids)) {
+        private$primary_$get_fields(prim_ids, fields)[, fields, drop = FALSE]
+      }
+      ov_df <- if (length(ov_ids)) {
+        cols <- lapply(fields, function(f) {
+          vapply(ov_ids, function(id) {
+            ov <- private$get_override(id)
+            val <- if (identical(f, "PX_LAST")) {
+              private$derive_override_price(ov)
+            } else if (identical(f, "OP006")) {
+              ov$delta
+            } else {
+              ov$fields[[f]] %||% NA
+            }
+            as.numeric(val)
+          }, numeric(1))
+        })
+        d <- data.frame(cols, stringsAsFactors = FALSE)
+        colnames(d) <- fields
+        rownames(d) <- ov_ids
+        d
+      }
+
+      combined <- if (!is.null(prim_df) && !is.null(ov_df)) {
+        rbind(prim_df, ov_df)
+      } else if (!is.null(ov_df)) {
+        ov_df
+      } else {
+        prim_df
+      }
+      combined[sec_ids, , drop = FALSE]
+    },
+    #' @description Full profile for a single security.
+    #' @param sec_id Character. Security identifier.
+    get_security_profile = function(sec_id) {
+      ov <- private$get_override(sec_id)
+      if (is.null(ov)) {
+        return(private$primary_$get_security_profile(sec_id))
+      }
+      list(
+        description     = ov$description,
+        instrument_type = ov$instrument_type,
+        price           = private$derive_override_price(ov),
+        delta           = ov$delta,
+        underlying_id   = ov$underlying_id
+      )
+    }
+  )
+)
+
+
 #' @title Set the Active Security Data Provider
 #' @description Sets the provider used by \code{\link{Security}} and related
 #' functions to fetch security data. Call this once at startup to run against

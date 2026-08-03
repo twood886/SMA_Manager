@@ -17,7 +17,8 @@ SMA Trade Constructor Class
 \item \href{#method-SMAConstructor-get_scale_qty}{\code{SMAConstructor$get_scale_qty()}}
 \item \href{#method-SMAConstructor-get_scale_ratio}{\code{SMAConstructor$get_scale_ratio()}}
 \item \href{#method-SMAConstructor-calc_target_quantities}{\code{SMAConstructor$calc_target_quantities()}}
-\item \href{#method-SMAConstructor-replicate_trade}{\code{SMAConstructor$replicate_trade()}}
+\item \href{#method-SMAConstructor-replicate_trade_qty}{\code{SMAConstructor$replicate_trade_qty()}}
+\item \href{#method-SMAConstructor-replicate_trade_pct}{\code{SMAConstructor$replicate_trade_pct()}}
 \item \href{#method-SMAConstructor-clone}{\code{SMAConstructor$clone()}}
 }
 }
@@ -89,12 +90,13 @@ Calculate target quantities for the SMA based on scaled base portfolio(s)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMAConstructor-replicate_trade"></a>}}
-\if{latex}{\out{\hypertarget{method-SMAConstructor-replicate_trade}{}}}
-\subsection{Method \code{replicate_trade()}}{
+\if{html}{\out{<a id="method-SMAConstructor-replicate_trade_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-SMAConstructor-replicate_trade_qty}{}}}
+\subsection{Method \code{replicate_trade_qty()}}{
 Replicate a trade from the base portfolio to the SMA
+based on trade quantity
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$replicate_trade(
+\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$replicate_trade_qty(
   security_id,
   base_trade_qty,
   portfolio,
@@ -105,14 +107,51 @@ Replicate a trade from the base portfolio to the SMA
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{security_id}}{Security ID of the traded security in the base portfolio}
+\item{\code{security_id}}{Security ID of the traded security in the base
+portfolio}
 
 \item{\code{base_trade_qty}}{Trade quantity in the base portfolio}
 
 \item{\code{portfolio}}{SMA portfolio object}
 
-\item{\code{base_portfolio_name}}{Short name of the trading base portfolio. Required
-for blended SMAs; defaults to the primary base portfolio when NULL.}
+\item{\code{base_portfolio_name}}{Short name of the trading base portfolio.
+Required for SMAs with blended bases; defaults to the primary base
+portfolio when NULL.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list with trade details and calculations
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMAConstructor-replicate_trade_pct"></a>}}
+\if{latex}{\out{\hypertarget{method-SMAConstructor-replicate_trade_pct}{}}}
+\subsection{Method \code{replicate_trade_pct()}}{
+Replicate a trade from the base portfolio to the SMA
+based on trade as percentage of base portfolio NAV
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMAConstructor$replicate_trade_pct(
+  security_id,
+  base_trade_pct,
+  portfolio,
+  base_portfolio_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{security_id}}{Security ID of the traded security in the base
+portfolio}
+
+\item{\code{base_trade_pct}}{Trade percentage in the base portfolio}
+
+\item{\code{portfolio}}{SMA portfolio object}
+
+\item{\code{base_portfolio_name}}{Short name of the trading base portfolio.
+Required for SMAs with blended bases; defaults to the primary base
+portfolio when NULL.}
 }
 \if{html}{\out{</div>}}
 }

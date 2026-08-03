@@ -122,7 +122,8 @@ The portfolio constructor object
 \if{html}{\out{<a id="method-Portfolio-get_replacement_security"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-get_replacement_security}{}}}
 \subsection{Method \code{get_replacement_security()}}{
-Get replacement security for a given replaced security
+Get replacement security (or securities) for a given
+ replaced security.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_replacement_security(replaced_security_id = NULL)}\if{html}{\out{</div>}}
 }
@@ -134,12 +135,22 @@ Get replacement security for a given replaced security
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+If \code{replaced_security_id} is NULL, the full named list of
+ replacements, each a \code{list(security, weight)} pair. Otherwise a
+ single \code{list(security, weight)} pair for that security, where
+ \code{security} is a character vector of one or more replacement IDs
+ and \code{weight} the matching split (summing to 1). Securities with
+ no replacement return
+ \code{list(security = replaced_security_id, weight = 1)}.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Portfolio-get_replaced_security"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-get_replaced_security}{}}}
 \subsection{Method \code{get_replaced_security()}}{
-Get replaced security for a given replacement security
+Get the replaced (original) security for a given
+ replacement security.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_replaced_security(replacement_security_id = NULL)}\if{html}{\out{</div>}}
 }
@@ -161,7 +172,6 @@ Get Max and Min Value of the security given all SMA Rules
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_security_position_limits(
   security_id = NULL,
   position_only = FALSE,
-  update_bbfields = TRUE,
   verbose = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -172,8 +182,6 @@ Get Max and Min Value of the security given all SMA Rules
 \item{\code{security_id}}{Security ID}
 
 \item{\code{position_only}}{Logical. Return only position-based limits (default: FALSE) #nolint}
-
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE)}
 
 \item{\code{verbose}}{Logical. Get verbose output (default: FALSE)}
 }
@@ -186,18 +194,13 @@ Get Max and Min Value of the security given all SMA Rules
 \subsection{Method \code{get_swap_flag_position_rules()}}{
 Get Swap Flag for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_swap_flag_position_rules(
-  security_id = NULL,
-  update_bbfields = TRUE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$get_swap_flag_position_rules(security_id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{security_id}}{Security ID}
-
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE) #nolint}
 }
 \if{html}{\out{</div>}}
 }
@@ -309,11 +312,17 @@ Add Replacement}
 \if{html}{\out{<a id="method-Portfolio-add_replacement"></a>}}
 \if{latex}{\out{\hypertarget{method-Portfolio-add_replacement}{}}}
 \subsection{Method \code{add_replacement()}}{
-Add replacement securitity
+Add one or more replacement securities for an original
+ security. When more than one replacement security is given,
+ \code{weight} controls how the original security's overflow (the
+ amount that can't be held directly, e.g. due to a rule limit) is
+ split across the replacements. Calling this again for the same
+ \code{original_security} replaces its prior replacement set.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Portfolio$add_replacement(
   original_security = NULL,
-  replacement_security = NULL
+  replacement_security = NULL,
+  weight = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -322,7 +331,13 @@ Add replacement securitity
 \describe{
 \item{\code{original_security}}{The original Security id}
 
-\item{\code{replacement_security}}{The replacement Security id}
+\item{\code{replacement_security}}{Character vector of one or more
+replacement Security ids}
+
+\item{\code{weight}}{Numeric vector the same length as
+\code{replacement_security} giving each replacement's share of the
+overflow; must sum to 1. Defaults to an equal split across
+\code{replacement_security}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -361,14 +376,12 @@ Rebalance Portfolio
 \subsection{Method \code{rebalance()}}{
 Calculate the trade quantity for a given security
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Portfolio$rebalance(update_bbfields = TRUE, as.df = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Portfolio$rebalance(as.df = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{update_bbfields}}{Logical. Update Bloomberg fields (default: TRUE)}
-
 \item{\code{as.df}}{Logical. Return as data frame (default: TRUE)}
 }
 \if{html}{\out{</div>}}

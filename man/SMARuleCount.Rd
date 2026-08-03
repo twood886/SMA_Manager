@@ -16,6 +16,7 @@ R6 Class that encapsulates rule for SMAs based on position count. #nolint
 \item \href{#method-SMARuleCount-check_swap_security}{\code{SMARuleCount$check_swap_security()}}
 \item \href{#method-SMARuleCount-get_security_limits}{\code{SMARuleCount$get_security_limits()}}
 \item \href{#method-SMARuleCount-build_constraints}{\code{SMARuleCount$build_constraints()}}
+\item \href{#method-SMARuleCount-get_last_selection}{\code{SMARuleCount$get_last_selection()}}
 \item \href{#method-SMARuleCount-clone}{\code{SMARuleCount$clone()}}
 }
 }
@@ -153,6 +154,25 @@ Build the constraints for the optimization model
 \item{\code{nav}}{Portfolio NAV}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SMARuleCount-get_last_selection"></a>}}
+\if{latex}{\out{\hypertarget{method-SMARuleCount-get_last_selection}{}}}
+\subsection{Method \code{get_last_selection()}}{
+Get the boolean selection variables built by the most
+ recent call to \code{build_constraints}, together with the security
+ IDs they correspond to. Used after a mixed-integer solve to translate
+ the solved selection into fixed continuous bounds for a follow-up
+ continuous re-solve (see \code{TradeConstructor$optimize_sma}).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SMARuleCount$get_last_selection()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+List with \code{ids} and one or both of \code{z_long} /
+ \code{z_short} (CVXR boolean Variables), or \code{NULL} if
+ \code{build_constraints} has not been called yet.
 }
 }
 \if{html}{\out{<hr>}}

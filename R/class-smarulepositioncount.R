@@ -7,6 +7,9 @@
 SMARuleCount <- R6::R6Class( #nolint
   "SMARuleCount",
   inherit = SMARule,
+  private = list(
+    last_selection_ = NULL
+  ),
   public = list(
     #' @description Check the rule against raw portfolio data
     #' @param ids Character vector of security IDs
@@ -87,6 +90,10 @@ SMARuleCount <- R6::R6Class( #nolint
       max_t <- self$get_max_threshold()
 
       eps <- 1e-4
+      # Weight units (fraction of NAV). Generously large relative to any
+      # legitimate position limit, so it never binds ahead of those rules -
+      # it only needs to dominate w so that z = 0 forces the position out.
+      big_m <- 10
 
       cons <- list()
 
@@ -96,10 +103,12 @@ SMARuleCount <- R6::R6Class( #nolint
         cons <- c(cons,
           list(p >= w),
           list(p >= 0),
-          list(p >= eps * z)
+          list(p >= eps * z),
+          list(p <= big_m * z)
         )
         if (is.finite(min_t)) cons <- c(cons, list(CVXR::sum_entries(z) >= min_t)) #nolint
         if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(z) <= max_t)) #nolint
+        private$last_selection_ <- list(ids = ctx$ids, z_long = z)
         return(cons)
       }
 
@@ -109,10 +118,12 @@ SMARuleCount <- R6::R6Class( #nolint
         cons <- c(cons,
           list(s >= -w),
           list(s >= 0),
-          list(s >= eps * z)
+          list(s >= eps * z),
+          list(s <= big_m * z)
         )
         if (is.finite(min_t)) cons <- c(cons, list(CVXR::sum_entries(z) >= min_t)) #nolint
         if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(z) <= max_t)) #nolint
+        private$last_selection_ <- list(ids = ctx$ids, z_short = z)
         return(cons)
       }
 
@@ -127,14 +138,26 @@ SMARuleCount <- R6::R6Class( #nolint
           list(s >= -w), list(s >= 0),
           list(p >= eps * z_long),
           list(s > eps * z_short),
+          list(p <= big_m * z_long),
+          list(s <= big_m * z_short),
           list(y >= z_long, y >= z_short),
           list(y <= z_long + z_short)
         )
         if (is.finite(min_t)) cons <- c(cons, list(CVXR::sum_entries(y) >= min_t)) #nolint
         if (is.finite(max_t)) cons <- c(cons, list(CVXR::sum_entries(y) <= max_t)) #nolint
+        private$last_selection_ <- list(ids = ctx$ids, z_long = z_long, z_short = z_short) #nolint
         return(cons)
       }
       stop("Unrecognized include in SMARuleCount: ", include)
-    }
+    },
+    #' @description Get the boolean selection variables built by the most
+    #'  recent call to \code{build_constraints}, together with the security
+    #'  IDs they correspond to. Used after a mixed-integer solve to translate
+    #'  the solved selection into fixed continuous bounds for a follow-up
+    #'  continuous re-solve (see \code{TradeConstructor$optimize_sma}).
+    #' @return List with \code{ids} and one or both of \code{z_long} /
+    #'  \code{z_short} (CVXR boolean Variables), or \code{NULL} if
+    #'  \code{build_constraints} has not been called yet.
+    get_last_selection = function() private$last_selection_
   )
 )

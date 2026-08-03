@@ -73,7 +73,7 @@ Security <- R6::R6Class( #nolint
       }
 
       if (.is_option_type(private$instrument_type_)) {
-        if(!is.null(underlying_security)) {
+        if (!is.null(underlying_security)) {
           checkmate::assert_r6(underlying_security, "Security")
           private$underlying_security_ <- underlying_security
         } else {
@@ -113,6 +113,17 @@ Security <- R6::R6Class( #nolint
     #' @description Get Delta-Adjusted Price (Delta * Underlying Price)
     get_delta_price = function() {
       self$get_delta() * self$get_underlying_price()
+    },
+    #' @description Get Replication Price (positive delta-notional).
+    #'  The valuation used to weight securities for replication and rule
+    #'  limits: \code{|delta| * underlying_price}. This equals
+    #'  \code{get_price()} for equity/FixedIncome (delta 1, underlying is self)
+    #'  and \code{|delta| * underlying_price} for options, so replacing an
+    #'  option with its underlying (or another option) preserves underlying
+    #'  exposure. \code{abs()} keeps puts positive so the price<=0 cleanup and
+    #'  position-driven weight signs stay correct.
+    get_replication_price = function() {
+      abs(self$get_delta()) * self$get_underlying_price()
     },
     #' @description Get Rule Data
     #' @param bbfield Character. bbfield.

@@ -72,18 +72,14 @@ SMA <- R6::R6Class(   #nolint
     # Checkers -----------------------------------------------------------------
     #' Check Rule Compliance
     #' @description Check if the SMA is compliant with all its rules.
-    #' @param update_bbfields Logical. Whether to update Bloomberg data before
-    #'  checking rules. Defaults to TRUE.
     #' @param verbose Logical. Whether to print compliance results. Defaults to
-    #'  FALSE.
+    #'  TRUE.
     #' @import checkmate
     #' @return A list of rule compliance results.
-    check_rule_compliance = function(update_bbfields = TRUE, verbose = TRUE) {
-      checkmate::assert_logical(update_bbfields)
+    check_rule_compliance = function(verbose = TRUE) {
       checkmate::assert_logical(verbose)
       rules <- self$get_rules()
       if (length(rules) == 0) return(list())
-      if (update_bbfields) replikit::update_bloomberg_fields()
       positions <- self$get_position()
 
       ids <- vapply(positions, \(p) p$get_id(), character(1))
@@ -110,30 +106,21 @@ SMA <- R6::R6Class(   #nolint
       }
     },
     # Replicators --------------------------------------------------------------
-    #' Replicate a trade from the base portfolio
+    #' Replicate a trade from the base portfolio using Quantity
     #' @description
     #' Analyzes the effect of a trade in the base portfolio on the SMA,
     #' identifying the required trade.
     #' @param security_id The ID of the security traded in the base portfolio.
     #' @param base_trade_qty The quantity of the trade in the base portfolio.
-    #' @param update_bbfields Logical. Refresh Bloomberg rule fields for the
-    #'   traded security before computing limits (default: FALSE). Rule
-    #'   fields are static intraday and already loaded by the portfolio
-    #'   loaders, and a brand-new security gets its fields fetched
-    #'   automatically, so the refresh is only needed if fields may have
-    #'   changed since load.
     #' @param base_portfolio_name Character. Short name of the trading base
     #'   portfolio. Required for blended SMAs; defaults to the primary base
     #'   portfolio when NULL.
-    replicate_trade = function(
-      security_id, base_trade_qty, update_bbfields = FALSE,
-      base_portfolio_name = NULL
+    replicate_trade_qty = function(
+      security_id, base_trade_qty, base_portfolio_name = NULL
     ) {
       checkmate::assert_character(security_id, len = 1)
       checkmate::assert_numeric(base_trade_qty, len = 1)
-      checkmate::assert_flag(update_bbfields)
-      if (update_bbfields) replikit::update_bloomberg_fields(security_id)
-      self$get_trade_constructor()$replicate_trade(
+      self$get_trade_constructor()$replicate_trade_qty(
         security_id = security_id,
         base_trade_qty = base_trade_qty,
         portfolio = self,

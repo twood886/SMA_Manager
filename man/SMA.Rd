@@ -19,7 +19,7 @@ R6 Class representing a seperately managed account.
 \item \href{#method-SMA-get_base_portfolio}{\code{SMA$get_base_portfolio()}}
 \item \href{#method-SMA-get_base_portfolio_position}{\code{SMA$get_base_portfolio_position()}}
 \item \href{#method-SMA-check_rule_compliance}{\code{SMA$check_rule_compliance()}}
-\item \href{#method-SMA-replicate_trade}{\code{SMA$replicate_trade()}}
+\item \href{#method-SMA-replicate_trade_qty}{\code{SMA$replicate_trade_qty()}}
 \item \href{#method-SMA-clone}{\code{SMA$clone()}}
 }
 }
@@ -127,36 +127,32 @@ Check Rule Compliance}
 \subsection{Method \code{check_rule_compliance()}}{
 Check if the SMA is compliant with all its rules.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$check_rule_compliance(update_bbfields = TRUE, verbose = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SMA$check_rule_compliance(verbose = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{update_bbfields}}{Logical. Whether to update Bloomberg data before
-checking rules. Defaults to TRUE.}
-
 \item{\code{verbose}}{Logical. Whether to print compliance results. Defaults to
-FALSE.}
+TRUE.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A list of rule compliance results.
-Replicate a trade from the base portfolio
+Replicate a trade from the base portfolio using Quantity
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SMA-replicate_trade"></a>}}
-\if{latex}{\out{\hypertarget{method-SMA-replicate_trade}{}}}
-\subsection{Method \code{replicate_trade()}}{
+\if{html}{\out{<a id="method-SMA-replicate_trade_qty"></a>}}
+\if{latex}{\out{\hypertarget{method-SMA-replicate_trade_qty}{}}}
+\subsection{Method \code{replicate_trade_qty()}}{
 Analyzes the effect of a trade in the base portfolio on the SMA,
 identifying the required trade.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SMA$replicate_trade(
+\if{html}{\out{<div class="r">}}\preformatted{SMA$replicate_trade_qty(
   security_id,
   base_trade_qty,
-  update_bbfields = FALSE,
   base_portfolio_name = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -167,13 +163,6 @@ identifying the required trade.
 \item{\code{security_id}}{The ID of the security traded in the base portfolio.}
 
 \item{\code{base_trade_qty}}{The quantity of the trade in the base portfolio.}
-
-\item{\code{update_bbfields}}{Logical. Refresh Bloomberg rule fields for the
-traded security before computing limits (default: FALSE). Rule
-fields are static intraday and already loaded by the portfolio
-loaders, and a brand-new security gets its fields fetched
-automatically, so the refresh is only needed if fields may have
-changed since load.}
 
 \item{\code{base_portfolio_name}}{Character. Short name of the trading base
 portfolio. Required for blended SMAs; defaults to the primary base

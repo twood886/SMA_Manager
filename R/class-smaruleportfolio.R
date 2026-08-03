@@ -17,7 +17,9 @@ SMARulePortfolio <- R6::R6Class( #nolint
       ids, qty, nav, prices = NULL, tolerance = 1e-6, ...
     ) {
       if (is.null(prices)) {
-        prices <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
+        prices <- vapply(
+          ids, \(id) .security(id)$get_replication_price(), numeric(1)
+        )
       }
       prices[!is.finite(prices) | prices <= 0] <- 1
       w <- qty * prices / nav
@@ -95,7 +97,7 @@ SMARulePortfolio <- R6::R6Class( #nolint
         prices_all
       } else {
         vapply(ids_all, \(id) {
-          p <- .security(id)$get_price()
+          p <- .security(id)$get_replication_price()
           if (!is.finite(p) || p <= 0) 1 else p
         }, numeric(1))
       }

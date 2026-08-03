@@ -58,39 +58,47 @@ Portfolio <- R6::R6Class( #nolint
     #' @description Get the Trade Constructor
     #' @return The portfolio constructor object
     get_trade_constructor = function() private$trade_constructor,
-    #' @description Get replacement security for a given replaced security
+    #' @description Get replacement security (or securities) for a given
+    #'  replaced security.
     #' @param replaced_security_id Security ID of the replaced security (in base ptfl) #nolint
+    #' @return If \code{replaced_security_id} is NULL, the full named list of
+    #'  replacements, each a \code{list(security, weight)} pair. Otherwise a
+    #'  single \code{list(security, weight)} pair for that security, where
+    #'  \code{security} is a character vector of one or more replacement IDs
+    #'  and \code{weight} the matching split (summing to 1). Securities with
+    #'  no replacement return
+    #'  \code{list(security = replaced_security_id, weight = 1)}.
     get_replacement_security = function(replaced_security_id = NULL) {
       if (is.null(replaced_security_id)) return(private$replacements_)
       if (!replaced_security_id %in% names(private$replacements_)) {
-        return(replaced_security_id)
+        return(list(security = replaced_security_id, weight = 1))
       }
       private$replacements_[[replaced_security_id]]
     },
-    #' @description Get replaced security for a given replacement security
+    #' @description Get the replaced (original) security for a given
+    #'  replacement security.
     #' @param replacement_security_id Security ID of the replacement security (in SMA) #nolint
     get_replaced_security = function(replacement_security_id = NULL) {
-      if (is.null(replacement_security_id)) names(private$replacements_)
-      u <- unlist(private$replacements_, use.names = TRUE)
-      idx <- which(u == replacement_security_id)
-      if (length(idx) == 0) return(NULL)
-      names(u)[idx]
+      if (is.null(replacement_security_id)) return(names(private$replacements_))
+      matches <- vapply(
+        private$replacements_,
+        \(r) replacement_security_id %in% r$security,
+        logical(1)
+      )
+      if (!any(matches)) return(NULL)
+      names(private$replacements_)[matches]
     },
     #' @description Get Max and Min Value of the security given all SMA Rules
     #' @param security_id Security ID
     #' @param position_only Logical. Return only position-based limits (default: FALSE) #nolint
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
     #' @param verbose Logical. Get verbose output (default: FALSE)
     get_security_position_limits = function(
       security_id = NULL,
       position_only = FALSE,
-      update_bbfields = TRUE,
       verbose = FALSE
     ) {
-      checkmate::assert_flag(update_bbfields)
       checkmate::assert_flag(verbose)
       checkmate::assert_flag(position_only)
-      if (update_bbfields) update_bloomberg_fields()
       self$get_trade_constructor()$get_security_position_limits(
         portfolio = self,
         security_id = security_id,
@@ -100,13 +108,9 @@ Portfolio <- R6::R6Class( #nolint
     },
     #' @description Get Swap Flag for a given security
     #' @param security_id Security ID
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE) #nolint
     get_swap_flag_position_rules = function(
-      security_id = NULL,
-      update_bbfields = TRUE
+      security_id = NULL
     ) {
-      checkmate::assert_flag(update_bbfields)
-      if (update_bbfields) update_bloomberg_fields()
       private$trade_constructor$get_swap_flag_position_rules(self, security_id)
     },
     #'@description Get OrderConstructor
@@ -167,19 +171,41 @@ Portfolio <- R6::R6Class( #nolint
       invisible(rule)
     },
     #' Add Replacement
-    #' @description Add replacement securitity
+    #' @description Add one or more replacement securities for an original
+    #'  security. When more than one replacement security is given,
+    #'  \code{weight} controls how the original security's overflow (the
+    #'  amount that can't be held directly, e.g. due to a rule limit) is
+    #'  split across the replacements. Calling this again for the same
+    #'  \code{original_security} replaces its prior replacement set.
     #' @param original_security The original Security id
-    #' @param replacement_security The replacement Security id
+    #' @param replacement_security Character vector of one or more
+    #'  replacement Security ids
+    #' @param weight Numeric vector the same length as
+    #'  \code{replacement_security} giving each replacement's share of the
+    #'  overflow; must sum to 1. Defaults to an equal split across
+    #'  \code{replacement_security}.
     add_replacement = function(
-      original_security = NULL, replacement_security = NULL
+      original_security = NULL, replacement_security = NULL, weight = NULL
     ) {
       if (is.null(original_security) | is.null(replacement_security)) {
         stop("Securities must be provided")
       }
       original_security <- tolower(original_security)
       replacement_security <- tolower(replacement_security)
-      .security(replacement_security)
-      private$replacements_[[original_security]] <- replacement_security
+      for (sec in replacement_security) .security(sec)
+
+      if (is.null(weight)) {
+        weight <- rep(1 / length(replacement_security), length(replacement_security)) #nolint
+      }
+      checkmate::assert_numeric(weight, len = length(replacement_security))
+      if (abs(sum(weight) - 1) > 1e-8) {
+        stop("Replacement weights must sum to 1")
+      }
+
+      private$replacements_[[original_security]] <- list(
+        security = replacement_security,
+        weight = weight
+      )
       invisible(NULL)
     },
     # Updaters -----------------------------------------------------------------
@@ -197,12 +223,9 @@ Portfolio <- R6::R6Class( #nolint
     # Calculators --------------------------------------------------------------
     #' Rebalance Portfolio
     #' @description Calculate the trade quantity for a given security
-    #' @param update_bbfields Logical. Update Bloomberg fields (default: TRUE)
     #' @param as.df Logical. Return as data frame (default: TRUE)
-    rebalance = function(update_bbfields = TRUE, as.df = TRUE) {
-      checkmate::assert_flag(update_bbfields)
+    rebalance = function(as.df = TRUE) {
       checkmate::assert_flag(as.df)
-      if (update_bbfields) update_security_data()
       rebal <- self$get_trade_constructor()$optimize_sma(self)
       current_sh <- vapply(self$get_position(), \(p) p$get_qty(), numeric(1))
       current_ids <- vapply(self$get_position(), \(p) p$get_id(), character(1))

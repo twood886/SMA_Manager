@@ -112,7 +112,7 @@ SMARulePosition <- R6::R6Class( #nolint
         prices_all
       } else {
         vapply(ids_all, \(id) {
-          p <- .security(id)$get_price()
+          p <- .security(id)$get_replication_price()
           if (!is.finite(p) || p <= 0) 1 else p
         }, numeric(1))
       }

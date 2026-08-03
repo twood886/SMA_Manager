@@ -28,7 +28,9 @@ DivisorProvider <- R6::R6Class( #nolint
     #'  If NULL, fetched from securities.
     weights_from_data = function(ids, shares, nav, prices = NULL) {
       if (is.null(prices)) {
-        prices <- vapply(ids, \(id) .security(id)$get_price(), numeric(1))
+        prices <- vapply(
+          ids, \(id) .security(id)$get_replication_price(), numeric(1)
+        )
       }
       prices[!is.finite(prices) | prices <= 0] <- 1
       shares * prices / nav

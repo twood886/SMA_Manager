@@ -30,8 +30,10 @@ Create a new OverflowRule R6 object.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{replacements}}{Named list of replacements. Each name is a source
-security ID, and each element is a character vector of target security
-IDs.}
+security ID, and each element is a list with \code{security} (a
+character vector of target security IDs) and \code{weight} (a numeric
+vector of the same length giving each target's fixed share of the
+source's overflow; must sum to 1).}
 }
 \if{html}{\out{</div>}}
 }
